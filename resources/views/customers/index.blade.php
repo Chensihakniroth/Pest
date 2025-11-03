@@ -12,71 +12,189 @@
 <!-- Search Form -->
 <div class="card mb-4">
     <div class="card-body">
-        <form method="GET" action="{{ route('customers.index') }}">
-            <div class="row">
-                <div class="col-md-8">
-                    <input type="text" name="search" class="form-control" placeholder="Search by name, customer ID, or phone number..." value="{{ request('search') }}">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <span class="input-group-text bg-white">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input 
+                        type="text" 
+                        name="search" 
+                        id="searchInput"
+                        class="form-control" 
+                        placeholder="Search by name, customer ID, or phone number..." 
+                        value="{{ request('search') }}"
+                        autocomplete="off">
+                    <button type="button" class="btn btn-outline-secondary d-none" id="clearSearch">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <span class="input-group-text bg-white d-none" id="loadingSpinner">
+                        <i class="fas fa-spinner fa-spin text-primary"></i>
+                    </span>
                 </div>
-                <div class="col-md-4">
-                    <button type="submit" class="btn btn-primary">Search</button>
-                    <a href="{{ route('customers.index') }}" class="btn btn-secondary">Clear</a>
-                </div>
+                <small class="text-muted">
+                    <i class="fas fa-info-circle"></i> Search updates automatically as you type
+                </small>
             </div>
-        </form>
+            <div class="col-md-4 d-flex align-items-start gap-2">
+                <a href="{{ route('customers.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Reset
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- Customers Table -->
 <div class="card">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Customer ID</th>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Service Type</th>
-                        <th>Contract Start</th>
-                        <th>Contract End</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($customers as $customer)
-                    <tr>
-                        <td><strong>{{ $customer->customer_id }}</strong></td>
-                        <td>{{ $customer->name }}</td>
-                        <td>{{ $customer->phone_number }}</td>
-                        <td>{{ ucfirst(str_replace('_', ' ', $customer->service_type)) }}</td>
-                        <td>{{ $customer->contract_start_date->format('M d, Y') }}</td>
-                        <td class="{{ $customer->isContractExpiring() ? 'text-danger fw-bold' : '' }}">
-                            {{ $customer->contract_end_date->format('M d, Y') }}
-                        </td>
-                        <td>
-                            <span class="badge bg-{{ $customer->status == 'active' ? 'success' : ($customer->status == 'expired' ? 'danger' : 'warning') }}">
-                                {{ ucfirst($customer->status) }}
-                            </span>
-                        </td>
-                        <td>
-                            <a href="{{ route('customers.show', $customer) }}" class="btn btn-sm btn-info">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="{{ route('customers.edit', $customer) }}" class="btn btn-sm btn-warning">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- Pagination -->
-        <div class="d-flex justify-content-center">
-            {{ $customers->links() }}
-        </div>
+    <div class="card-body" id="customersTableContainer">
+        @include('customers.partials.table')
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+(function() {
+    'use strict';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearSearch');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const tableContainer = document.getElementById('customersTableContainer');
+        let searchTimeout;
+        let currentRequest = null;
+
+        function performSearch(searchTerm) {
+            // Cancel previous request if still pending
+            if (currentRequest) {
+                currentRequest.abort();
+            }
+
+            // Show loading indicator
+            loadingSpinner.classList.remove('d-none');
+            
+            // Create XMLHttpRequest
+            currentRequest = new XMLHttpRequest();
+            const url = new URL(window.location.origin + '/customers');
+            if (searchTerm) {
+                url.searchParams.append('search', searchTerm);
+            }
+
+            currentRequest.open('GET', url, true);
+            currentRequest.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            
+            currentRequest.onload = function() {
+                if (currentRequest.status === 200) {
+                    tableContainer.innerHTML = currentRequest.responseText;
+                    
+                    // Update URL without page reload
+                    const newUrl = searchTerm ? url.toString() : window.location.pathname;
+                    window.history.pushState({search: searchTerm}, '', newUrl);
+                    
+                    // Show/hide clear button
+                    if (searchTerm) {
+                        clearBtn.classList.remove('d-none');
+                    } else {
+                        clearBtn.classList.add('d-none');
+                    }
+                    
+                    // Re-attach pagination click handlers
+                    attachPaginationHandlers();
+                }
+                loadingSpinner.classList.add('d-none');
+                currentRequest = null;
+            };
+
+            currentRequest.onerror = function() {
+                loadingSpinner.classList.add('d-none');
+                currentRequest = null;
+            };
+
+            currentRequest.send();
+        }
+
+        function attachPaginationHandlers() {
+            const paginationLinks = tableContainer.querySelectorAll('.pagination a');
+            paginationLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = new URL(this.href);
+                    const page = url.searchParams.get('page');
+                    const searchTerm = searchInput.value.trim();
+                    
+                    loadingSpinner.classList.remove('d-none');
+                    
+                    const requestUrl = new URL(window.location.origin + '/customers');
+                    if (searchTerm) {
+                        requestUrl.searchParams.append('search', searchTerm);
+                    }
+                    if (page) {
+                        requestUrl.searchParams.append('page', page);
+                    }
+
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('GET', requestUrl, true);
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                    
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            tableContainer.innerHTML = xhr.responseText;
+                            window.history.pushState({}, '', requestUrl.toString());
+                            attachPaginationHandlers();
+                            
+                            // Scroll to top of table
+                            tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                        loadingSpinner.classList.add('d-none');
+                    };
+                    
+                    xhr.send();
+                });
+            });
+        }
+
+        // Live search as user types
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const searchTerm = this.value.trim();
+                
+                // Wait 400ms after user stops typing
+                searchTimeout = setTimeout(function() {
+                    performSearch(searchTerm);
+                }, 400);
+            });
+
+            // Show clear button if there's initial search value
+            if (searchInput.value) {
+                clearBtn.classList.remove('d-none');
+            }
+        }
+
+        // Clear search button
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                clearBtn.classList.add('d-none');
+                performSearch('');
+                searchInput.focus();
+            });
+        }
+
+        // Initial pagination handlers
+        attachPaginationHandlers();
+
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', function(e) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchTerm = urlParams.get('search') || '';
+            searchInput.value = searchTerm;
+            performSearch(searchTerm);
+        });
+    });
+})();
+</script>
+@endpush

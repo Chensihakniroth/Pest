@@ -21,11 +21,11 @@ class MaintenanceHistory extends Model
         'maintenance_date' => 'date',
     ];
 
-    // Relationship with Customer
+    /**
+     * Relationship with Customer
+     */
     public function customer()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
-
-    // No static methods that use $this - removed any problematic methods
 }

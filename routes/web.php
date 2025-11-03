@@ -21,6 +21,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/test', function () {
+    return view('test');
+});
+
 // Protected Routes
 Route::middleware(['auth'])->group(function () {
     // Dashboard

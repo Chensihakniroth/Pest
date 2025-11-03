@@ -12,18 +12,42 @@
             min-height: 100vh;
             display: flex;
             align-items: center;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            cursor: default;
         }
+        
+        /* Allow selection in form elements */
+        input, select, textarea {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+            cursor: text;
+        }
+        
         .auth-card {
             border: none;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
+        
         .auth-header {
             background: #198754;
             color: white;
             border-radius: 15px 15px 0 0;
             padding: 2rem;
             text-align: center;
+        }
+        
+        .btn:focus {
+            box-shadow: none !important;
+        }
+        
+        *:focus {
+            outline: none !important;
         }
     </style>
 </head>
@@ -45,6 +69,9 @@
             </div>
         </div>
     </div>
+
+    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

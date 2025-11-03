@@ -22,13 +22,17 @@ class Customer extends Model
         'service_price' => 'decimal:2',
     ];
 
-    // Relationship with MaintenanceHistory
+    /**
+     * Relationship with MaintenanceHistory
+     */
     public function maintenanceHistory()
     {
-        return $this->hasMany(MaintenanceHistory::class);
+        return $this->hasMany(MaintenanceHistory::class, 'customer_id');
     }
 
-    // Auto-generate customer ID
+    /**
+     * Auto-generate customer ID
+     */
     protected static function boot()
     {
         parent::boot();
@@ -40,36 +44,76 @@ class Customer extends Model
         });
     }
 
-    // Get next maintenance date (instance method)
+    /**
+     * Get next maintenance date
+     */
     public function getNextMaintenanceDate()
     {
         $lastMaintenance = $this->maintenanceHistory()->latest()->first();
-        $startDate = $lastMaintenance ? 
-            Carbon::parse($lastMaintenance->maintenance_date) : 
-            Carbon::parse($this->contract_start_date);
+        
+        if ($lastMaintenance) {
+            $startDate = Carbon::parse($lastMaintenance->maintenance_date);
+        } else {
+            $startDate = Carbon::parse($this->contract_start_date);
+        }
         
         $interval = $this->service_type === 'host_system' ? 6 : 3;
         
         return $startDate->copy()->addMonths($interval);
     }
 
-    // Check if maintenance is due (instance method)
+    /**
+     * Check if maintenance is due (within 3 days)
+     */
     public function isMaintenanceDue()
     {
-        $nextMaintenance = $this->getNextMaintenanceDate();
-        return now()->diffInDays($nextMaintenance, false) <= 3;
+        try {
+            $nextMaintenance = $this->getNextMaintenanceDate();
+            return now()->diffInDays($nextMaintenance, false) <= 3;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
-    // Check if contract is expiring (instance method)
+    /**
+     * Check if contract is expiring (within 90 days)
+     */
     public function isContractExpiring()
     {
-        $endDate = Carbon::parse($this->contract_end_date);
-        return now()->diffInDays($endDate, false) <= 90 && now()->diffInDays($endDate, false) >= 0;
+        try {
+            $endDate = Carbon::parse($this->contract_end_date);
+            return now()->diffInDays($endDate, false) <= 90 && now()->diffInDays($endDate, false) >= 0;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
-    // Check if contract has expired (instance method)
+    /**
+     * Check if contract has expired
+     */
     public function hasContractExpired()
     {
-        return now()->gt(Carbon::parse($this->contract_end_date));
+        try {
+            return now()->gt(Carbon::parse($this->contract_end_date));
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Scope for active customers
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    /**
+     * Scope for expiring contracts
+     */
+    public function scopeExpiringSoon($query)
+    {
+        return $query->where('contract_end_date', '<=', now()->addDays(90))
+                    ->where('contract_end_date', '>=', now());
     }
 }

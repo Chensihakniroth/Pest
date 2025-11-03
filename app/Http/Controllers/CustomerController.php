@@ -10,23 +10,27 @@ use Illuminate\Support\Facades\Auth;
 class CustomerController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = Customer::query();
-        
-        // Search functionality
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('customer_id', 'like', "%{$search}%")
-                  ->orWhere('phone_number', 'like', "%{$search}%");
-            });
-        }
-        
-        $customers = $query->latest()->paginate(10);
-        
-        return view('customers.index', compact('customers'));
+{
+    $query = Customer::query();
+    
+    if ($request->has('search') && $request->search != '') {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('customer_id', 'like', "%{$search}%")
+              ->orWhere('phone_number', 'like', "%{$search}%");
+        });
     }
+    
+    $customers = $query->orderBy('created_at', 'desc')->paginate(10);
+    
+    // Check if it's an AJAX request
+    if ($request->ajax()) {
+        return view('customers.partials.table', compact('customers'))->render();
+    }
+    
+    return view('customers.index', compact('customers'));
+}
 
     public function create()
     {
