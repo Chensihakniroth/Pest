@@ -6,31 +6,38 @@ use App\Models\Customer;
 use App\Models\MaintenanceHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class CustomerController extends Controller
 {
     public function index(Request $request)
-{
-    $query = Customer::query();
-    
-    if ($request->has('search') && $request->search != '') {
-        $search = $request->search;
-        $query->where(function($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%")
-              ->orWhere('customer_id', 'like', "%{$search}%")
-              ->orWhere('phone_number', 'like', "%{$search}%");
-        });
+    {
+        $query = Customer::query();
+
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('customer_id', 'like', "%{$search}%")
+                  ->orWhere('phone_number', 'like', "%{$search}%");
+            });
+        }
+
+        $customers = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        // Update status for all customers in the result
+        foreach ($customers as $customer) {
+            $customer->updateContractStatus();
+            $customer->save();
+        }
+
+        // Check if it's an AJAX request
+        if ($request->ajax()) {
+            return view('customers.partials.table', compact('customers'))->render();
+        }
+
+        return view('customers.index', compact('customers'));
     }
-    
-    $customers = $query->orderBy('created_at', 'desc')->paginate(10);
-    
-    // Check if it's an AJAX request
-    if ($request->ajax()) {
-        return view('customers.partials.table', compact('customers'))->render();
-    }
-    
-    return view('customers.index', compact('customers'));
-}
 
     public function create()
     {
@@ -52,6 +59,17 @@ class CustomerController extends Controller
             'comments' => 'nullable|string',
         ]);
 
+        // Set status based on contract dates
+        $startDate = Carbon::parse($validated['contract_start_date']);
+        $endDate = Carbon::parse($validated['contract_end_date']);
+        $today = Carbon::today();
+
+        if ($today->gt($endDate)) {
+            $validated['status'] = 'expired';
+        } else {
+            $validated['status'] = 'active';
+        }
+
         Customer::create($validated);
 
         return redirect()->route('customers.index')
@@ -60,6 +78,10 @@ class CustomerController extends Controller
 
     public function show(Customer $customer)
     {
+        // Update status before displaying
+        $customer->updateContractStatus();
+        $customer->save();
+
         $maintenanceHistory = $customer->maintenanceHistory()->latest()->get();
         return view('customers.show', compact('customer', 'maintenanceHistory'));
     }
@@ -81,6 +103,7 @@ class CustomerController extends Controller
             'service_type' => 'required|in:baiting_system_complete,baiting_system_not_complete,host_system',
             'contract_start_date' => 'required|date',
             'contract_end_date' => 'required|date|after:contract_start_date',
+            'status' => 'required|in:active,expired,pending',
             'comments' => 'nullable|string',
         ]);
 

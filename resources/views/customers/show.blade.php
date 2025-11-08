@@ -20,7 +20,7 @@
                         <p><strong>Address:</strong> {{ $customer->address }}</p>
                         @if($customer->google_map_link)
                         <p>
-                            <strong>Map:</strong> 
+                            <strong>Map:</strong>
                             <a href="{{ $customer->google_map_link }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-map-marker-alt"></i> View on Map
                             </a>
@@ -34,11 +34,16 @@
                         <p><strong>Contract Start:</strong> {{ $customer->contract_start_date->format('M d, Y') }}</p>
                         <p><strong>Contract End:</strong> {{ $customer->contract_end_date->format('M d, Y') }}</p>
                         <p class="{{ $customer->isContractExpiring() ? 'text-danger fw-bold' : '' }}">
-                            <strong>Days Left:</strong> {{ now()->diffInDays($customer->contract_end_date, false) }} days
+                            <strong>Days Left:</strong>
+                            @if($customer->hasContractExpired())
+                                <span class="text-danger">0 days (Expired)</span>
+                            @else
+                                {{ $customer->getDisplayDaysUntilExpiration() }} days
+                            @endif
                         </p>
                     </div>
                 </div>
-                
+
                 @if($customer->comments)
                 <div class="mt-3">
                     <strong>Comments:</strong>
@@ -101,22 +106,22 @@
         @endif
 
         <!-- Contract Actions -->
-        @if($customer->isContractExpiring() || $customer->status == 'expired')
+        @if($customer->hasContractExpired() || $customer->isContractExpiring())
         <div class="card border-danger mb-4">
             <div class="card-header bg-danger text-white">
                 <h5 class="mb-0"><i class="fas fa-calendar-times"></i> Contract Alert</h5>
             </div>
             <div class="card-body">
-                @if($customer->status == 'expired')
+                @if($customer->hasContractExpired())
                 <p class="text-danger">Contract expired on {{ $customer->contract_end_date->format('M d, Y') }}</p>
                 @else
-                <p class="text-danger">Contract expires in {{ now()->diffInDays($customer->contract_end_date, false) }} days</p>
+                <p class="text-danger">Contract expires in {{ $customer->getDisplayDaysUntilExpiration() }} days</p>
                 @endif
-                
+
                 <button type="button" class="btn btn-success w-100 mb-2" data-bs-toggle="modal" data-bs-target="#renewModal">
                     Renew Contract
                 </button>
-                
+
                 <form action="{{ route('customers.renew', $customer) }}" method="POST" class="d-inline w-100">
                     @csrf
                     <input type="hidden" name="contract_end_date" value="{{ now()->addYear()->format('Y-m-d') }}">

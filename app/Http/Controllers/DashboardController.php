@@ -14,37 +14,53 @@ class DashboardController extends Controller
         try {
             $totalCustomers = Customer::count();
             $activeCustomers = Customer::where('status', 'active')->count();
-            $expiringContracts = Customer::where('contract_end_date', '<=', now()->addDays(90))
-                ->where('status', 'active')
+
+            // Fixed: Get expiring contracts (within 90 days, not expired)
+            $expiringContracts = Customer::where('status', 'active')
+                ->where('contract_end_date', '<=', Carbon::today()->addDays(90))
+                ->where('contract_end_date', '>=', Carbon::today())
                 ->count();
-            
-            // Maintenance alerts - handle potential errors
+
+            // Maintenance alerts - ONLY for active customers (not expired)
             $maintenanceAlerts = Customer::where('status', 'active')->get()->filter(function($customer) {
                 try {
-                    return $customer->isMaintenanceDue();
+                    // Only show maintenance alerts for active, non-expired contracts
+                    return !$customer->hasContractExpired() && $customer->isMaintenanceDue();
                 } catch (\Exception $e) {
                     return false;
                 }
             });
 
-            // Contract expiration alerts
+            // Contract expiration alerts - only active contracts within 90 days
             $contractAlerts = Customer::where('status', 'active')
-                ->where('contract_end_date', '<=', now()->addDays(90))
-                ->where('contract_end_date', '>=', now())
+                ->where('contract_end_date', '<=', Carbon::today()->addDays(90))
+                ->where('contract_end_date', '>=', Carbon::today())
+                ->orderBy('contract_end_date', 'asc')
                 ->get();
 
-            // Recent maintenance with error handling
-            $recentMaintenance = MaintenanceHistory::with('customer')
-                ->latest()
-                ->take(10)
-                ->get();
+            // Expired contracts - separate display
+            $expiredContracts = Customer::where(function($query) {
+                $query->where('contract_end_date', '<', Carbon::today())
+                      ->orWhere('status', 'expired');
+            })->orderBy('contract_end_date', 'desc')
+              ->get();
+
+            // Recent maintenance - only for active customers
+            $recentMaintenance = MaintenanceHistory::with(['customer' => function($query) {
+                $query->where('status', 'active'); // Only show maintenance for active customers
+            }])->whereHas('customer', function($query) {
+                $query->where('status', 'active');
+            })->latest()
+              ->take(10)
+              ->get();
 
             return view('dashboard', compact(
-                'totalCustomers', 
-                'activeCustomers', 
+                'totalCustomers',
+                'activeCustomers',
                 'expiringContracts',
                 'maintenanceAlerts',
                 'contractAlerts',
+                'expiredContracts',
                 'recentMaintenance'
             ));
 
@@ -56,6 +72,7 @@ class DashboardController extends Controller
                 'expiringContracts' => 0,
                 'maintenanceAlerts' => collect(),
                 'contractAlerts' => collect(),
+                'expiredContracts' => collect(),
                 'recentMaintenance' => collect(),
             ]);
         }
