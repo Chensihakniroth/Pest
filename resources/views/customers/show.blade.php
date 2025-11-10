@@ -13,6 +13,7 @@ header("Expires: 0");
             <h2 class="h3 mb-1 text-dark fw-bold">Customer Details</h2>
             <p class="text-muted mb-0">Complete customer information and service history</p>
         </div>
+<<<<<<< HEAD
         <div>
             <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Back to List
@@ -89,6 +90,139 @@ header("Expires: 0");
                             </div>
                         </div>
                     </div>
+=======
+
+        <!-- Maintenance Schedule -->
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Maintenance Schedule</h5>
+            </div>
+            <div class="card-body">
+                @php
+                    $allScheduledDates = $customer->getAllScheduledMaintenanceDates();
+                @endphp
+
+                @if($allScheduledDates->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Scheduled Date</th>
+                                    <th>Status</th>
+                                    <th>Days</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($allScheduledDates as $schedule)
+                                    @php
+                                        $isOverdue = $schedule['type'] === 'overdue';
+                                        $isUpcoming = $schedule['type'] === 'upcoming';
+                                        $isScheduled = $schedule['type'] === 'scheduled';
+                                        $daysDiff = $schedule['days'];
+                                    @endphp
+                                    <tr class="{{ $schedule['completed'] ? 'table-success' : ($isOverdue ? 'table-danger' : ($isUpcoming ? 'table-warning' : '')) }}">
+                                        <td>{{ $schedule['maintenance_number'] }}</td>
+                                        <td>
+                                            {{ $schedule['date']->format('M d, Y') }}
+                                            @if($schedule['completed'])
+                                                <i class="fas fa-check text-success ms-1"></i>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($schedule['completed'])
+                                                <span class="badge bg-success">Completed</span>
+                                            @elseif($isOverdue)
+                                                <span class="badge bg-danger">Overdue</span>
+                                            @elseif($isUpcoming)
+                                                <span class="badge bg-warning">Upcoming</span>
+                                            @else
+                                                <span class="badge bg-secondary">Scheduled</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($schedule['completed'])
+                                                <span class="text-muted">Done</span>
+                                            @elseif($isOverdue)
+                                                <span class="text-danger">Overdue by {{ abs($daysDiff) }} days</span>
+                                            @elseif($isUpcoming)
+                                                <span class="text-info">In {{ $daysDiff }} days</span>
+                                            @else
+                                                <span class="text-muted">In {{ $daysDiff }} days</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if(!$schedule['completed'])
+                                                <button type="button" class="btn btn-sm btn-success"
+                                                    onclick="markMaintenanceAsDone('{{ $schedule['date']->format('Y-m-d') }}')">
+                                                    <i class="fas fa-check"></i> Mark Done
+                                                </button>
+                                            @else
+                                                <span class="text-muted">Completed</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <p class="text-muted">No maintenance schedule available.</p>
+                @endif
+            </div>
+        </div>
+
+        <!-- Maintenance History -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Maintenance History</h5>
+            </div>
+            <div class="card-body">
+                @if($maintenanceHistory->count() > 0)
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Service Type</th>
+                                <th>Performed By</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($maintenanceHistory as $history)
+                            <tr>
+                                <td>{{ $history->maintenance_date->format('M d, Y') }}</td>
+                                <td>{{ ucfirst(str_replace('_', ' ', $history->service_type)) }}</td>
+                                <td>{{ $history->performed_by }}</td>
+                                <td>{{ $history->notes }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @else
+                <p class="text-muted">No maintenance history recorded.</p>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Contract Actions -->
+        @if($customer->hasContractExpired() || $customer->isContractExpiring())
+        <div class="card border-danger mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-calendar-times"></i> Contract Alert</h5>
+            </div>
+            <div class="card-body">
+                @if($customer->hasContractExpired())
+                <p class="text-danger">Contract expired on {{ $customer->contract_end_date->format('M d, Y') }}</p>
+                @else
+                <p class="text-danger">Contract expires in {{ $customer->getDisplayDaysUntilExpiration() }} days</p>
+                @endif
+>>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
 
                     <!-- Service Information -->
                     <div class="row mt-3">
@@ -166,6 +300,7 @@ header("Expires: 0");
                         </div>
                     </div>
 
+<<<<<<< HEAD
                     <!-- Comments -->
                     @if($customer->comments)
                     <div class="row mt-3">
@@ -179,6 +314,21 @@ header("Expires: 0");
                         </div>
                     </div>
                     @endif
+=======
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ route('customers.edit', $customer) }}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Edit Customer
+                    </a>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#maintenanceModal">
+                        <i class="fas fa-tools"></i> Record New Maintenance
+                    </button>
+>>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
                 </div>
             </div>
 
@@ -535,6 +685,7 @@ header("Expires: 0");
         </div>
     </div>
 </div>
+<<<<<<< HEAD
 @endif
 
 <!-- ... rest of the styles and JavaScript remain the same ... -->
@@ -624,6 +775,8 @@ header("Expires: 0");
     }
 }
 </style>
+=======
+>>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
 
 <script>
 function markMaintenanceAsDone(date) {
@@ -631,6 +784,7 @@ function markMaintenanceAsDone(date) {
     document.getElementById('maintenance_date').value = date;
 
     // Show the modal
+<<<<<<< HEAD
     const modal = new bootstrap.Modal(document.getElementById('maintenanceModal'));
     modal.show();
 }
@@ -680,5 +834,15 @@ document.addEventListener('keydown', function(e) {
 function printCustomerDetails() {
     window.print();
 }
+=======
+    var modal = new bootstrap.Modal(document.getElementById('maintenanceModal'));
+    modal.show();
+}
+
+// Optional: Auto-submit form when modal opens with a specific date
+document.getElementById('maintenanceForm').addEventListener('submit', function(e) {
+    // You can add any validation here if needed
+});
+>>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
 </script>
 @endsection
