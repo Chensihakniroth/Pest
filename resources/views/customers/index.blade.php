@@ -2,7 +2,6 @@
 @extends('layouts.app')
 
 @section('content')
-<<<<<<< HEAD
 @php
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
@@ -29,23 +28,6 @@ header("Expires: 0");
             </h5>
         </div>
         <div class="card-body bg-light">
-=======
-<div class="container-fluid px-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center py-3">
-        <div>
-            <h2 class="h3 mb-1 text-dark">Customers</h2>
-            <p class="text-muted mb-0">Manage your customer database</p>
-        </div>
-        <a href="{{ route('customers.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i> Add Customer
-        </a>
-    </div>
-
-    <!-- Simple Filter Bar -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body py-3">
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
             <form action="{{ route('customers.index') }}" method="GET" id="filterForm" class="row g-2 align-items-center">
                 <div class="col-md-5">
                     <div class="input-group input-group-sm position-relative">
@@ -77,7 +59,6 @@ header("Expires: 0");
                         <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>Expired</option>
                     </select>
                 </div>
-<<<<<<< HEAD
 
                 <div class="col-md-2">
                 <select class="form-select form-select-sm" name="status" id="statusFilter">
@@ -88,8 +69,6 @@ header("Expires: 0");
                 </select>
                 </div>
 
-=======
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
                 <div class="col-md-2">
                     <a href="{{ route('customers.index') }}" class="btn btn-sm btn-outline-secondary w-100">
                         Clear
@@ -100,7 +79,6 @@ header("Expires: 0");
     </div>
 
     <!-- Customers Table -->
-<<<<<<< HEAD
     <div class="card border-0 shadow-lg">
         <div class="card-header bg-dark text-white py-3 border-0">
             <div class="d-flex justify-content-between align-items-center">
@@ -122,23 +100,12 @@ header("Expires: 0");
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead class="table-dark">
-=======
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="bg-light">
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
                         <tr>
                             <th class="border-0 ps-4">
                                 <div class="d-flex align-items-center">
                                     <span>CUSTOMER</span>
                                     <div class="sort-arrows ms-1">
-<<<<<<< HEAD
                                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'name', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}" class="text-white-50 text-decoration-none">
-=======
-                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'name', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}" class="text-muted text-decoration-none">
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
                                             <i class="fas fa-sort"></i>
                                         </a>
                                     </div>
@@ -148,11 +115,7 @@ header("Expires: 0");
                                 <div class="d-flex align-items-center">
                                     <span>SERVICE</span>
                                     <div class="sort-arrows ms-1">
-<<<<<<< HEAD
                                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'service_type', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}" class="text-white-50 text-decoration-none">
-=======
-                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'service_type', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}" class="text-muted text-decoration-none">
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
                                             <i class="fas fa-sort"></i>
                                         </a>
                                     </div>
@@ -163,11 +126,7 @@ header("Expires: 0");
                                 <div class="d-flex align-items-center">
                                     <span>STATUS</span>
                                     <div class="sort-arrows ms-1">
-<<<<<<< HEAD
                                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'contract_end_date', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}" class="text-white-50 text-decoration-none">
-=======
-                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'contract_end_date', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}" class="text-muted text-decoration-none">
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
                                             <i class="fas fa-sort"></i>
                                         </a>
                                     </div>
@@ -178,11 +137,7 @@ header("Expires: 0");
                     </thead>
                     <tbody id="customersTableBody">
                         @forelse($customers as $customer)
-<<<<<<< HEAD
                         <tr class="bg-white {{ $customer->hasContractExpired() ? 'table-warning' : '' }}">
-=======
-                        <tr class="{{ $customer->hasContractExpired() ? 'table-warning' : '' }}">
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
                             <!-- Customer Column -->
                             <td class="ps-4">
                                 <div class="d-flex align-items-center">
@@ -221,7 +176,6 @@ header("Expires: 0");
                             </td>
 
                             <!-- Status Column -->
-<<<<<<< HEAD
 <td>
     <div class="d-flex align-items-center gap-2">
         <div>
@@ -259,36 +213,6 @@ header("Expires: 0");
         @endif
     </div>
 </td>
-=======
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div>
-                                        @if($customer->hasContractExpired())
-                                            <span class="badge bg-danger">Expired</span>
-                                            <div class="text-danger small mt-1">
-                                                {{ $customer->getDaysSinceExpiration() }} days ago
-                                            </div>
-                                        @elseif($customer->isContractExpiring())
-                                            <span class="badge bg-warning text-dark">Expiring</span>
-                                            <div class="text-warning small mt-1">
-                                                {{ $customer->getDisplayDaysUntilExpiration() }} days left
-                                            </div>
-                                        @else
-                                            <span class="badge bg-success">Active</span>
-                                            <div class="text-success small mt-1">
-                                                {{ $customer->getDisplayDaysUntilExpiration() }} days left
-                                            </div>
-                                        @endif
-                                    </div>
-                                    @if($customer->google_map_link)
-                                        <a href="{{ $customer->google_map_link }}" target="_blank"
-                                           class="btn btn-sm btn-outline-primary ms-2" title="View on Google Maps">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                        </a>
-                                    @endif
-                                </div>
-                            </td>
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
 
                             <!-- Actions Column -->
                             <td class="text-end pe-4">
@@ -314,15 +238,9 @@ header("Expires: 0");
                         </tr>
                         @empty
                         <tr>
-<<<<<<< HEAD
                             <td colspan="5" class="text-center py-5 text-muted bg-white">
                                 <i class="fas fa-users fa-2x mb-3"></i>
                                 <p class="fw-semibold">No customers found</p>
-=======
-                            <td colspan="5" class="text-center py-5 text-muted">
-                                <i class="fas fa-users fa-2x mb-3"></i>
-                                <p>No customers found</p>
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
                                 @if(request()->anyFilled(['search', 'service_type', 'status']))
                                     <a href="{{ route('customers.index') }}" class="btn btn-sm btn-outline-primary">
                                         Clear filters
@@ -361,7 +279,6 @@ header("Expires: 0");
     border-radius: 12px;
 }
 
-<<<<<<< HEAD
 /* Enhanced shadows */
 .shadow-lg {
     box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.15) !important;
@@ -372,12 +289,6 @@ header("Expires: 0");
     font-weight: 600;
     font-size: 0.875rem;
     color: #fff;
-=======
-.table th {
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: #6c757d;
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 1rem 0.75rem;
@@ -404,21 +315,12 @@ header("Expires: 0");
     padding: 0.35em 0.65em;
 }
 
-<<<<<<< HEAD
 .bg-light {
     background-color: #f8f9fa !important;
 }
 
 .bg-white {
     background-color: #ffffff !important;
-=======
-.table-hover tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.02);
-}
-
-.bg-light {
-    background-color: #f8f9fa !important;
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
 }
 
 .sort-arrows {
@@ -428,20 +330,12 @@ header("Expires: 0");
 
 .sort-arrows .fa-sort {
     font-size: 0.7rem;
-<<<<<<< HEAD
     opacity: 0.7;
-=======
-    opacity: 0.6;
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
 }
 
 .sort-arrows .fa-sort:hover {
     opacity: 1;
-<<<<<<< HEAD
     color: #fff !important;
-=======
-    color: #007bff;
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
 }
 
 .search-loading {
@@ -460,7 +354,6 @@ header("Expires: 0");
     position: relative;
     min-height: 200px;
 }
-<<<<<<< HEAD
 
 /* Dark header styling */
 .bg-dark {
@@ -513,8 +406,6 @@ header("Expires: 0");
 .badge.bg-info {
     background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
 }
-=======
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
 </style>
 
 <script>
@@ -551,11 +442,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 searchTimeout = setTimeout(function() {
                     showTableLoading();
                     filterForm.submit();
-<<<<<<< HEAD
                 }, 500);
-=======
-                }, 500); // Reduced to 500ms for faster response
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
 
                 lastSearchValue = currentValue;
             } else {
@@ -594,20 +481,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function showTableLoading() {
         if (tableBody) {
             tableBody.innerHTML = `
-<<<<<<< HEAD
                 <tr class="bg-white">
-=======
-                <tr>
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
                     <td colspan="5" class="text-center py-5">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
-<<<<<<< HEAD
                         <p class="mt-2 text-muted fw-semibold">Searching customers...</p>
-=======
-                        <p class="mt-2 text-muted">Searching customers...</p>
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
                     </td>
                 </tr>
             `;
@@ -624,11 +503,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const icon = link.querySelector('i');
             if (icon) {
                 icon.className = currentOrder === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
-<<<<<<< HEAD
                 link.classList.add('text-white');
-=======
-                link.classList.add('text-primary');
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
             }
         });
     }
