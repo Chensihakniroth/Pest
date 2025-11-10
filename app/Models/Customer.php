@@ -42,7 +42,6 @@ class Customer extends Model
                 $customer->customer_id = 'GH' . date('Ymd') . str_pad(static::count() + 1, 4, '0', STR_PAD_LEFT);
             }
         });
-
     }
 
     /**
@@ -63,7 +62,7 @@ class Customer extends Model
     }
 
     /**
-     * Get all overdue maintenance dates - FIXED VERSION
+     * Get all overdue maintenance dates
      */
     public function getOverdueMaintenanceDates()
     {
@@ -100,7 +99,7 @@ class Customer extends Model
     }
 
     /**
-     * Get next scheduled maintenance date (not overdue) - FIXED VERSION
+     * Get next scheduled maintenance date (not overdue)
      */
     public function getNextScheduledMaintenanceDate()
     {
@@ -129,7 +128,7 @@ class Customer extends Model
     }
 
     /**
-     * Get all maintenance alert dates for display in customer show page - FIXED VERSION
+     * Get all maintenance alert dates for display in customer show page
      */
     public function getAllMaintenanceAlertDates()
     {
@@ -170,7 +169,7 @@ class Customer extends Model
     }
 
     /**
-     * Calculate calendar days difference between two dates (pure day count) - FIXED VERSION
+     * Calculate calendar days difference between two dates (pure day count)
      */
     public function getCalendarDaysDifference($startDate, $endDate)
     {
@@ -195,7 +194,7 @@ class Customer extends Model
     }
 
     /**
-     * Get the most urgent maintenance alert (only one per customer) - FIXED VERSION
+     * Get the most urgent maintenance alert (only one per customer)
      */
     public function getMostUrgentMaintenanceAlert()
     {
@@ -363,9 +362,6 @@ class Customer extends Model
         }
 
         $scheduledDates = collect();
-        $lastMaintenance = $this->maintenanceHistory()->latest()->first();
-
-        // Start from contract start date
         $startDate = Carbon::parse($this->contract_start_date)->startOfDay();
         $interval = $this->service_type === 'host_system' ? 6 : 3;
         $today = Carbon::today()->startOfDay();
@@ -378,7 +374,7 @@ class Customer extends Model
         while ($nextDate->lte($contractEnd)) {
             $isCompleted = $this->isMaintenanceDateCompleted($nextDate);
 
-            // FIX: Calculate days difference correctly (today to maintenance date)
+            // Calculate days difference correctly (today to maintenance date)
             $daysDiff = $today->diffInDays($nextDate, false); // false = don't return absolute value
 
             // Determine type based on actual date comparison
@@ -392,29 +388,27 @@ class Customer extends Model
                 $type = 'scheduled';
             }
 
-            // Only add if it's not completed OR if it's overdue
-            if (!$isCompleted || $type === 'overdue') {
-                $scheduledDates->push([
-                    'date' => $nextDate->copy(),
-                    'type' => $type,
-                    'days' => $daysDiff, // This now shows negative for overdue, positive for future
-                    'completed' => $isCompleted,
-                    'maintenance_number' => $maintenanceNumber
-                ]);
-            }
+            // ALWAYS add the maintenance date, regardless of completion status
+            $scheduledDates->push([
+                'date' => $nextDate->copy(),
+                'type' => $type,
+                'days' => $daysDiff, // This now shows negative for overdue, positive for future
+                'completed' => $isCompleted,
+                'maintenance_number' => $maintenanceNumber
+            ]);
 
             $nextDate = $nextDate->copy()->addMonths($interval);
             $maintenanceNumber++;
 
-            // Limit to reasonable number to avoid infinite loop
-            if ($maintenanceNumber > 50) break;
+            // Increase the limit to 100 to handle longer contracts
+            if ($maintenanceNumber > 100) break;
         }
 
         return $scheduledDates;
     }
 
     /**
-     * Check if a specific maintenance date has been completed - FIXED VERSION
+     * Check if a specific maintenance date has been completed
      */
     public function isMaintenanceDateCompleted($maintenanceDate)
     {
@@ -449,5 +443,13 @@ class Customer extends Model
         $this->getNextScheduledMaintenanceDate();
 
         return $this;
+    }
+
+    /**
+     * Get maintenance interval in months
+     */
+    public function getMaintenanceInterval()
+    {
+        return $this->service_type === 'host_system' ? 6 : 3;
     }
 }
