@@ -2,199 +2,414 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Customers</h2>
-    <a href="{{ route('customers.create') }}" class="btn btn-success">
-        <i class="fas fa-plus"></i> Add Customer
-    </a>
-</div>
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center py-3">
+        <div>
+            <h2 class="h3 mb-1 text-dark">Customers</h2>
+            <p class="text-muted mb-0">Manage your customer database</p>
+        </div>
+        <a href="{{ route('customers.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Add Customer
+        </a>
+    </div>
 
-<!-- Search Form -->
-<div class="card mb-4">
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-8">
-                <div class="input-group">
-                    <span class="input-group-text bg-white">
-                        <i class="fas fa-search text-muted"></i>
-                    </span>
-                    <input 
-                        type="text" 
-                        name="search" 
-                        id="searchInput"
-                        class="form-control" 
-                        placeholder="Search by name, customer ID, or phone number..." 
-                        value="{{ request('search') }}"
-                        autocomplete="off">
-                    <button type="button" class="btn btn-outline-secondary d-none" id="clearSearch">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <span class="input-group-text bg-white d-none" id="loadingSpinner">
-                        <i class="fas fa-spinner fa-spin text-primary"></i>
-                    </span>
+    <!-- Simple Filter Bar -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body py-3">
+            <form action="{{ route('customers.index') }}" method="GET" id="filterForm" class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group input-group-sm position-relative">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" name="search" id="searchInput" class="form-control border-start-0"
+                               placeholder="Search by name, ID, phone, or address..." value="{{ request('search') }}"
+                               autocomplete="off">
+                        <div class="search-loading position-absolute end-0 top-50 translate-middle-y me-3" style="display: none;">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <small class="text-muted">
-                    <i class="fas fa-info-circle"></i> Search updates automatically as you type
-                </small>
-            </div>
-            <div class="col-md-4 d-flex align-items-start gap-2">
-                <a href="{{ route('customers.index') }}" class="btn btn-secondary">
-                    <i class="fas fa-redo"></i> Reset
-                </a>
-            </div>
+                <div class="col-md-3">
+                    <select class="form-select form-select-sm" name="service_type">
+                        <option value="">All Services</option>
+                        <option value="baiting_system_complete" {{ request('service_type') == 'baiting_system_complete' ? 'selected' : '' }}>Baiting Complete</option>
+                        <option value="baiting_system_not_complete" {{ request('service_type') == 'baiting_system_not_complete' ? 'selected' : '' }}>Baiting Not Complete</option>
+                        <option value="host_system" {{ request('service_type') == 'host_system' ? 'selected' : '' }}>Host System</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select form-select-sm" name="status">
+                        <option value="">All Status</option>
+                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>Expired</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ route('customers.index') }}" class="btn btn-sm btn-outline-secondary w-100">
+                        Clear
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
-</div>
 
-<!-- Customers Table -->
-<div class="card">
-    <div class="card-body" id="customersTableContainer">
-        @include('customers.partials.table')
+    <!-- Customers Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="border-0 ps-4">
+                                <div class="d-flex align-items-center">
+                                    <span>CUSTOMER</span>
+                                    <div class="sort-arrows ms-1">
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'name', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}" class="text-muted text-decoration-none">
+                                            <i class="fas fa-sort"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="border-0">
+                                <div class="d-flex align-items-center">
+                                    <span>SERVICE</span>
+                                    <div class="sort-arrows ms-1">
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'service_type', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}" class="text-muted text-decoration-none">
+                                            <i class="fas fa-sort"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="border-0">CONTACT</th>
+                            <th class="border-0">
+                                <div class="d-flex align-items-center">
+                                    <span>STATUS</span>
+                                    <div class="sort-arrows ms-1">
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'contract_end_date', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}" class="text-muted text-decoration-none">
+                                            <i class="fas fa-sort"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="border-0 text-end pe-4">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customersTableBody">
+                        @forelse($customers as $customer)
+                        <tr class="{{ $customer->hasContractExpired() ? 'table-warning' : '' }}">
+                            <!-- Customer Column -->
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center me-3"
+                                         style="width: 40px; height: 40px; font-weight: 600;">
+                                        {{ strtoupper(substr($customer->name, 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold text-dark">{{ $customer->name }}</div>
+                                        <small class="text-muted">{{ $customer->customer_id }}</small>
+                                        @if($customer->isMaintenanceDue())
+                                            <div class="mt-1">
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="fas fa-tools me-1"></i>Maintenance Due
+                                                </span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Service Column -->
+                            <td>
+                                <div class="fw-medium text-dark">
+                                    {{ $customer->service_type === 'host_system' ? 'Host System' : 'Baiting System' }}
+                                </div>
+                                <small class="text-muted">${{ number_format($customer->service_price, 2) }}</small>
+                            </td>
+
+                            <!-- Contact Column -->
+                            <td>
+                                <div class="text-dark">{{ $customer->phone_number }}</div>
+                                <small class="text-muted" title="{{ $customer->address }}">
+                                    {{ Str::limit($customer->address, 25) }}
+                                </small>
+                            </td>
+
+                            <!-- Status Column -->
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div>
+                                        @if($customer->hasContractExpired())
+                                            <span class="badge bg-danger">Expired</span>
+                                            <div class="text-danger small mt-1">
+                                                {{ $customer->getDaysSinceExpiration() }} days ago
+                                            </div>
+                                        @elseif($customer->isContractExpiring())
+                                            <span class="badge bg-warning text-dark">Expiring</span>
+                                            <div class="text-warning small mt-1">
+                                                {{ $customer->getDisplayDaysUntilExpiration() }} days left
+                                            </div>
+                                        @else
+                                            <span class="badge bg-success">Active</span>
+                                            <div class="text-success small mt-1">
+                                                {{ $customer->getDisplayDaysUntilExpiration() }} days left
+                                            </div>
+                                        @endif
+                                    </div>
+                                    @if($customer->google_map_link)
+                                        <a href="{{ $customer->google_map_link }}" target="_blank"
+                                           class="btn btn-sm btn-outline-primary ms-2" title="View on Google Maps">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
+
+                            <!-- Actions Column -->
+                            <td class="text-end pe-4">
+                                <div class="btn-group">
+                                    <a href="{{ route('customers.show', $customer) }}"
+                                       class="btn btn-sm btn-outline-primary" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ route('customers.edit', $customer) }}"
+                                       class="btn btn-sm btn-outline-secondary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('customers.destroy', $customer) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"
+                                                onclick="return confirm('Delete {{ $customer->name }}? This cannot be undone.')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-users fa-2x mb-3"></i>
+                                <p>No customers found</p>
+                                @if(request()->anyFilled(['search', 'service_type', 'status']))
+                                    <a href="{{ route('customers.index') }}" class="btn btn-sm btn-outline-primary">
+                                        Clear filters
+                                    </a>
+                                @else
+                                    <a href="{{ route('customers.create') }}" class="btn btn-sm btn-primary">
+                                        Add your first customer
+                                    </a>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        @if($customers->hasPages())
+        <div class="card-footer bg-white border-0 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    Showing {{ $customers->firstItem() }} to {{ $customers->lastItem() }} of {{ $customers->total() }}
+                </div>
+                <div>
+                    {{ $customers->links() }}
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 </div>
-@endsection
 
-@push('scripts')
+<style>
+.card {
+    border-radius: 12px;
+}
+
+.table th {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1rem 0.75rem;
+}
+
+.table td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.btn-group .btn {
+    border-radius: 6px;
+    margin: 0 2px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.35em 0.65em;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.sort-arrows {
+    display: flex;
+    flex-direction: column;
+}
+
+.sort-arrows .fa-sort {
+    font-size: 0.7rem;
+    opacity: 0.6;
+}
+
+.sort-arrows .fa-sort:hover {
+    opacity: 1;
+    color: #007bff;
+}
+
+.search-loading {
+    z-index: 5;
+}
+
+.table-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.table-container {
+    position: relative;
+    min-height: 200px;
+}
+</style>
+
 <script>
-(function() {
-    'use strict';
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchInput');
-        const clearBtn = document.getElementById('clearSearch');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const tableContainer = document.getElementById('customersTableContainer');
-        let searchTimeout;
-        let currentRequest = null;
+document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filterForm');
+    const searchInput = document.getElementById('searchInput');
+    const searchLoading = document.querySelector('.search-loading');
+    const tableBody = document.getElementById('customersTableBody');
 
-        function performSearch(searchTerm) {
-            // Cancel previous request if still pending
-            if (currentRequest) {
-                currentRequest.abort();
-            }
-
-            // Show loading indicator
-            loadingSpinner.classList.remove('d-none');
-            
-            // Create XMLHttpRequest
-            currentRequest = new XMLHttpRequest();
-            const url = new URL(window.location.origin + '/customers');
-            if (searchTerm) {
-                url.searchParams.append('search', searchTerm);
-            }
-
-            currentRequest.open('GET', url, true);
-            currentRequest.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-            
-            currentRequest.onload = function() {
-                if (currentRequest.status === 200) {
-                    tableContainer.innerHTML = currentRequest.responseText;
-                    
-                    // Update URL without page reload
-                    const newUrl = searchTerm ? url.toString() : window.location.pathname;
-                    window.history.pushState({search: searchTerm}, '', newUrl);
-                    
-                    // Show/hide clear button
-                    if (searchTerm) {
-                        clearBtn.classList.remove('d-none');
-                    } else {
-                        clearBtn.classList.add('d-none');
-                    }
-                    
-                    // Re-attach pagination click handlers
-                    attachPaginationHandlers();
-                }
-                loadingSpinner.classList.add('d-none');
-                currentRequest = null;
-            };
-
-            currentRequest.onerror = function() {
-                loadingSpinner.classList.add('d-none');
-                currentRequest = null;
-            };
-
-            currentRequest.send();
-        }
-
-        function attachPaginationHandlers() {
-            const paginationLinks = tableContainer.querySelectorAll('.pagination a');
-            paginationLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const url = new URL(this.href);
-                    const page = url.searchParams.get('page');
-                    const searchTerm = searchInput.value.trim();
-                    
-                    loadingSpinner.classList.remove('d-none');
-                    
-                    const requestUrl = new URL(window.location.origin + '/customers');
-                    if (searchTerm) {
-                        requestUrl.searchParams.append('search', searchTerm);
-                    }
-                    if (page) {
-                        requestUrl.searchParams.append('page', page);
-                    }
-
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('GET', requestUrl, true);
-                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-                    
-                    xhr.onload = function() {
-                        if (xhr.status === 200) {
-                            tableContainer.innerHTML = xhr.responseText;
-                            window.history.pushState({}, '', requestUrl.toString());
-                            attachPaginationHandlers();
-                            
-                            // Scroll to top of table
-                            tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-                        loadingSpinner.classList.add('d-none');
-                    };
-                    
-                    xhr.send();
-                });
-            });
-        }
-
-        // Live search as user types
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                const searchTerm = this.value.trim();
-                
-                // Wait 400ms after user stops typing
-                searchTimeout = setTimeout(function() {
-                    performSearch(searchTerm);
-                }, 400);
-            });
-
-            // Show clear button if there's initial search value
-            if (searchInput.value) {
-                clearBtn.classList.remove('d-none');
-            }
-        }
-
-        // Clear search button
-        if (clearBtn) {
-            clearBtn.addEventListener('click', function() {
-                searchInput.value = '';
-                clearBtn.classList.add('d-none');
-                performSearch('');
-                searchInput.focus();
-            });
-        }
-
-        // Initial pagination handlers
-        attachPaginationHandlers();
-
-        // Handle browser back/forward buttons
-        window.addEventListener('popstate', function(e) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const searchTerm = urlParams.get('search') || '';
-            searchInput.value = searchTerm;
-            performSearch(searchTerm);
+    // Auto-submit form when selects change
+    document.querySelectorAll('select[name="service_type"], select[name="status"]').forEach(select => {
+        select.addEventListener('change', function() {
+            showTableLoading();
+            filterForm.submit();
         });
     });
-})();
+
+    // Instant search with better UX
+    if (searchInput) {
+        let searchTimeout;
+        let lastSearchValue = searchInput.value;
+
+        searchInput.addEventListener('input', function() {
+            const currentValue = this.value.trim();
+
+            // Clear previous timeout
+            clearTimeout(searchTimeout);
+
+            // Show loading immediately
+            searchLoading.style.display = 'block';
+
+            // Only search if value actually changed
+            if (currentValue !== lastSearchValue) {
+                searchTimeout = setTimeout(function() {
+                    showTableLoading();
+                    filterForm.submit();
+                }, 500); // Reduced to 500ms for faster response
+
+                lastSearchValue = currentValue;
+            } else {
+                searchLoading.style.display = 'none';
+            }
+        });
+
+        // Hide loading when user stops typing but doesn't change value
+        searchInput.addEventListener('blur', function() {
+            setTimeout(() => {
+                searchLoading.style.display = 'none';
+            }, 200);
+        });
+
+        // Also submit on Enter key for instant results
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                clearTimeout(searchTimeout);
+                showTableLoading();
+                filterForm.submit();
+            }
+        });
+
+        // Clear search when Escape is pressed
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                this.value = '';
+                showTableLoading();
+                filterForm.submit();
+            }
+        });
+    }
+
+    // Show table loading state
+    function showTableLoading() {
+        if (tableBody) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Searching customers...</p>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    // Add active state to current sort
+    const currentSort = '{{ request('sort') }}';
+    const currentOrder = '{{ request('order') }}';
+
+    if (currentSort) {
+        const sortLinks = document.querySelectorAll(`a[href*="sort=${currentSort}"]`);
+        sortLinks.forEach(link => {
+            const icon = link.querySelector('i');
+            if (icon) {
+                icon.className = currentOrder === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+                link.classList.add('text-primary');
+            }
+        });
+    }
+
+    // Focus search input on page load for quick searching
+    if (searchInput && !searchInput.value) {
+        setTimeout(() => {
+            searchInput.focus();
+        }, 100);
+    }
+});
 </script>
-@endpush
+@endsection

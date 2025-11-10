@@ -21,15 +21,8 @@ class DashboardController extends Controller
                 ->where('contract_end_date', '>=', Carbon::today())
                 ->count();
 
-            // Maintenance alerts - ONLY for active customers (not expired)
-            $maintenanceAlerts = Customer::where('status', 'active')->get()->filter(function($customer) {
-                try {
-                    // Only show maintenance alerts for active, non-expired contracts
-                    return !$customer->hasContractExpired() && $customer->isMaintenanceDue();
-                } catch (\Exception $e) {
-                    return false;
-                }
-            });
+            // Get real-time maintenance alerts - recalculated on every page load
+            $maintenanceAlerts = $this->getRealTimeMaintenanceAlerts();
 
             // Contract expiration alerts - only active contracts within 90 days
             $contractAlerts = Customer::where('status', 'active')
@@ -77,4 +70,45 @@ class DashboardController extends Controller
             ]);
         }
     }
+
+/**
+ * Get real-time maintenance alerts that recalculate on every page load - FIXED VERSION
+ */
+private function getRealTimeMaintenanceAlerts()
+{
+    $maintenanceAlerts = collect();
+
+    $activeCustomersList = Customer::where('status', 'active')->get();
+
+    foreach ($activeCustomersList as $customer) {
+        if (!$customer->hasContractExpired()) {
+            // Force fresh calculation by reloading relationships
+            $customer->load('maintenanceHistory');
+            $customer->recalculateMaintenanceDates();
+
+            // Get ALL maintenance alerts for this customer, not just the most urgent one
+            $allAlerts = $customer->getAllMaintenanceAlertDates();
+
+            foreach ($allAlerts as $alert) {
+                // Check if this alert date is already completed
+                if (!$customer->isMaintenanceDateCompleted($alert['date'])) {
+                    $maintenanceAlerts->push([
+                        'customer' => $customer,
+                        'alert' => $alert
+                    ]);
+                }
+            }
+        }
+    }
+
+    // Sort by urgency (overdue first, then by days)
+    return $maintenanceAlerts->sortBy(function($item) {
+        // Overdue come first (negative days), then sort by absolute days
+        if ($item['alert']['type'] === 'overdue') {
+            return $item['alert']['days']; // Most negative (oldest) first
+        } else {
+            return 10000 + $item['alert']['days']; // Upcoming after overdue
+        }
+    });
+}
 }
