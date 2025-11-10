@@ -7,6 +7,7 @@ use App\Models\MaintenanceHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -14,27 +15,59 @@ class CustomerController extends Controller
     {
         $query = Customer::query();
 
+        // Search filter
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('customer_id', 'like', "%{$search}%")
-                  ->orWhere('phone_number', 'like', "%{$search}%");
+                  ->orWhere('phone_number', 'like', "%{$search}%")
+                  ->orWhere('address', 'like', "%{$search}%");
             });
         }
 
-        $customers = $query->orderBy('created_at', 'desc')->paginate(10);
-
-        // Update status for all customers in the result
-        foreach ($customers as $customer) {
-            $customer->updateContractStatus();
-            $customer->save();
+        // Service type filter
+        if ($request->has('service_type') && $request->service_type != '') {
+            $query->where('service_type', $request->service_type);
         }
 
-        // Check if it's an AJAX request
-        if ($request->ajax()) {
-            return view('customers.partials.table', compact('customers'))->render();
+        // Status filter
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
         }
+
+        // Contract status filter
+        if ($request->has('contract_status') && $request->contract_status != '') {
+            $today = Carbon::today();
+
+            if ($request->contract_status === 'active') {
+                $query->where('status', 'active')
+                      ->where('contract_end_date', '>=', $today);
+            } elseif ($request->contract_status === 'expiring') {
+                $query->where('status', 'active')
+                      ->where('contract_end_date', '<=', $today->copy()->addDays(90))
+                      ->where('contract_end_date', '>=', $today);
+            } elseif ($request->contract_status === 'expired') {
+                $query->where(function($q) use ($today) {
+                    $q->where('contract_end_date', '<', $today)
+                      ->orWhere('status', 'expired');
+                });
+            }
+        }
+
+        // Sorting
+        $sort = $request->get('sort', 'created_at');
+        $order = $request->get('order', 'desc');
+
+        // Validate sortable columns
+        $sortableColumns = ['name', 'customer_id', 'service_type', 'contract_end_date', 'created_at'];
+        if (!in_array($sort, $sortableColumns)) {
+            $sort = 'created_at';
+        }
+
+        $query->orderBy($sort, $order);
+
+        $customers = $query->paginate(10);
 
         return view('customers.index', compact('customers'));
     }
@@ -59,16 +92,8 @@ class CustomerController extends Controller
             'comments' => 'nullable|string',
         ]);
 
-        // Set status based on contract dates
-        $startDate = Carbon::parse($validated['contract_start_date']);
-        $endDate = Carbon::parse($validated['contract_end_date']);
-        $today = Carbon::today();
-
-        if ($today->gt($endDate)) {
-            $validated['status'] = 'expired';
-        } else {
-            $validated['status'] = 'active';
-        }
+        // Set initial status to 'active' for new customers
+        $validated['status'] = 'active';
 
         Customer::create($validated);
 
@@ -78,10 +103,6 @@ class CustomerController extends Controller
 
     public function show(Customer $customer)
     {
-        // Update status before displaying
-        $customer->updateContractStatus();
-        $customer->save();
-
         $maintenanceHistory = $customer->maintenanceHistory()->latest()->get();
         return view('customers.show', compact('customer', 'maintenanceHistory'));
     }
@@ -95,31 +116,34 @@ class CustomerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'phone_number' => 'required|string|max:20',
             'address' => 'required|string',
             'google_map_link' => 'nullable|url',
-            'phone_number' => 'required|string',
             'service_name' => 'required|string|max:255',
             'service_price' => 'required|numeric|min:0',
-            'service_type' => 'required|in:baiting_system_complete,baiting_system_not_complete,host_system',
+            'service_type' => 'required|string',
             'contract_start_date' => 'required|date',
             'contract_end_date' => 'required|date|after:contract_start_date',
-            'status' => 'required|in:active,expired,pending',
+            'status' => 'required|in:active,pending',
             'comments' => 'nullable|string',
         ]);
 
-        $customer->update($validated);
+        // Use the direct update that works
+        DB::table('customers')
+            ->where('id', $customer->id)
+            ->update($validated);
 
-        return redirect()->route('customers.index')
-            ->with('success', 'Customer updated successfully.');
+        // Force refresh the model
+        $customer->refresh();
+
+        // Redirect with cache-busting parameter
+        return redirect()->route('customers.show', [$customer, 't' => time()])
+            ->with('success', 'Customer updated successfully!');
     }
 
-    public function destroy(Customer $customer)
-    {
-        $customer->delete();
-        return redirect()->route('customers.index')
-            ->with('success', 'Customer deleted successfully.');
-    }
-
+    /**
+     * Mark maintenance as done - FIXED VERSION
+     */
     public function markMaintenance(Request $request, Customer $customer)
     {
         $request->validate([
@@ -127,6 +151,7 @@ class CustomerController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        // Create maintenance record
         MaintenanceHistory::create([
             'customer_id' => $customer->id,
             'maintenance_date' => $request->maintenance_date,
@@ -135,7 +160,11 @@ class CustomerController extends Controller
             'performed_by' => Auth::user()->name,
         ]);
 
-        return redirect()->back()->with('success', 'Maintenance recorded successfully.');
+        // Force recalculation of maintenance dates
+        $customer->refresh();
+        $customer->recalculateMaintenanceDates();
+
+        return redirect()->back()->with('success', 'Maintenance recorded successfully. Dashboard will update immediately.');
     }
 
     public function renewContract(Request $request, Customer $customer)
@@ -154,5 +183,12 @@ class CustomerController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Contract renewed successfully.');
+    }
+
+    public function destroy(Customer $customer)
+    {
+        $customer->delete();
+        return redirect()->route('customers.index')
+            ->with('success', 'Customer deleted successfully.');
     }
 }
