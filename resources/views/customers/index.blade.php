@@ -20,7 +20,7 @@ header("Expires: 0");
         </a>
     </div>
 
-    <!-- Simple Filter Bar -->
+        <!-- Simple Filter Bar -->
     <div class="card border-0 shadow-lg mb-4">
         <div class="card-header bg-dark text-white py-3 border-0">
             <h5 class="card-title mb-0 fw-semibold">
@@ -53,22 +53,13 @@ header("Expires: 0");
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select form-select-sm" name="status">
+                    <select class="form-select form-select-sm" name="status" id="statusFilter">
                         <option value="">All Status</option>
                         <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                         <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>Expired</option>
                     </select>
                 </div>
-
-                <div class="col-md-2">
-                <select class="form-select form-select-sm" name="status" id="statusFilter">
-                    <option value="">All Status</option>
-                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
-                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                    <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>Expired</option>
-                </select>
-                </div>
-
                 <div class="col-md-2">
                     <a href="{{ route('customers.index') }}" class="btn btn-sm btn-outline-secondary w-100">
                         Clear

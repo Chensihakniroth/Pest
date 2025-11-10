@@ -20,7 +20,7 @@ header("Expires: 0");
         </div>
     </div>
 
-    <div class="row">
+    <div clsass="row">
         <!-- Left Column - Customer Information -->
         <div class="col-lg-8">
             <!-- Customer Profile Card -->
@@ -166,7 +166,6 @@ header("Expires: 0");
                         </div>
                     </div>
 
-<<<<<<< HEAD
                     <!-- Comments -->
                     @if($customer->comments)
                     <div class="row mt-3">
@@ -180,21 +179,6 @@ header("Expires: 0");
                         </div>
                     </div>
                     @endif
-=======
-        <!-- Quick Actions -->
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Quick Actions</h5>
-            </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a href="{{ route('customers.edit', $customer) }}" class="btn btn-warning">
-                        <i class="fas fa-edit"></i> Edit Customer
-                    </a>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#maintenanceModal">
-                        <i class="fas fa-tools"></i> Record New Maintenance
-                    </button>
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
                 </div>
             </div>
 
@@ -551,7 +535,6 @@ header("Expires: 0");
         </div>
     </div>
 </div>
-<<<<<<< HEAD
 @endif
 
 <!-- ... rest of the styles and JavaScript remain the same ... -->
@@ -641,8 +624,6 @@ header("Expires: 0");
     }
 }
 </style>
-=======
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
 
 <script>
 function markMaintenanceAsDone(date) {
@@ -650,7 +631,6 @@ function markMaintenanceAsDone(date) {
     document.getElementById('maintenance_date').value = date;
 
     // Show the modal
-<<<<<<< HEAD
     const modal = new bootstrap.Modal(document.getElementById('maintenanceModal'));
     modal.show();
 }
@@ -700,15 +680,5 @@ document.addEventListener('keydown', function(e) {
 function printCustomerDetails() {
     window.print();
 }
-=======
-    var modal = new bootstrap.Modal(document.getElementById('maintenanceModal'));
-    modal.show();
-}
-
-// Optional: Auto-submit form when modal opens with a specific date
-document.getElementById('maintenanceForm').addEventListener('submit', function(e) {
-    // You can add any validation here if needed
-});
->>>>>>> a8f6281edc15a37faa672006974c61f4b62ca3cd
 </script>
 @endsection
