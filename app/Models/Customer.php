@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 
 class Customer extends Model
 {
@@ -52,7 +53,8 @@ class Customer extends Model
         $today = Carbon::today();
         $endDate = Carbon::parse($this->contract_end_date);
 
-        if ($today->gt($endDate)) {
+        // FIXED: If today is greater than OR EQUAL to end date, contract is expired
+        if ($today->gte($endDate)) {
             $this->status = 'expired';
         } elseif ($this->isContractExpiring()) {
             $this->status = 'active'; // Keep as active but show alert
@@ -269,6 +271,7 @@ class Customer extends Model
 
             $daysUntilEnd = $this->getDisplayDaysUntilExpiration();
 
+            // FIXED: Only show as expiring if there are positive days left (1-90 days)
             return $daysUntilEnd <= 90 && $daysUntilEnd > 0;
         } catch (\Exception $e) {
             return false;
@@ -282,7 +285,11 @@ class Customer extends Model
     {
         try {
             $endDate = Carbon::parse($this->contract_end_date)->startOfDay();
-            return Carbon::today()->startOfDay()->gt($endDate) || $this->status === 'expired';
+            $today = Carbon::today()->startOfDay();
+
+            // FIXED: Use gte (greater than or equal) instead of gt (greater than)
+            // This makes contracts expire ON the end date, not the day after
+            return $today->gte($endDate) || $this->status === 'expired';
         } catch (\Exception $e) {
             return false;
         }
@@ -328,7 +335,7 @@ class Customer extends Model
     /**
      * Scope for active customers
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query)
     {
         return $query->where('status', 'active');
     }
@@ -336,7 +343,7 @@ class Customer extends Model
     /**
      * Scope for expiring contracts
      */
-    public function scopeExpiringSoon($query)
+    public function scopeExpiringSoon(Builder $query)
     {
         return $query->where('contract_end_date', '<=', Carbon::today()->addDays(90))
                     ->where('contract_end_date', '>=', Carbon::today())
@@ -346,7 +353,7 @@ class Customer extends Model
     /**
      * Scope for expired contracts
      */
-    public function scopeExpired($query)
+    public function scopeExpired(Builder $query)
     {
         return $query->where('contract_end_date', '<', Carbon::today())
                     ->orWhere('status', 'expired');

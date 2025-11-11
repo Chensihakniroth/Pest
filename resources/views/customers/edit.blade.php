@@ -238,26 +238,28 @@
                                 </div>
 
                                 <!-- Status -->
-<div class="mb-3">
-    <label for="status" class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
-    <div class="input-group">
-        <span class="input-group-text bg-light border-end-0">
-            <i class="fas fa-info-circle text-muted"></i>
-        </span>
-        <select class="form-control border-start-0 @error('status') is-invalid @enderror"
-                id="status" name="status" required>
-            <option value="active" {{ old('status', $customer->status) == 'active' ? 'selected' : '' }}>Active</option>
-            <option value="pending" {{ old('status', $customer->status) == 'pending' ? 'selected' : '' }}>Pending</option>
-        </select>
-    </div>
-    @error('status')
-        <div class="text-danger small mt-1">{{ $message }}</div>
-    @enderror
-    <small class="text-muted">
-        <strong>Active:</strong> Full access to maintenance features |
-        <strong>Pending:</strong> Account on hold, maintenance features disabled
-    </small>
-</div>
+                                <div class="mb-3">
+                                    <label for="status" class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="fas fa-info-circle text-muted"></i>
+                                        </span>
+                                        <select class="form-control border-start-0 @error('status') is-invalid @enderror"
+                                                id="status" name="status" required>
+                                            <option value="active" {{ old('status', $customer->status) == 'active' ? 'selected' : '' }}>Active</option>
+                                            <option value="pending" {{ old('status', $customer->status) == 'pending' ? 'selected' : '' }}>Pending</option>
+                                        </select>
+                                    </div>
+                                    @error('status')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">
+                                        <strong>Active:</strong> Full access to maintenance features |
+                                        <strong>Pending:</strong> Account on hold, maintenance features disabled
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Comments -->
                         <div class="row mt-3">
@@ -316,7 +318,7 @@
                             </a>
                         </div>
                         <div class="col-md-4">
-                            <button type="button" class="btn btn-outline-warning w-100" onclick="resetForm()">
+                            <button type="button" class="btn btn-outline-warning w-100" onclick="GreenHome.resetForm('customerForm')">
                                 <i class="fas fa-undo me-2"></i>Reset Form
                             </button>
                         </div>
@@ -337,278 +339,14 @@
     </div>
 </div>
 
-<style>
-.card {
-    border-radius: 12px;
-}
-
-.shadow-lg {
-    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.15) !important;
-}
-
-.form-control {
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    border: 1px solid #e0e0e0;
-    transition: all 0.3s ease;
-}
-
-.form-control:focus {
-    border-color: #198754;
-    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.1);
-}
-
-.input-group-text {
-    border-radius: 8px 0 0 8px;
-    background-color: #f8f9fa;
-    border: 1px solid #e0e0e0;
-    border-right: none;
-}
-
-.input-group .form-control {
-    border-left: none;
-    border-right: 1px solid #e0e0e0;
-}
-
-.input-group .form-control:focus {
-    border-left: none;
-    border-right: 1px solid #198754;
-}
-
-.input-group .form-select {
-    border-left: none;
-    border-right: 1px solid #e0e0e0;
-}
-
-.input-group .form-select:focus {
-    border-left: none;
-    border-right: 1px solid #198754;
-}
-
-.btn {
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.btn:hover {
-    transform: translateY(-1px);
-}
-
-.alert {
-    border-radius: 10px;
-    border: none;
-}
-
-.border-bottom {
-    border-color: #dee2e6 !important;
-}
-
-/* Loading animation */
-.btn-loading {
-    position: relative;
-    color: transparent !important;
-}
-
-.btn-loading::after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    top: 50%;
-    left: 50%;
-    margin-left: -10px;
-    margin-top: -10px;
-    border: 2px solid #ffffff;
-    border-radius: 50%;
-    border-right-color: transparent;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .container-fluid {
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-
-    .d-flex.justify-content-between {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-    }
-
-    .btn-group {
-        width: 100%;
-    }
-
-    .btn-group .btn {
-        flex: 1;
-    }
-}
-</style>
-
 <script>
+// Customer edit page specific initialization
 document.addEventListener('DOMContentLoaded', function() {
-    const customerForm = document.getElementById('customerForm');
-    const updateCustomerButton = document.getElementById('updateCustomerButton');
-
-    // Form submission handler
-    customerForm.addEventListener('submit', function(e) {
-        // Basic validation
-        const requiredFields = customerForm.querySelectorAll('[required]');
-        let isValid = true;
-
-        requiredFields.forEach(field => {
-            if (!field.value.trim()) {
-                isValid = false;
-                field.classList.add('is-invalid');
-            }
-        });
-
-        if (!isValid) {
-            e.preventDefault();
-            showError('Please fill in all required fields');
-            return;
-        }
-
-        // Contract date validation
-        const startDate = new Date(document.getElementById('contract_start_date').value);
-        const endDate = new Date(document.getElementById('contract_end_date').value);
-
-        if (endDate <= startDate) {
-            e.preventDefault();
-            showError('Contract end date must be after start date');
-            return;
-        }
-
-        // Show loading state
-        updateCustomerButton.classList.add('btn-loading');
-        updateCustomerButton.disabled = true;
+    // Initialize form validation with date validation
+    initFormValidation('customerForm', {
+        submitButtonId: 'updateCustomerButton',
+        validateDates: true
     });
-
-    // Function to show error messages
-    function showError(message) {
-        // Remove existing error alerts
-        const existingAlerts = document.querySelectorAll('.alert-danger');
-        existingAlerts.forEach(alert => alert.remove());
-
-        // Create new error alert
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
-        alertDiv.innerHTML = `
-            <i class="fas fa-exclamation-circle me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-
-        // Insert after the header
-        const cardBody = document.querySelector('.card-body');
-        const firstChild = cardBody.firstChild;
-        cardBody.insertBefore(alertDiv, firstChild);
-
-        // Scroll to top
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // Real-time validation for required fields
-    const requiredFields = customerForm.querySelectorAll('[required]');
-    requiredFields.forEach(field => {
-        field.addEventListener('input', function() {
-            if (this.value.trim()) {
-                this.classList.remove('is-invalid');
-                this.classList.add('is-valid');
-            } else {
-                this.classList.remove('is-valid');
-            }
-        });
-    });
-
-    // Contract date validation
-    const startDateField = document.getElementById('contract_start_date');
-    const endDateField = document.getElementById('contract_end_date');
-
-    if (startDateField && endDateField) {
-        startDateField.addEventListener('change', validateDates);
-        endDateField.addEventListener('change', validateDates);
-    }
-
-    function validateDates() {
-        const startDate = new Date(startDateField.value);
-        const endDate = new Date(endDateField.value);
-
-        if (startDateField.value && endDateField.value && endDate <= startDate) {
-            endDateField.classList.add('is-invalid');
-        } else {
-            endDateField.classList.remove('is-invalid');
-        }
-    }
-
-    // Auto-format phone number
-    const phoneField = document.getElementById('phone_number');
-    if (phoneField) {
-        phoneField.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 0) {
-                value = value.match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
-                e.target.value = !value[2] ? value[1] : '(' + value[1] + ') ' + value[2] + (value[3] ? '-' + value[3] : '');
-            }
-        });
-    }
 });
-
-// Reset form function
-function resetForm() {
-    if (confirm('Are you sure you want to reset the form? All changes will be lost.')) {
-        document.getElementById('customerForm').reset();
-
-        // Remove validation classes
-        const fields = document.querySelectorAll('.is-valid, .is-invalid');
-        fields.forEach(field => {
-            field.classList.remove('is-valid', 'is-invalid');
-        });
-    }
-}
-
-// Keyboard shortcuts
-document.addEventListener('keydown', function(e) {
-    // Ctrl + S to save
-    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-        e.preventDefault();
-        document.getElementById('updateCustomerButton').click();
-    }
-
-    // Escape to cancel
-    if (e.key === 'Escape') {
-        window.location.href = "{{ route('customers.show', $customer) }}";
-    }
-});
-
-@if (session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle me-2"></i>
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-
-@if ($errors->any())
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        Please correct the following errors:
-        <ul class="mb-0 mt-2">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-
 </script>
 @endsection

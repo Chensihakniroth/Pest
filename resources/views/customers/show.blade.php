@@ -1,11 +1,12 @@
+@extends('layouts.app')
+
+@section('content')
 @php
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
 @endphp
-@extends('layouts.app')
 
-@section('content')
 <div class="container-fluid px-4">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center py-4">
@@ -13,10 +14,7 @@ header("Expires: 0");
             <h2 class="h3 mb-1 text-dark fw-bold">Customer Details</h2>
             <p class="text-muted mb-0">Complete customer information and service history</p>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('customers.edit', $customer) }}" class="btn btn-warning">
-                <i class="fas fa-edit me-2"></i>Edit Customer
-            </a>
+        <div>
             <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Back to List
             </a>
@@ -125,7 +123,7 @@ header("Expires: 0");
                         </div>
                     </div>
 
-                    <!-- Contract Information -->
+                    <!-- Contract Information - FIXED STATUS DISPLAY WITH 90-DAY ALERT -->
                     <div class="row mt-3">
                         <div class="col-12">
                             <h6 class="fw-semibold text-dark border-bottom pb-2 mb-3">
@@ -140,23 +138,31 @@ header("Expires: 0");
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label fw-semibold text-muted mb-1 small text-uppercase">Contract End</label>
-                                    <div class="fs-6 fw-bold {{ $customer->isContractExpiring() ? 'text-danger' : 'text-dark' }}">
+                                    @php
+                                        $daysUntilExpiration = $customer->getDisplayDaysUntilExpiration();
+                                        $isExpiringSoon = $customer->isContractExpiring();
+                                    @endphp
+                                    <div class="fs-6 fw-bold {{ $isExpiringSoon ? 'text-warning' : ($customer->hasContractExpired() ? 'text-danger' : 'text-dark') }}">
                                         <i class="fas fa-calendar-minus text-primary me-2"></i>{{ $customer->contract_end_date->format('M d, Y') }}
                                     </div>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label fw-semibold text-muted mb-1 small text-uppercase">Contract Status</label>
                                     <div class="fs-6 fw-bold">
-                                        @if($customer->hasContractExpired())
+                                        @php
+                                            // Force status update before display
+                                            $customer->updateContractStatus();
+                                        @endphp
+
+                                        @if($customer->hasContractExpired() || $customer->status === 'expired')
                                             <span class="badge bg-danger px-3 py-2">
                                                 <i class="fas fa-exclamation-triangle me-1"></i>Expired
                                             </span>
                                             <div class="text-danger small mt-1 fw-semibold">{{ $customer->getDaysSinceExpiration() }} days ago</div>
                                         @elseif($customer->isContractExpiring())
                                             <span class="badge bg-warning text-dark px-3 py-2">
-                                                <i class="fas fa-clock me-1"></i>Expiring
+                                                <i class="fas fa-clock me-1"></i>Expiring Soon
                                             </span>
-                                            <div class="text-warning small mt-1 fw-semibold">{{ $customer->getDisplayDaysUntilExpiration() }} days left</div>
                                         @else
                                             @if($customer->status == 'active')
                                                 <span class="badge bg-success px-3 py-2">
@@ -173,6 +179,24 @@ header("Expires: 0");
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Contract Alert Banner for 90-day warning -->
+                            @if($customer->isContractExpiring() && !$customer->hasContractExpired())
+                            <div class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-exclamation-triangle fa-2x me-3 text-warning"></i>
+                                    <div>
+                                        <h6 class="alert-heading mb-1 fw-bold">Contract Expiring Soon!</h6>
+                                        <p class="mb-0">
+                                            This contract will expire in <strong>{{ $customer->getDisplayDaysUntilExpiration() }} days</strong>
+                                            on <strong>{{ $customer->contract_end_date->format('M d, Y') }}</strong>.
+                                            Consider renewing the contract to maintain service continuity.
+                                        </p>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            @endif
                         </div>
                     </div>
 
@@ -192,8 +216,8 @@ header("Expires: 0");
                 </div>
             </div>
 
-            <!-- Maintenance Schedule - Only show if customer is active -->
-            @if($customer->status == 'active')
+            <!-- Maintenance Schedule - Only show if customer is active and contract not expired -->
+            @if($customer->status == 'active' && !$customer->hasContractExpired())
             <div class="card border-0 shadow-lg mb-4">
                 <div class="card-header bg-gradient-info text-white py-3 border-0">
                     <div class="d-flex justify-content-between align-items-center">
@@ -265,8 +289,8 @@ header("Expires: 0");
                                             </td>
                                             <td class="text-end pe-4">
                                                 @if(!$isCompleted)
-                                                    <button type="button" class="btn btn-sm btn-success"
-                                                        onclick="markMaintenanceAsDone('{{ $schedule['date']->format('Y-m-d') }}')">
+                                                    <button type="button" class="btn btn-sm btn-success mark-done-btn"
+                                                            data-date="{{ $schedule['date']->format('Y-m-d') }}">
                                                         <i class="fas fa-check me-1"></i>Mark Done
                                                     </button>
                                                 @else
@@ -340,11 +364,28 @@ header("Expires: 0");
                 </div>
                 <div class="card-body text-center py-5">
                     <i class="fas fa-pause-circle fa-3x text-muted mb-3"></i>
-                    <h5 class="text-muted fw-semibold mb-2">Customer Account is Pending</h5>
-                    <p class="text-muted mb-4">Maintenance features and contract management are available when the account status is set to Active.</p>
+                    <h5 class="text-muted fw-semibold mb-2">
+                        @if($customer->hasContractExpired())
+                            Contract Expired
+                        @else
+                            Customer Account is Pending
+                        @endif
+                    </h5>
+                    <p class="text-muted mb-4">
+                        @if($customer->hasContractExpired())
+                            This contract has expired. Maintenance features are disabled until the contract is renewed.
+                        @else
+                            Maintenance features and contract management are available when the account status is set to Active.
+                        @endif
+                    </p>
                     <a href="{{ route('customers.edit', $customer) }}" class="btn btn-primary">
-                        <i class="fas fa-edit me-2"></i>Edit Customer to Activate
+                        <i class="fas fa-edit me-2"></i>Edit Customer
                     </a>
+                    @if($customer->hasContractExpired())
+                        <button type="button" class="btn btn-success ms-2" data-bs-toggle="modal" data-bs-target="#renewModal">
+                            <i class="fas fa-sync-alt me-2"></i>Renew Contract
+                        </button>
+                    @endif
                 </div>
             </div>
             @endif
@@ -352,7 +393,7 @@ header("Expires: 0");
 
         <!-- Right Column - Actions & Alerts -->
         <div class="col-lg-4">
-            <!-- Contract Alerts -->
+            <!-- Contract Alerts Card - Show for expiring or expired contracts -->
             @if($customer->status == 'active' && ($customer->hasContractExpired() || $customer->isContractExpiring()))
             <div class="card border-danger shadow-lg mb-4">
                 <div class="card-header bg-gradient-danger text-white py-3 border-0">
@@ -366,12 +407,14 @@ header("Expires: 0");
                         <i class="fas fa-calendar-times fa-2x text-danger mb-2"></i>
                         <p class="text-danger fw-semibold mb-1">Contract Expired</p>
                         <p class="text-muted small">Expired on {{ $customer->contract_end_date->format('M d, Y') }}</p>
+                        <p class="text-danger small fw-semibold">{{ $customer->getDaysSinceExpiration() }} days ago</p>
                     </div>
-                    @else
+                    @elseif($customer->isContractExpiring())
                     <div class="text-center mb-3">
                         <i class="fas fa-clock fa-2x text-warning mb-2"></i>
                         <p class="text-warning fw-semibold mb-1">Contract Expiring Soon</p>
-                        <p class="text-muted small">{{ $customer->getDisplayDaysUntilExpiration() }} days remaining</p>
+                        <p class="text-muted small">Expires on {{ $customer->contract_end_date->format('M d, Y') }}</p>
+                        <p class="text-warning small fw-semibold">{{ $customer->getDisplayDaysUntilExpiration() }} days remaining</p>
                     </div>
                     @endif
 
@@ -406,7 +449,7 @@ header("Expires: 0");
                             <i class="fas fa-edit me-2"></i>Edit Customer
                         </a>
 
-                        @if($customer->status == 'active')
+                        @if($customer->status == 'active' && !$customer->hasContractExpired())
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#maintenanceModal">
                             <i class="fas fa-tools me-2"></i>Record Maintenance
                         </button>
@@ -419,17 +462,12 @@ header("Expires: 0");
                         <a href="tel:{{ $customer->phone_number }}" class="btn btn-outline-primary">
                             <i class="fas fa-phone me-2"></i>Call Customer
                         </a>
-                        @if($customer->google_map_link)
-                        <a href="{{ $customer->google_map_link }}" target="_blank" class="btn btn-outline-info">
-                            <i class="fas fa-map-marked-alt me-2"></i>View on Map
-                        </a>
-                        @endif
                     </div>
                 </div>
             </div>
 
             <!-- Service Summary -->
-            @if($customer->status == 'active')
+            @if($customer->status == 'active' && !$customer->hasContractExpired())
             <div class="card border-0 shadow-lg">
                 <div class="card-header bg-gradient-info text-white py-3 border-0">
                     <h6 class="card-title mb-0 fw-semibold">
@@ -491,7 +529,7 @@ header("Expires: 0");
 </div>
 
 <!-- Maintenance Modal -->
-@if($customer->status == 'active')
+@if($customer->status == 'active' && !$customer->hasContractExpired())
 <div class="modal fade" id="maintenanceModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -514,13 +552,14 @@ header("Expires: 0");
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-success">Save Maintenance</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+@endif
 
 <!-- Renew Modal -->
 <div class="modal fade" id="renewModal" tabindex="-1">
@@ -560,192 +599,51 @@ header("Expires: 0");
         </div>
     </div>
 </div>
-@endif
-
-<style>
-.card {
-    border-radius: 12px;
-}
-
-/* Gradient backgrounds */
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #198754 0%, #146c43 100%) !important;
-}
-
-.bg-gradient-success {
-    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%) !important;
-}
-
-.bg-gradient-info {
-    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
-}
-
-.bg-gradient-warning {
-    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%) !important;
-}
-
-.bg-gradient-danger {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
-}
-
-.bg-gradient-dark {
-    background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%) !important;
-}
-
-.bg-gradient-secondary {
-    background: linear-gradient(135deg, #6c757d 0%, #545b62 100%) !important;
-}
-
-.shadow-lg {
-    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.15) !important;
-}
-
-.table th {
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: #495057;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.table td {
-    padding: 1rem 0.75rem;
-    vertical-align: middle;
-}
-
-.badge {
-    font-size: 0.75rem;
-    padding: 0.5em 0.75em;
-}
-
-.btn {
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.btn:hover {
-    transform: translateY(-1px);
-}
-
-.list-group-item {
-    border: none;
-    padding: 0.75rem 0;
-}
-
-.border-bottom {
-    border-color: #dee2e6 !important;
-}
-
-.modal-content {
-    border-radius: 12px;
-    border: none;
-}
-
-.modal-header {
-    border-radius: 12px 12px 0 0;
-}
-
-.table-success {
-    background-color: rgba(25, 135, 84, 0.05);
-}
-
-.table-warning {
-    background-color: rgba(255, 193, 7, 0.05);
-}
-
-.table-danger {
-    background-color: rgba(220, 53, 69, 0.05);
-}
-
-/* Progress bar styling */
-.progress {
-    border-radius: 3px;
-    background-color: #e9ecef;
-}
-
-.progress-bar {
-    border-radius: 3px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .container-fluid {
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-
-    .d-flex.justify-content-between {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-    }
-
-    .btn-group {
-        width: 100%;
-    }
-}
-</style>
 
 <script>
-function markMaintenanceAsDone(date) {
-    // Set the date in the maintenance form
-    document.getElementById('maintenance_date').value = date;
-
-    // Show the modal
-    const modal = new bootstrap.Modal(document.getElementById('maintenanceModal'));
-    modal.show();
-}
-
-// Auto-focus on notes field when maintenance modal opens
-document.getElementById('maintenanceModal').addEventListener('shown.bs.modal', function () {
-    document.getElementById('notes').focus();
-});
-
-// Auto-focus on service price when renew modal opens
-document.getElementById('renewModal').addEventListener('shown.bs.modal', function () {
-    document.getElementById('service_price').focus();
-});
-
-// Keyboard shortcuts
-document.addEventListener('keydown', function(e) {
-    // Only trigger shortcuts if no input, textarea, or select is focused
-    const focusedElement = document.activeElement;
-    const isInputFocused = focusedElement.tagName === 'INPUT' ||
-                          focusedElement.tagName === 'TEXTAREA' ||
-                          focusedElement.tagName === 'SELECT';
-
-    if (isInputFocused) {
-        return; // Don't trigger shortcuts when typing in forms
+// Customer show page specific initialization
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus on notes field when maintenance modal opens
+    const maintenanceModal = document.getElementById('maintenanceModal');
+    if (maintenanceModal) {
+        maintenanceModal.addEventListener('shown.bs.modal', function () {
+            const notesField = document.getElementById('notes');
+            if (notesField) notesField.focus();
+        });
     }
 
-    // 'e' for edit (with Ctrl/Cmd modifier)
-    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
-        e.preventDefault();
-        window.location.href = "{{ route('customers.edit', $customer) }}";
+    // Auto-focus on service price when renew modal opens
+    const renewModal = document.getElementById('renewModal');
+    if (renewModal) {
+        renewModal.addEventListener('shown.bs.modal', function () {
+            const servicePriceField = document.getElementById('service_price');
+            if (servicePriceField) servicePriceField.focus();
+        });
     }
 
-    // 'm' for maintenance (with Ctrl/Cmd modifier)
-    if ((e.ctrlKey || e.metaKey) && e.key === 'm') {
-        e.preventDefault();
-        const modal = new bootstrap.Modal(document.getElementById('maintenanceModal'));
-        modal.show();
-    }
+    // Handle "Mark as Done" button clicks
+    const markDoneButtons = document.querySelectorAll('.mark-done-btn');
+    markDoneButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const maintenanceDate = this.getAttribute('data-date');
 
-    // Escape to go back (only when no modal is open)
-    if (e.key === 'Escape' && !document.querySelector('.modal.show')) {
-        window.location.href = "{{ route('customers.index') }}";
+            // Set the date in the maintenance form
+            document.getElementById('maintenance_date').value = maintenanceDate;
+
+            // Show the maintenance modal
+            const maintenanceModal = new bootstrap.Modal(document.getElementById('maintenanceModal'));
+            maintenanceModal.show();
+        });
+    });
+
+    // Handle form submission for maintenance
+    const maintenanceForm = document.getElementById('maintenanceForm');
+    if (maintenanceForm) {
+        maintenanceForm.addEventListener('submit', function(e) {
+            // You can add any validation here if needed
+            console.log('Submitting maintenance form with date:', document.getElementById('maintenance_date').value);
+        });
     }
 });
-
-// Print customer details
-function printCustomerDetails() {
-    window.print();
-}
-
-// Auto-refresh page every 2 minutes to update maintenance status
-setTimeout(function() {
-    window.location.reload();
-}, 120000);
 </script>
 @endsection

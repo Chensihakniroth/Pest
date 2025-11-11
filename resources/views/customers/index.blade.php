@@ -1,4 +1,3 @@
-<!-- resources/views/customers/index.blade.php -->
 @extends('layouts.app')
 
 @section('content')
@@ -20,7 +19,7 @@ header("Expires: 0");
         </a>
     </div>
 
-        <!-- Simple Filter Bar -->
+    <!-- Simple Filter Bar -->
     <div class="card border-0 shadow-lg mb-4">
         <div class="card-header bg-dark text-white py-3 border-0">
             <h5 class="card-title mb-0 fw-semibold">
@@ -167,43 +166,43 @@ header("Expires: 0");
                             </td>
 
                             <!-- Status Column -->
-<td>
-    <div class="d-flex align-items-center gap-2">
-        <div>
-            @if($customer->status == 'pending')
-                <!-- Pending Status -->
-                <span class="badge bg-secondary">
-                    <i class="fas fa-pause me-1"></i>Pending
-                </span>
-                <div class="text-muted small mt-1">Contract on hold</div>
-            @elseif($customer->hasContractExpired())
-                <!-- Expired Contract -->
-                <span class="badge bg-danger">Expired</span>
-                <div class="text-danger small mt-1 fw-semibold">
-                    {{ $customer->getDaysSinceExpiration() }} days ago
-                </div>
-            @elseif($customer->isContractExpiring())
-                <!-- Expiring Contract -->
-                <span class="badge bg-warning text-dark">Expiring</span>
-                <div class="text-warning small mt-1 fw-semibold">
-                    {{ $customer->getDisplayDaysUntilExpiration() }} days left
-                </div>
-            @else
-                <!-- Active Status -->
-                <span class="badge bg-success">Active</span>
-                <div class="text-success small mt-1 fw-semibold">
-                    {{ $customer->getDisplayDaysUntilExpiration() }} days left
-                </div>
-            @endif
-        </div>
-        @if($customer->google_map_link)
-            <a href="{{ $customer->google_map_link }}" target="_blank"
-               class="btn btn-sm btn-outline-primary ms-2" title="View on Google Maps">
-                <i class="fas fa-map-marker-alt"></i>
-            </a>
-        @endif
-    </div>
-</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div>
+                                        @if($customer->status == 'pending')
+                                            <!-- Pending Status -->
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-pause me-1"></i>Pending
+                                            </span>
+                                            <div class="text-muted small mt-1">Contract on hold</div>
+                                        @elseif($customer->hasContractExpired())
+                                            <!-- Expired Contract -->
+                                            <span class="badge bg-danger">Expired</span>
+                                            <div class="text-danger small mt-1 fw-semibold">
+                                                {{ $customer->getDaysSinceExpiration() }} days ago
+                                            </div>
+                                        @elseif($customer->isContractExpiring())
+                                            <!-- Expiring Contract -->
+                                            <span class="badge bg-warning text-dark">Expiring</span>
+                                            <div class="text-warning small mt-1 fw-semibold">
+                                                {{ $customer->getDisplayDaysUntilExpiration() }} days left
+                                            </div>
+                                        @else
+                                            <!-- Active Status -->
+                                            <span class="badge bg-success">Active</span>
+                                            <div class="text-success small mt-1 fw-semibold">
+                                                {{ $customer->getDisplayDaysUntilExpiration() }} days left
+                                            </div>
+                                        @endif
+                                    </div>
+                                    @if($customer->google_map_link)
+                                        <a href="{{ $customer->google_map_link }}" target="_blank"
+                                           class="btn btn-sm btn-outline-primary ms-2" title="View on Google Maps">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
 
                             <!-- Actions Column -->
                             <td class="text-end pe-4">
@@ -265,224 +264,10 @@ header("Expires: 0");
     </div>
 </div>
 
-<style>
-.card {
-    border-radius: 12px;
-}
-
-/* Enhanced shadows */
-.shadow-lg {
-    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.15) !important;
-}
-
-/* Table styling */
-.table th {
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 1rem 0.75rem;
-}
-
-.table td {
-    padding: 1rem 0.75rem;
-    vertical-align: middle;
-    border-bottom: 1px solid #f8f9fa;
-}
-
-.btn-group .btn {
-    border-radius: 6px;
-    margin: 0 2px;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.badge {
-    font-size: 0.75rem;
-    padding: 0.35em 0.65em;
-}
-
-.bg-light {
-    background-color: #f8f9fa !important;
-}
-
-.bg-white {
-    background-color: #ffffff !important;
-}
-
-.sort-arrows {
-    display: flex;
-    flex-direction: column;
-}
-
-.sort-arrows .fa-sort {
-    font-size: 0.7rem;
-    opacity: 0.7;
-}
-
-.sort-arrows .fa-sort:hover {
-    opacity: 1;
-    color: #fff !important;
-}
-
-.search-loading {
-    z-index: 5;
-}
-
-.table-loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10;
-}
-
-.table-container {
-    position: relative;
-    min-height: 200px;
-}
-
-/* Dark header styling */
-.bg-dark {
-    background-color: #2c3e50 !important;
-}
-
-.table-dark {
-    background-color: #2c3e50 !important;
-}
-
-/* Hover effects */
-.table-hover tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.02) !important;
-    transform: translateY(-1px);
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Card body background */
-.card-body.bg-light {
-    background-color: #f8f9fa !important;
-}
-
-/* Button hover effects */
-.btn {
-    transition: all 0.2s ease-in-out;
-}
-
-.btn:hover {
-    transform: translateY(-1px);
-}
-
-/* Status badges enhancement */
-.badge.bg-success {
-    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%) !important;
-}
-
-.badge.bg-danger {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
-}
-
-.badge.bg-warning {
-    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%) !important;
-}
-
-.badge.bg-primary {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
-}
-
-.badge.bg-info {
-    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
-}
-</style>
-
 <script>
+// Customer index page specific initialization
 document.addEventListener('DOMContentLoaded', function() {
-    const filterForm = document.getElementById('filterForm');
-    const searchInput = document.getElementById('searchInput');
-    const searchLoading = document.querySelector('.search-loading');
-    const tableBody = document.getElementById('customersTableBody');
-
-    // Auto-submit form when selects change
-    document.querySelectorAll('select[name="service_type"], select[name="status"]').forEach(select => {
-        select.addEventListener('change', function() {
-            showTableLoading();
-            filterForm.submit();
-        });
-    });
-
-    // Instant search with better UX
-    if (searchInput) {
-        let searchTimeout;
-        let lastSearchValue = searchInput.value;
-
-        searchInput.addEventListener('input', function() {
-            const currentValue = this.value.trim();
-
-            // Clear previous timeout
-            clearTimeout(searchTimeout);
-
-            // Show loading immediately
-            searchLoading.style.display = 'block';
-
-            // Only search if value actually changed
-            if (currentValue !== lastSearchValue) {
-                searchTimeout = setTimeout(function() {
-                    showTableLoading();
-                    filterForm.submit();
-                }, 500);
-
-                lastSearchValue = currentValue;
-            } else {
-                searchLoading.style.display = 'none';
-            }
-        });
-
-        // Hide loading when user stops typing but doesn't change value
-        searchInput.addEventListener('blur', function() {
-            setTimeout(() => {
-                searchLoading.style.display = 'none';
-            }, 200);
-        });
-
-        // Also submit on Enter key for instant results
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                clearTimeout(searchTimeout);
-                showTableLoading();
-                filterForm.submit();
-            }
-        });
-
-        // Clear search when Escape is pressed
-        searchInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                this.value = '';
-                showTableLoading();
-                filterForm.submit();
-            }
-        });
-    }
-
-    // Show table loading state
-    function showTableLoading() {
-        if (tableBody) {
-            tableBody.innerHTML = `
-                <tr class="bg-white">
-                    <td colspan="5" class="text-center py-5">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-2 text-muted fw-semibold">Searching customers...</p>
-                    </td>
-                </tr>
-            `;
-        }
-    }
+    // Search and filters are handled by global app.js
 
     // Add active state to current sort
     const currentSort = '{{ request('sort') }}';
@@ -497,13 +282,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 link.classList.add('text-white');
             }
         });
-    }
-
-    // Focus search input on page load for quick searching
-    if (searchInput && !searchInput.value) {
-        setTimeout(() => {
-            searchInput.focus();
-        }, 100);
     }
 });
 </script>
