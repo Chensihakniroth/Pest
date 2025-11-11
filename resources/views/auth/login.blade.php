@@ -1,10 +1,17 @@
+
 @extends('layouts.auth')
 
 @section('content')
 <div class="auth-form">
     <div class="text-center mb-4">
+        <div class="auth-icon mb-3">
+            <div class="bg-gradient-primary rounded-circle text-white d-flex align-items-center justify-content-center mx-auto"
+                 style="width: 60px; height: 60px;">
+                <i class="fas fa-sign-in-alt fa-lg"></i>
+            </div>
+        </div>
         <h4 class="fw-bold text-dark mb-2">Welcome Back</h4>
-        <p class="text-muted">Sign in to your account</p>
+        <p class="text-muted">Sign in to your GreenHome account</p>
     </div>
 
     @if($errors->any())
@@ -29,12 +36,12 @@
         @csrf
 
         <div class="mb-3">
-            <label for="email" class="form-label">Email Address</label>
+            <label for="email" class="form-label fw-semibold">Email Address</label>
             <div class="input-group">
-                <span class="input-group-text">
+                <span class="input-group-text bg-light border-end-0">
                     <i class="fas fa-envelope text-muted"></i>
                 </span>
-                <input type="email" class="form-control @error('email') is-invalid @enderror"
+                <input type="email" class="form-control border-start-0 @error('email') is-invalid @enderror"
                        id="email" name="email" value="{{ old('email') }}"
                        placeholder="Enter your email" required autofocus>
             </div>
@@ -44,12 +51,12 @@
         </div>
 
         <div class="mb-4">
-            <label for="password" class="form-label">Password</label>
+            <label for="password" class="form-label fw-semibold">Password</label>
             <div class="input-group">
-                <span class="input-group-text">
+                <span class="input-group-text bg-light border-end-0">
                     <i class="fas fa-lock text-muted"></i>
                 </span>
-                <input type="password" class="form-control @error('password') is-invalid @enderror"
+                <input type="password" class="form-control border-start-0 @error('password') is-invalid @enderror"
                        id="password" name="password" placeholder="Enter your password" required>
                 <button type="button" class="input-group-text toggle-password" data-target="password">
                     <i class="fas fa-eye"></i>
@@ -81,6 +88,16 @@
     </form>
 </div>
 
+<style>
+.auth-icon {
+    transition: transform 0.3s ease;
+}
+
+.auth-icon:hover {
+    transform: scale(1.05);
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-focus on email field
@@ -89,6 +106,12 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             emailField.focus();
         }, 100);
+    }
+
+    // Add subtle animation to auth icon
+    const authIcon = document.querySelector('.auth-icon');
+    if (authIcon) {
+        authIcon.style.animation = 'fadeInUp 0.6s ease';
     }
 });
 </script>

@@ -11,6 +11,39 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Enhanced loading states */
+        .btn-loading {
+            position: relative;
+            color: transparent !important;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-right-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Smooth transitions */
+        .card, .btn, .nav-item, .table tr {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
 </head>
 <body>
     <!-- Enhanced Modern Navbar -->
@@ -20,7 +53,7 @@
             <a class="navbar-brand" href="{{ route('dashboard') }}">
                 <div class="brand-container">
                     <div class="brand-icon">
-                        <i class="fas fa-home"></i>
+                        <i class="fas fa-leaf"></i>
                     </div>
                     <div class="brand-text">
                         <span class="brand-primary">GreenHome</span>
@@ -139,7 +172,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <i class="fas fa-home"></i>
+                    <i class="fas fa-leaf"></i>
                     <span>GreenHome Pest Control</span>
                 </div>
                 <p class="footer-text">Professional pest control & customer management</p>

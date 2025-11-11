@@ -8,6 +8,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DarkModeController;
+use Illuminate\Support\Facades\Log; // Add this
+use Illuminate\Support\Facades\DB;  // Add this
 
 // Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -26,7 +28,7 @@ Route::get('/test', function () {
     return view('test');
 });
 
-// Dark Mode Toggle Route - MOVE THIS OUTSIDE THE AUTH GROUP
+// Dark Mode Toggle Route
 Route::post('/dark-mode/toggle', [DarkModeController::class, 'toggle'])->name('dark-mode.toggle');
 
 // Protected Routes
@@ -46,11 +48,13 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Add this to web.php - TEMPORARY TEST ROUTE
+    // Dashboard stats API
+    Route::get('/dashboard/stats', [DashboardController::class, 'getStats'])->name('dashboard.stats');
+
+    // Test routes
     Route::get('/test-status/{customer}', function($customerId) {
-        // Check current status multiple ways
         $customer = \App\Models\Customer::find($customerId);
-        $dbStatus = \DB::table('customers')->where('id', $customerId)->value('status');
+        $dbStatus = DB::table('customers')->where('id', $customerId)->value('status');
 
         return [
             'eloquent_status' => $customer->status,
@@ -60,34 +64,32 @@ Route::middleware(['auth'])->group(function () {
         ];
     });
 
-    // Add this temporary route to check for active jobs
     Route::get('/check-jobs', function() {
         return [
-            'scheduled_tasks' => \DB::table('jobs')->count(),
-            'failed_jobs' => \DB::table('failed_jobs')->count(),
+            'scheduled_tasks' => DB::table('jobs')->count(),
+            'failed_jobs' => DB::table('failed_jobs')->count(),
         ];
     });
 
-    // Add this to your web.php routes file
     Route::get('/direct-status-test/{customer}/{status}', function($customer, $status) {
         if (!in_array($status, ['active', 'pending'])) {
             return 'Invalid status';
         }
 
-        \Log::info('=== DIRECT STATUS TEST ===');
-        \Log::info('Customer ID:', ['id' => $customer]);
-        \Log::info('Requested status:', ['status' => $status]);
+        Log::info('=== DIRECT STATUS TEST ===');
+        Log::info('Customer ID:', ['id' => $customer]);
+        Log::info('Requested status:', ['status' => $status]);
 
         // Direct database update
-        $result = \DB::table('customers')
+        $result = DB::table('customers')
             ->where('id', $customer)
             ->update(['status' => $status]);
 
-        \Log::info('Update result:', ['affected_rows' => $result]);
+        Log::info('Update result:', ['affected_rows' => $result]);
 
         // Check immediately
-        $newStatus = \DB::table('customers')->where('id', $customer)->value('status');
-        \Log::info('New status in database:', ['status' => $newStatus]);
+        $newStatus = DB::table('customers')->where('id', $customer)->value('status');
+        Log::info('New status in database:', ['status' => $newStatus]);
 
         return [
             'update_result' => $result,
@@ -96,5 +98,5 @@ Route::middleware(['auth'])->group(function () {
             'requested_status' => $status,
             'timestamp' => now()
         ];
-    }); // This was missing the closing parenthesis and semicolon
+    });
 });

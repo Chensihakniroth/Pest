@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log; // Add this
 
 class Customer extends Model
 {
@@ -451,6 +452,28 @@ class Customer extends Model
 
         return $this;
     }
+
+    /**
+ * Force status update and save
+ */
+public function forceStatusUpdate()
+{
+    $originalStatus = $this->status;
+    $this->updateContractStatus();
+
+    if ($this->isDirty('status')) {
+        $this->save();
+        Log::info("Customer status updated", [
+            'customer_id' => $this->id,
+            'name' => $this->name,
+            'old_status' => $originalStatus,
+            'new_status' => $this->status,
+            'contract_end' => $this->contract_end_date
+        ]);
+    }
+
+    return $this;
+}
 
     /**
      * Get maintenance interval in months
