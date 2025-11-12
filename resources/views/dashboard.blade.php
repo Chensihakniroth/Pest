@@ -21,8 +21,8 @@
         </div>
     </div>
 
-    <!-- Statistics Grid with Full Color Gradients -->
-<div class="stats-grid">
+    <!-- Compact Statistics Grid -->
+<div class="stats-grid compact">
     <!-- Total Customers -->
     <div class="stat-card gradient-primary">
         <div class="stat-icon">
@@ -31,11 +31,7 @@
         <div class="stat-content">
             <div class="stat-value" data-stat="total-customers">{{ $totalCustomers ?? 0 }}</div>
             <div class="stat-label">Total Customers</div>
-            <div class="stat-description">
-                <i class="fas fa-users me-1"></i>All registered clients
-            </div>
         </div>
-        <div class="stat-glow"></div>
     </div>
 
     <!-- Active Customers -->
@@ -46,11 +42,7 @@
         <div class="stat-content">
             <div class="stat-value" data-stat="active-customers">{{ $activeCustomers ?? 0 }}</div>
             <div class="stat-label">Active Customers</div>
-            <div class="stat-description">
-                <i class="fas fa-check-circle me-1"></i>Current contracts
-            </div>
         </div>
-        <div class="stat-glow"></div>
     </div>
 
     <!-- Expiring Contracts -->
@@ -61,11 +53,7 @@
         <div class="stat-content">
             <div class="stat-value" data-stat="expiring-contracts">{{ $expiringContracts ?? 0 }}</div>
             <div class="stat-label">Expiring Contracts</div>
-            <div class="stat-description">
-                <i class="fas fa-clock me-1"></i>Within 90 days
-            </div>
         </div>
-        <div class="stat-glow"></div>
     </div>
 
     <!-- Maintenance Due -->
@@ -76,11 +64,7 @@
         <div class="stat-content">
             <div class="stat-value" data-stat="maintenance-alerts">{{ $maintenanceAlertsCount ?? 0 }}</div>
             <div class="stat-label">Maintenance Due</div>
-            <div class="stat-description">
-                <i class="fas fa-tools me-1"></i>Requires attention
-            </div>
         </div>
-        <div class="stat-glow"></div>
     </div>
 </div>
 
@@ -421,102 +405,107 @@
     font-size: 0.875rem;
 }
 
-/* Statistics Grid */
-.stats-grid {
+/* Enhanced Statistics Grid with Full Gradients */
+/* Compact Statistics Grid */
+.stats-grid.compact {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .stat-card {
-    background: var(--gh-surface);
-    border: 1px solid var(--gh-border);
-    border-radius: 16px;
-    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--card-color-1), var(--card-color-2));
+    border-radius: 12px;
+    padding: 1rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: white;
+    min-height: 80px;
 }
-
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(135deg, currentColor, transparent);
-}
-
-.stat-card.primary::before { background: linear-gradient(135deg, #10b981, #34d399); }
-.stat-card.success::before { background: linear-gradient(135deg, #059669, #10b981); }
-.stat-card.warning::before { background: linear-gradient(135deg, #d97706, #f59e0b); }
-.stat-card.info::before { background: linear-gradient(135deg, #0e7490, #06b6d4); }
 
 .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--gh-shadow-lg);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
+/* Gradient Variations */
+.stat-card.gradient-primary {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.stat-card.gradient-success {
+    background: linear-gradient(135deg, #059669, #047857);
+}
+
+.stat-card.gradient-warning {
+    background: linear-gradient(135deg, #d97706, #b45309);
+}
+
+.stat-card.gradient-info {
+    background: linear-gradient(135deg, #0e7490, #0c6b85);
+}
+
+/* Stat Icon */
 .stat-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
-    color: white;
+    font-size: 1.1rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
 }
 
-.stat-card.primary .stat-icon { background: linear-gradient(135deg, #10b981, #34d399); }
-.stat-card.success .stat-icon { background: linear-gradient(135deg, #059669, #10b981); }
-.stat-card.warning .stat-icon { background: linear-gradient(135deg, #d97706, #f59e0b); }
-.stat-card.info .stat-icon { background: linear-gradient(135deg, #0e7490, #06b6d4); }
-
+/* Stat Content */
 .stat-content {
     flex: 1;
 }
 
 .stat-value {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    color: var(--gh-text);
     line-height: 1;
     margin-bottom: 0.25rem;
 }
 
 .stat-label {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    color: var(--gh-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 0.25rem;
+    opacity: 0.9;
 }
 
-.stat-description {
-    font-size: 0.75rem;
-    color: var(--gh-text-light);
-}
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-grid.compact {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
 
-.stat-trend {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.875rem;
-}
+    .stat-card {
+        padding: 0.75rem;
+        min-height: 70px;
+    }
 
-.stat-trend.positive { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-.stat-trend.negative { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
-.stat-trend.stable { background: rgba(156, 163, 175, 0.1); color: #9ca3af; }
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+    }
+}
 
 /* Alerts Grid */
 .alerts-grid {
@@ -889,19 +878,6 @@
         font-size: 1.5rem;
     }
 
-    .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-
-    .stat-card {
-        padding: 1rem;
-    }
-
-    .stat-value {
-        font-size: 1.5rem;
-    }
-
     .alerts-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
@@ -963,6 +939,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Auto-refresh dashboard every 60 seconds
     let refreshTimer = setInterval(refreshDashboardStats, 60000);
 
+    // Enhanced stat card interactions
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+
+        // Add click effect
+        card.addEventListener('mousedown', function() {
+            this.style.transform = 'translateY(-4px) scale(0.98)';
+        });
+
+        card.addEventListener('mouseup', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+    });
+
     // AJAX stats refresh function
     function refreshDashboardStats() {
         if (window.location.pathname === '/dashboard' || window.location.pathname === '/') {
@@ -992,6 +989,14 @@ document.addEventListener('DOMContentLoaded', function() {
         Object.entries(elements).forEach(([key, value]) => {
             const element = document.querySelector(`[data-stat="${key}"]`);
             if (element && element.textContent != value) {
+                // Flash animation
+                const card = element.closest('.stat-card');
+                card.style.animation = 'none';
+                setTimeout(() => {
+                    card.style.animation = 'statFlash 0.6s ease';
+                }, 10);
+
+                // Update value
                 element.textContent = value;
                 element.classList.add('updating');
                 setTimeout(() => element.classList.remove('updating'), 600);
@@ -1003,20 +1008,41 @@ document.addEventListener('DOMContentLoaded', function() {
         if (refreshIndicator) {
             const now = new Date();
             refreshIndicator.innerHTML = `<i class="fas fa-sync-alt"></i><span>Updated: ${now.toLocaleTimeString()}</span>`;
+            refreshIndicator.style.animation = 'none';
+            setTimeout(() => {
+                refreshIndicator.style.animation = 'pulseUpdate 0.6s ease';
+            }, 10);
         }
     }
 
-    // Add smooth interactions
-    const statCards = document.querySelectorAll('.stat-card');
-    statCards.forEach(card => {
-        card.style.cursor = 'pointer';
-        card.addEventListener('click', function() {
-            this.style.transform = 'translateY(-2px) scale(1.02)';
-            setTimeout(() => {
-                this.style.transform = 'translateY(-4px)';
-            }, 150);
-        });
+    // Compact stat card interactions
+const statCards = document.querySelectorAll('.stat-card');
+statCards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-2px)';
     });
+
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+    });
+})();
+
+    // Add flash animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes statFlash {
+            0% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+            50% { box-shadow: 0 8px 32px rgba(255, 255, 255, 0.3); }
+            100% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        }
+
+        @keyframes pulseUpdate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    `;
+    document.head.appendChild(style);
 
     // Initialize any charts or additional components here
     console.log('GreenHome Dashboard initialized');
