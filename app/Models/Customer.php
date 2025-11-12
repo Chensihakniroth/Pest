@@ -24,6 +24,27 @@ class Customer extends Model
         'service_price' => 'decimal:2',
     ];
 
+    // Update service types to include Drill and injection
+    const SERVICE_TYPES = [
+        'baiting_system_complete' => 'Baiting System Complete',
+        'baiting_system_not_complete' => 'Baiting System Not Complete',
+        'host_system' => 'Host System',
+        'drill_injection' => 'Drill and Injection'
+    ];
+
+    const MAINTENANCE_INTERVALS = [
+        'baiting_system_complete' => 3,
+        'baiting_system_not_complete' => 3,
+        'host_system' => 6,
+        'drill_injection' => 6
+    ];
+
+    const CONTRACT_STATUSES = [
+        'active',
+        'expired',
+        'pending'
+    ];
+
     /**
      * Relationship with MaintenanceHistory
      */
@@ -83,7 +104,7 @@ class Customer extends Model
             $startDate = Carbon::parse($this->contract_start_date)->startOfDay();
         }
 
-        $interval = $this->service_type === 'host_system' ? 6 : 3;
+        $interval = $this->getMaintenanceInterval();
         $today = Carbon::today()->startOfDay();
 
         // Calculate next expected maintenance date from last maintenance
@@ -118,7 +139,7 @@ class Customer extends Model
             $startDate = Carbon::parse($this->contract_start_date)->startOfDay();
         }
 
-        $interval = $this->service_type === 'host_system' ? 6 : 3;
+        $interval = $this->getMaintenanceInterval();
         $today = Carbon::today()->startOfDay();
 
         // Find the next maintenance date that is in the future
@@ -371,7 +392,7 @@ class Customer extends Model
 
         $scheduledDates = collect();
         $startDate = Carbon::parse($this->contract_start_date)->startOfDay();
-        $interval = $this->service_type === 'host_system' ? 6 : 3;
+        $interval = $this->getMaintenanceInterval();
         $today = Carbon::today()->startOfDay();
         $contractEnd = Carbon::parse($this->contract_end_date)->startOfDay();
 
@@ -434,7 +455,7 @@ class Customer extends Model
      */
     public function getNextMaintenanceDateAfter($date)
     {
-        $interval = $this->service_type === 'host_system' ? 6 : 3;
+        $interval = $this->getMaintenanceInterval();
         return Carbon::parse($date)->addMonths($interval)->startOfDay();
     }
 
@@ -454,32 +475,40 @@ class Customer extends Model
     }
 
     /**
- * Force status update and save
- */
-public function forceStatusUpdate()
-{
-    $originalStatus = $this->status;
-    $this->updateContractStatus();
+     * Force status update and save
+     */
+    public function forceStatusUpdate()
+    {
+        $originalStatus = $this->status;
+        $this->updateContractStatus();
 
-    if ($this->isDirty('status')) {
-        $this->save();
-        Log::info("Customer status updated", [
-            'customer_id' => $this->id,
-            'name' => $this->name,
-            'old_status' => $originalStatus,
-            'new_status' => $this->status,
-            'contract_end' => $this->contract_end_date
-        ]);
+        if ($this->isDirty('status')) {
+            $this->save();
+            Log::info("Customer status updated", [
+                'customer_id' => $this->id,
+                'name' => $this->name,
+                'old_status' => $originalStatus,
+                'new_status' => $this->status,
+                'contract_end' => $this->contract_end_date
+            ]);
+        }
+
+        return $this;
     }
-
-    return $this;
-}
 
     /**
      * Get maintenance interval in months
      */
     public function getMaintenanceInterval()
     {
-        return $this->service_type === 'host_system' ? 6 : 3;
+        return self::MAINTENANCE_INTERVALS[$this->service_type] ?? 3;
+    }
+
+    /**
+     * Get service type display name
+     */
+    public function getServiceTypeDisplayAttribute()
+    {
+        return self::SERVICE_TYPES[$this->service_type] ?? $this->service_type;
     }
 }

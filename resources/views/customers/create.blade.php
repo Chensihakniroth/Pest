@@ -151,30 +151,33 @@
                                 </div>
 
                                 <!-- Service Type -->
-                                <div class="mb-3">
-                                    <label for="service_type" class="form-label fw-semibold">Service Type <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light border-end-0">
-                                            <i class="fas fa-list text-muted"></i>
-                                        </span>
-                                        <select class="form-control border-start-0 @error('service_type') is-invalid @enderror"
-                                                id="service_type" name="service_type" required>
-                                            <option value="">Select Service Type</option>
-                                            <option value="baiting_system_complete" {{ old('service_type') == 'baiting_system_complete' ? 'selected' : '' }}>
-                                                Baiting System Complete (Maintenance every 3 months)
-                                            </option>
-                                            <option value="baiting_system_not_complete" {{ old('service_type') == 'baiting_system_not_complete' ? 'selected' : '' }}>
-                                                Baiting System Not Complete (Maintenance every 3 months)
-                                            </option>
-                                            <option value="host_system" {{ old('service_type') == 'host_system' ? 'selected' : '' }}>
-                                                Host System (Maintenance every 6 months)
-                                            </option>
-                                        </select>
-                                    </div>
-                                    @error('service_type')
-                                        <div class="text-danger small mt-1">{{ $message }}</div>
-                                    @enderror
-                                </div>
+<div class="mb-3">
+    <label for="service_type" class="form-label fw-semibold">Service Type <span class="text-danger">*</span></label>
+    <div class="input-group">
+        <span class="input-group-text bg-light border-end-0">
+            <i class="fas fa-list text-muted"></i>
+        </span>
+        <select class="form-control border-start-0 @error('service_type') is-invalid @enderror"
+                id="service_type" name="service_type" required>
+            <option value="">Select Service Type</option>
+            <option value="baiting_system_complete" {{ old('service_type') == 'baiting_system_complete' ? 'selected' : '' }}>
+                Baiting System Complete (Maintenance every 3 months)
+            </option>
+            <option value="baiting_system_not_complete" {{ old('service_type') == 'baiting_system_not_complete' ? 'selected' : '' }}>
+                Baiting System Not Complete (Maintenance every 3 months)
+            </option>
+            <option value="host_system" {{ old('service_type') == 'host_system' ? 'selected' : '' }}>
+                Host System (Maintenance every 6 months)
+            </option>
+            <option value="drill_injection" {{ old('service_type') == 'drill_injection' ? 'selected' : '' }}>
+                Drill and Injection (Maintenance every 6 months)
+            </option>
+        </select>
+    </div>
+    @error('service_type')
+        <div class="text-danger small mt-1">{{ $message }}</div>
+    @enderror
+</div>
 
                                 <!-- Contract Dates -->
                                 <h6 class="fw-semibold text-dark mb-3 border-bottom pb-2 mt-4">

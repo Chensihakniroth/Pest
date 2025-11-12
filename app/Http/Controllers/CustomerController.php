@@ -95,7 +95,6 @@ class CustomerController extends Controller
         return view('customers.index', compact('customers'));
     }
 
-    // ... keep all your other methods exactly as they were
     public function create()
     {
         return view('customers.create');
@@ -110,7 +109,7 @@ class CustomerController extends Controller
             'phone_number' => 'required|string',
             'service_name' => 'required|string|max:255',
             'service_price' => 'required|numeric|min:0',
-            'service_type' => 'required|in:baiting_system_complete,baiting_system_not_complete,host_system',
+            'service_type' => 'required|in:baiting_system_complete,baiting_system_not_complete,host_system,drill_injection',
             'contract_start_date' => 'required|date',
             'contract_end_date' => 'required|date|after:contract_start_date',
             'comments' => 'nullable|string',
@@ -180,23 +179,25 @@ class CustomerController extends Controller
         return redirect()->back()->with('success', 'Maintenance recorded successfully. Dashboard will update immediately.');
     }
 
-    public function renewContract(Request $request, Customer $customer)
-    {
-        $request->validate([
-            'contract_end_date' => 'required|date|after:today',
-            'service_type' => 'required|in:baiting_system_complete,baiting_system_not_complete,host_system',
-            'service_price' => 'required|numeric|min:0',
-        ]);
+public function renewContract(Request $request, Customer $customer)
+{
+    $request->validate([
+        'contract_start_date' => 'required|date',
+        'contract_end_date' => 'required|date|after:contract_start_date',
+        'service_type' => 'required|in:baiting_system_complete,baiting_system_not_complete,host_system,drill_injection',
+        'service_price' => 'required|numeric|min:0',
+    ]);
 
-        $customer->update([
-            'contract_end_date' => $request->contract_end_date,
-            'service_type' => $request->service_type,
-            'service_price' => $request->service_price,
-            'status' => 'active',
-        ]);
+    $customer->update([
+        'contract_start_date' => $request->contract_start_date,
+        'contract_end_date' => $request->contract_end_date,
+        'service_type' => $request->service_type,
+        'service_price' => $request->service_price,
+        'status' => 'active',
+    ]);
 
-        return redirect()->back()->with('success', 'Contract renewed successfully.');
-    }
+    return redirect()->back()->with('success', 'Contract renewed successfully.');
+}
 
     public function destroy(Customer $customer)
     {

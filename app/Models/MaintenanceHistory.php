@@ -10,10 +10,10 @@ class MaintenanceHistory extends Model
     use HasFactory;
 
     protected $fillable = [
-        'customer_id', 
-        'maintenance_date', 
-        'service_type', 
-        'notes', 
+        'customer_id',
+        'maintenance_date',
+        'service_type',
+        'notes',
         'performed_by'
     ];
 
@@ -27,5 +27,13 @@ class MaintenanceHistory extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    /**
+     * Get service type display name
+     */
+    public function getServiceTypeDisplayAttribute()
+    {
+        return \App\Models\Customer::SERVICE_TYPES[$this->service_type] ?? $this->service_type;
     }
 }

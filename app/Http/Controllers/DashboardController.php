@@ -231,37 +231,37 @@ class DashboardController extends Controller
         })->values();
     }
 
-/**
- * Get ALL maintenance dates for a customer (overdue and future)
- */
-private function getAllMaintenanceDatesForCustomer(Customer $customer)
-{
-    $dates = collect();
-    $today = Carbon::today();
+    /**
+     * Get ALL maintenance dates for a customer (overdue and future)
+     */
+    private function getAllMaintenanceDatesForCustomer(Customer $customer)
+    {
+        $dates = collect();
+        $today = Carbon::today();
 
-    // Get the last maintenance date or use contract start date
-    $lastMaintenance = $customer->maintenanceHistory()->latest()->first();
-    $startDate = $lastMaintenance ? $lastMaintenance->maintenance_date : $customer->contract_start_date;
+        // Get the last maintenance date or use contract start date
+        $lastMaintenance = $customer->maintenanceHistory()->latest()->first();
+        $startDate = $lastMaintenance ? $lastMaintenance->maintenance_date : $customer->contract_start_date;
 
-    // Determine interval based on service type
-    $intervalMonths = $customer->service_type === 'host_system' ? 6 : 3;
+        // Determine interval based on service type
+        $intervalMonths = $customer->getMaintenanceInterval();
 
-    // Calculate enough dates to cover from contract start to today + 30 days
-    $earliestDate = $customer->contract_start_date->copy();
-    $maxDate = $today->copy()->addDays(30);
+        // Calculate enough dates to cover from contract start to today + 30 days
+        $earliestDate = $customer->contract_start_date->copy();
+        $maxDate = $today->copy()->addDays(30);
 
-    $currentDate = $earliestDate->copy();
-    while ($currentDate <= $maxDate) {
-        $dates->push($currentDate->copy());
-        $currentDate = $currentDate->copy()->addMonths($intervalMonths);
+        $currentDate = $earliestDate->copy();
+        while ($currentDate <= $maxDate) {
+            $dates->push($currentDate->copy());
+            $currentDate = $currentDate->copy()->addMonths($intervalMonths);
+        }
+
+        // Filter to only include dates that are either overdue or within 7 days
+        return $dates->filter(function($date) use ($today) {
+            $daysDifference = $today->diffInDays($date, false);
+            return $daysDifference < 0 || $daysDifference <= 7;
+        })->sort()->values();
     }
-
-    // Filter to only include dates that are either overdue or within 7 days
-    return $dates->filter(function($date) use ($today) {
-        $daysDifference = $today->diffInDays($date, false);
-        return $daysDifference < 0 || $daysDifference <= 7;
-    })->sort()->values();
-}
 
     /**
      * API endpoint for dashboard stats (optional - for AJAX updates)

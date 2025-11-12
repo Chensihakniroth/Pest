@@ -381,50 +381,50 @@ header("Expires: 0");
         </div>
 
         <!-- Right Column - Actions & Alerts -->
-        <div class="col-lg-4">
-            <!-- Contract Alerts Card -->
-            @if($customer->status == 'active' && ($customer->hasContractExpired() || $customer->isContractExpiring()))
-            <div class="card glass-morphism border-0 shadow-sm mb-4">
-                <div class="card-header bg-transparent py-3 px-4 border-bottom">
-                    <h6 class="mb-0 fw-semibold text-dark">
-                        <i class="fas fa-exclamation-triangle me-2 text-primary"></i>Contract Alert
-                    </h6>
-                </div>
-                <div class="card-body p-4">
-                    @if($customer->hasContractExpired())
-                    <div class="text-center mb-3">
-                        <i class="fas fa-calendar-times fa-lg text-danger mb-2"></i>
-                        <p class="text-danger fw-semibold mb-1 small">Contract Expired</p>
-                        <p class="text-muted small">Expired on {{ $customer->contract_end_date->format('M d, Y') }}</p>
-                        <p class="text-danger small fw-semibold">{{ $customer->getDaysSinceExpiration() }} days ago</p>
-                    </div>
-                    @elseif($customer->isContractExpiring())
-                    <div class="text-center mb-3">
-                        <i class="fas fa-clock fa-lg text-warning mb-2"></i>
-                        <p class="text-warning fw-semibold mb-1 small">Contract Expiring Soon</p>
-                        <p class="text-muted small">Expires on {{ $customer->contract_end_date->format('M d, Y') }}</p>
-                        <p class="text-warning small fw-semibold">{{ $customer->getDisplayDaysUntilExpiration() }} days remaining</p>
-                    </div>
-                    @endif
-
-                    <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#renewModal">
-                            <i class="fas fa-sync-alt me-2"></i>Renew Contract
-                        </button>
-                        <form action="{{ route('customers.renew', $customer) }}" method="POST" class="d-grid">
-                            @csrf
-                            <input type="hidden" name="contract_end_date" value="{{ now()->addYear()->format('Y-m-d') }}">
-                            <input type="hidden" name="service_type" value="{{ $customer->service_type }}">
-                            <input type="hidden" name="service_price" value="{{ $customer->service_price }}">
-                            <button type="submit" class="btn btn-outline-success btn-sm">
-                                <i class="fas fa-bolt me-2"></i>Quick Renew (1 Year)
-                            </button>
-                        </form>
-                    </div>
-                </div>
+<div class="col-lg-4">
+    <!-- Contract Alerts Card -->
+    @if(($customer->status == 'active' && $customer->isContractExpiring()) || $customer->hasContractExpired())
+    <div class="card glass-morphism border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent py-3 px-4 border-bottom">
+            <h6 class="mb-0 fw-semibold text-dark">
+                <i class="fas fa-exclamation-triangle me-2 text-primary"></i>Contract Alert
+            </h6>
+        </div>
+        <div class="card-body p-4">
+            @if($customer->hasContractExpired())
+            <div class="text-center mb-3">
+                <i class="fas fa-calendar-times fa-lg text-danger mb-2"></i>
+                <p class="text-danger fw-semibold mb-1 small">Contract Expired</p>
+                <p class="text-muted small">Expired on {{ $customer->contract_end_date->format('M d, Y') }}</p>
+                <p class="text-danger small fw-semibold">{{ $customer->getDaysSinceExpiration() }} days ago</p>
+            </div>
+            @elseif($customer->isContractExpiring())
+            <div class="text-center mb-3">
+                <i class="fas fa-clock fa-lg text-warning mb-2"></i>
+                <p class="text-warning fw-semibold mb-1 small">Contract Expiring Soon</p>
+                <p class="text-muted small">Expires on {{ $customer->contract_end_date->format('M d, Y') }}</p>
+                <p class="text-warning small fw-semibold">{{ $customer->getDisplayDaysUntilExpiration() }} days remaining</p>
             </div>
             @endif
 
+            <div class="d-grid gap-2">
+                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#renewModal">
+                    <i class="fas fa-sync-alt me-2"></i>Renew Contract
+                </button>
+                <form action="{{ route('customers.renew', $customer) }}" method="POST" class="d-grid">
+                    @csrf
+                    <input type="hidden" name="contract_start_date" value="{{ now()->format('Y-m-d') }}">
+                    <input type="hidden" name="contract_end_date" value="{{ now()->addYears(5)->format('Y-m-d') }}">
+                    <input type="hidden" name="service_type" value="{{ $customer->service_type }}">
+                    <input type="hidden" name="service_price" value="{{ $customer->service_price }}">
+                    <button type="submit" class="btn btn-outline-success btn-sm">
+                        <i class="fas fa-bolt me-2"></i>Quick Renew (5 Years)
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
             <!-- Quick Actions -->
             <div class="card glass-morphism border-0 shadow-sm mb-4">
                 <div class="card-header bg-transparent py-3 px-4 border-bottom">
@@ -563,18 +563,30 @@ header("Expires: 0");
             <form action="{{ route('customers.renew', $customer) }}" method="POST">
                 @csrf
                 <div class="modal-body px-4">
+                    <!-- Contract Start Date -->
                     <div class="mb-3">
-                        <label for="contract_end_date" class="form-label fw-semibold small">New Contract End Date</label>
-                        <input type="date" class="form-control modern-input" id="contract_end_date" name="contract_end_date" value="{{ now()->addYear()->format('Y-m-d') }}" required>
+                        <label for="contract_start_date" class="form-label fw-semibold small">Contract Start Date</label>
+                        <input type="date" class="form-control modern-input" id="contract_start_date" name="contract_start_date" value="{{ now()->format('Y-m-d') }}" required>
                     </div>
+
+                    <!-- Contract End Date -->
+                    <div class="mb-3">
+                        <label for="contract_end_date" class="form-label fw-semibold small">Contract End Date</label>
+                        <input type="date" class="form-control modern-input" id="contract_end_date" name="contract_end_date" value="{{ now()->addYears(5)->format('Y-m-d') }}" required>
+                    </div>
+
+                    <!-- Service Type -->
                     <div class="mb-3">
                         <label for="service_type" class="form-label fw-semibold small">Service Type</label>
                         <select class="form-control modern-select" id="service_type" name="service_type" required>
                             <option value="baiting_system_complete" {{ $customer->service_type == 'baiting_system_complete' ? 'selected' : '' }}>Baiting System Complete</option>
                             <option value="baiting_system_not_complete" {{ $customer->service_type == 'baiting_system_not_complete' ? 'selected' : '' }}>Baiting System Not Complete</option>
                             <option value="host_system" {{ $customer->service_type == 'host_system' ? 'selected' : '' }}>Host System</option>
+                            <option value="drill_injection" {{ $customer->service_type == 'drill_injection' ? 'selected' : '' }}>Drill and Injection</option>
                         </select>
                     </div>
+
+                    <!-- Service Price -->
                     <div class="mb-3">
                         <label for="service_price" class="form-label fw-semibold small">Service Price</label>
                         <input type="number" step="0.01" class="form-control modern-input" id="service_price" name="service_price" value="{{ $customer->service_price }}" required>
