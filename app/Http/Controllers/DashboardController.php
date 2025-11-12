@@ -7,6 +7,7 @@ use App\Models\MaintenanceHistory;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -151,39 +152,116 @@ class DashboardController extends Controller
             ->with('maintenanceHistory')
             ->get();
 
+        Log::info('Total active customers found: ' . $activeCustomers->count());
+
         foreach ($activeCustomers as $customer) {
             try {
-                // Force fresh calculation
-                $customer->recalculateMaintenanceDates();
+                Log::info("Processing customer: {$customer->name} (ID: {$customer->id})");
 
-                // Get the most urgent maintenance alert for this customer
-                $urgentAlert = $customer->getMostUrgentMaintenanceAlert();
+                // Get ALL maintenance dates, not just the next one
+                $allMaintenanceDates = $this->getAllMaintenanceDatesForCustomer($customer);
+                Log::info("Customer {$customer->name} total maintenance dates found: " . count($allMaintenanceDates));
 
-                if ($urgentAlert && !$customer->isMaintenanceDateCompleted($urgentAlert['date'])) {
-                    $maintenanceAlerts->push([
-                        'customer' => $customer,
-                        'alert' => $urgentAlert
-                    ]);
+                $today = Carbon::today();
+                $hasAddedUpcoming = false;
+
+                foreach ($allMaintenanceDates as $maintenanceDate) {
+                    $daysDifference = $today->diffInDays($maintenanceDate, false);
+                    Log::info("Customer {$customer->name} date: {$maintenanceDate->format('Y-m-d')}, days difference: {$daysDifference}");
+
+                    $isCompleted = $customer->isMaintenanceDateCompleted($maintenanceDate);
+                    Log::info("Customer {$customer->name} maintenance completed for {$maintenanceDate->format('Y-m-d')}: " . ($isCompleted ? 'Yes' : 'No'));
+
+                    // Skip completed maintenance
+                    if ($isCompleted) {
+                        continue;
+                    }
+
+                    // Add ALL overdue dates (any negative days)
+                    if ($daysDifference < 0) {
+                        $maintenanceAlerts->push([
+                            'customer' => $customer,
+                            'alert' => [
+                                'date' => $maintenanceDate,
+                                'days' => $daysDifference,
+                                'type' => 'overdue'
+                            ]
+                        ]);
+                        Log::info("Added OVERDUE alert for customer {$customer->name} for date {$maintenanceDate->format('Y-m-d')}");
+                    }
+                    // Add only the NEXT upcoming date within 7 days (not already added one)
+                    elseif ($daysDifference <= 7 && $daysDifference >= 0 && !$hasAddedUpcoming) {
+                        $maintenanceAlerts->push([
+                            'customer' => $customer,
+                            'alert' => [
+                                'date' => $maintenanceDate,
+                                'days' => $daysDifference,
+                                'type' => $daysDifference == 0 ? 'today' : 'upcoming'
+                            ]
+                        ]);
+                        $hasAddedUpcoming = true; // Only add one upcoming per customer
+                        Log::info("Added UPCOMING alert for customer {$customer->name} for date {$maintenanceDate->format('Y-m-d')}");
+                    }
                 }
+
             } catch (\Exception $e) {
                 Log::error("Error processing maintenance alerts for customer {$customer->id}: " . $e->getMessage());
                 continue;
             }
         }
 
-        // Sort by urgency: overdue first (most overdue first), then upcoming (soonest first)
-        return $maintenanceAlerts->sortBy(function($item) {
-            $alert = $item['alert'];
+        Log::info('Total maintenance alerts found: ' . $maintenanceAlerts->count());
 
-            if ($alert['type'] === 'overdue') {
-                // Most negative days (oldest overdue) first
-                return $alert['days'];
+        // Sort by urgency: most overdue first, then due today, then upcoming
+        return $maintenanceAlerts->sortBy(function($item) {
+            /** @var array $item */
+            $alert = $item['alert'] ?? [];
+            $days = $alert['days'] ?? 0;
+
+            if ($days < 0) {
+                // Most overdue first (lowest negative number)
+                return $days;
+            } elseif ($days == 0) {
+                // Due today comes after overdue
+                return 10000;
             } else {
-                // Upcoming: soonest first (lowest positive number)
-                return 10000 + $alert['days'];
+                // Upcoming: soonest first, but after overdue and due today
+                return 20000 + $days;
             }
-        })->values(); // Reset keys
+        })->values();
     }
+
+/**
+ * Get ALL maintenance dates for a customer (overdue and future)
+ */
+private function getAllMaintenanceDatesForCustomer(Customer $customer)
+{
+    $dates = collect();
+    $today = Carbon::today();
+
+    // Get the last maintenance date or use contract start date
+    $lastMaintenance = $customer->maintenanceHistory()->latest()->first();
+    $startDate = $lastMaintenance ? $lastMaintenance->maintenance_date : $customer->contract_start_date;
+
+    // Determine interval based on service type
+    $intervalMonths = $customer->service_type === 'host_system' ? 6 : 3;
+
+    // Calculate enough dates to cover from contract start to today + 30 days
+    $earliestDate = $customer->contract_start_date->copy();
+    $maxDate = $today->copy()->addDays(30);
+
+    $currentDate = $earliestDate->copy();
+    while ($currentDate <= $maxDate) {
+        $dates->push($currentDate->copy());
+        $currentDate = $currentDate->copy()->addMonths($intervalMonths);
+    }
+
+    // Filter to only include dates that are either overdue or within 7 days
+    return $dates->filter(function($date) use ($today) {
+        $daysDifference = $today->diffInDays($date, false);
+        return $daysDifference < 0 || $daysDifference <= 7;
+    })->sort()->values();
+}
 
     /**
      * API endpoint for dashboard stats (optional - for AJAX updates)
@@ -193,14 +271,11 @@ class DashboardController extends Controller
         try {
             $this->updateAllCustomerStatuses();
 
-            // Get maintenance alerts and count them manually to avoid count() method
+            // Get maintenance alerts and count them
             $maintenanceAlerts = $this->getRealTimeMaintenanceAlerts();
-            $maintenanceAlertsCount = 0;
-            foreach ($maintenanceAlerts as $alert) {
-                $maintenanceAlertsCount++;
-            }
+            $maintenanceAlertsCount = $maintenanceAlerts->count();
 
-            // Calculate ALL counts separately to avoid IDE errors
+            // Calculate ALL counts separately
             $totalCustomersCount = Customer::count();
             $activeCustomersCount = Customer::where('status', 'active')
                 ->where('contract_end_date', '>=', Carbon::today())
@@ -213,6 +288,7 @@ class DashboardController extends Controller
                 ->where('contract_end_date', '>=', Carbon::today())
                 ->where('contract_end_date', '<=', Carbon::today()->addDays(90))
                 ->count();
+
             $expiredContractsCount = Customer::where(function($query) {
                 $query->where('contract_end_date', '<', Carbon::today())
                       ->orWhere('status', 'expired');

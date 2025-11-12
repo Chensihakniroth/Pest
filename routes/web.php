@@ -19,6 +19,34 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
+// Temporary maintenance test route
+Route::get('/test-maintenance', function() {
+    $customers = \App\Models\Customer::where('status', 'active')
+        ->where('contract_end_date', '>=', now())
+        ->get();
+
+    $results = [];
+
+    foreach ($customers as $customer) {
+        $nextMaintenance = $customer->getNextMaintenanceDate();
+        $today = \Carbon\Carbon::today();
+
+        $results[] = [
+            'customer_id' => $customer->id,
+            'customer_name' => $customer->name,
+            'service_type' => $customer->service_type,
+            'last_maintenance' => $customer->maintenanceHistory->last() ? $customer->maintenanceHistory->last()->maintenance_date->format('Y-m-d') : 'Never',
+            'next_maintenance_calculated' => $nextMaintenance ? $nextMaintenance->format('Y-m-d') : 'None',
+            'days_difference' => $nextMaintenance ? $today->diffInDays($nextMaintenance, false) : 'N/A',
+            'is_overdue' => $nextMaintenance ? ($today->diffInDays($nextMaintenance, false) < 0) : false,
+            'is_due_today' => $nextMaintenance ? ($today->diffInDays($nextMaintenance, false) == 0) : false,
+            'is_upcoming' => $nextMaintenance ? ($today->diffInDays($nextMaintenance, false) > 0 && $today->diffInDays($nextMaintenance, false) <= 7) : false
+        ];
+    }
+
+    return response()->json($results);
+});
+
 // Homepage
 Route::get('/', function () {
     return view('welcome');
@@ -99,4 +127,9 @@ Route::middleware(['auth'])->group(function () {
             'timestamp' => now()
         ];
     });
+
+
+
+
+
 });

@@ -13,6 +13,227 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --gh-primary: #10b981;
+            --gh-primary-dark: #059669;
+            --gh-primary-light: #34d399;
+            --gh-surface: #ffffff;
+            --gh-background: #f8fafc;
+            --gh-text: #1e293b;
+            --gh-text-light: #64748b;
+            --gh-border: #e2e8f0;
+            --gh-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --gh-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        .dark-mode {
+            --gh-surface: #1e293b;
+            --gh-background: #0f172a;
+            --gh-text: #f1f5f9;
+            --gh-text-light: #cbd5e1;
+            --gh-border: #334155;
+            --gh-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+            --gh-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gh-background);
+            color: var(--gh-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Modern Navbar */
+        .navbar {
+            background: var(--gh-surface);
+            border-bottom: 1px solid var(--gh-border);
+            box-shadow: var(--gh-shadow);
+            padding: 1rem 0;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.875rem;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .brand-primary {
+            font-weight: 700;
+            color: var(--gh-text);
+            font-size: 1.125rem;
+        }
+
+        .brand-secondary {
+            font-weight: 400;
+            color: var(--gh-text-light);
+            font-size: 0.75rem;
+        }
+
+        /* Navigation */
+        .navbar-nav {
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--gh-text-light);
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--gh-primary);
+            color: white;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 1.5rem 0;
+        }
+
+        /* Compact Dark Mode Toggle */
+        .dark-mode-section {
+            margin: 1rem 0;
+        }
+
+        .dark-mode-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--gh-surface);
+            border: 1px solid var(--gh-border);
+            border-radius: 12px;
+            max-width: 180px;
+            margin: 0 auto;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gh-border);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background: var(--gh-primary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .toggle-icon {
+            font-size: 0.75rem;
+            color: var(--gh-text-light);
+            flex-shrink: 0;
+        }
+
+        .toggle-label {
+            font-size: 0.75rem;
+            color: var(--gh-text-light);
+            font-weight: 500;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        /* Modern Footer */
+        .main-footer {
+            background: var(--gh-surface);
+            border-top: 1px solid var(--gh-border);
+            padding: 1.5rem 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            text-align: center;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--gh-text);
+        }
+
+        .footer-text {
+            color: var(--gh-text-light);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .footer-copyright {
+            color: var(--gh-text-light);
+            font-size: 0.75rem;
+        }
+
         /* Enhanced loading states */
         .btn-loading {
             position: relative;
@@ -47,7 +268,7 @@
 </head>
 <body>
     <!-- Enhanced Modern Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
             <!-- Brand Logo with Modern Design -->
             <a class="navbar-brand" href="{{ route('dashboard') }}">
@@ -119,7 +340,7 @@
                                         @csrf
                                         <button type="submit" class="dropdown-item logout-btn">
                                             <i class="fas fa-sign-out-alt me-2"></i>Logout
-                                        </button>
+                                    </button>
                                     </form>
                                 </li>
                             </ul>
@@ -147,7 +368,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="container mt-4">
+    <main class="container">
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <i class="fas fa-check-circle me-2"></i>
@@ -177,7 +398,7 @@
                 </div>
                 <p class="footer-text">Professional pest control & customer management</p>
 
-                <!-- Ultra Modern Dark Mode Toggle -->
+                <!-- Compact Dark Mode Toggle -->
                 <div class="dark-mode-section">
                     <form method="POST" action="/dark-mode/toggle" id="darkModeForm">
                         @csrf
