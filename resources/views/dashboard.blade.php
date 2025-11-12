@@ -272,68 +272,67 @@
     </div>
     @endif
 
-    <!-- Quick Actions -->
-    <div class="section-card">
-        <div class="section-header">
-            <div class="section-title">
-                <i class="fas fa-bolt"></i>
-                <span>Quick Actions</span>
-            </div>
+<!-- Quick Actions - COMPACT FIX -->
+<div class="section-card">
+    <div class="section-header" style="padding: 1rem 1.5rem; min-height: auto;">
+        <div class="section-title" style="font-size: 0.9rem; font-weight: 600;">
+            <i class="fas fa-bolt" style="font-size: 0.8rem;"></i>
+            <span>Quick Actions</span>
         </div>
-        <div class="section-content">
-            <div class="actions-grid">
-                <a href="{{ route('customers.create') }}" class="action-card primary">
-                    <div class="action-icon">
-                        <i class="fas fa-plus-circle"></i>
-                    </div>
-                    <div class="action-content">
-                        <div class="action-title">Add New Customer</div>
-                        <div class="action-description">Create new client</div>
-                    </div>
-                    <div class="action-arrow">
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                </a>
+    </div>
+    <div class="section-content" style="padding: 0 !important; max-height: none !important;">
+        <div class="actions-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; padding: 1rem;">
+            <a href="{{ route('customers.create') }}" class="action-card primary" style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--gh-surface); border: 1px solid var(--gh-border); border-radius: 12px; text-decoration: none; transition: all 0.3s ease; min-height: 70px; position: relative; overflow: hidden;">
+                <div class="action-icon" style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: white; flex-shrink: 0; background: linear-gradient(135deg, #3b82f6, #60a5fa);">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                <div class="action-content" style="flex: 1; min-width: 0;">
+                    <div class="action-title" style="font-weight: 600; color: var(--gh-text); margin-bottom: 0.25rem; font-size: 0.9rem; line-height: 1.2;">Add New Customer</div>
+                    <div class="action-description" style="font-size: 0.75rem; color: var(--gh-text-light); line-height: 1.3; opacity: 0.7;">Create new client</div>
+                </div>
+                <div class="action-arrow" style="color: var(--gh-text-light); transition: all 0.3s ease; font-size: 0.8rem; opacity: 0.6; flex-shrink: 0;">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
 
-                <a href="{{ route('customers.index') }}?status=active&sort=contract_end_date&order=asc" class="action-card success">
-                    <div class="action-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="action-content">
-                        <div class="action-title">Active Customers</div>
-                        <div class="action-description">Sorted by expiry date</div>
-                    </div>
-                    <div class="action-arrow">
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                </a>
+            <a href="{{ route('customers.index') }}?status=active&sort=contract_end_date&order=asc" class="action-card success" style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--gh-surface); border: 1px solid var(--gh-border); border-radius: 12px; text-decoration: none; transition: all 0.3s ease; min-height: 70px; position: relative; overflow: hidden;">
+                <div class="action-icon" style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: white; flex-shrink: 0; background: linear-gradient(135deg, #10b981, #34d399);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="action-content" style="flex: 1; min-width: 0;">
+                    <div class="action-title" style="font-weight: 600; color: var(--gh-text); margin-bottom: 0.25rem; font-size: 0.9rem; line-height: 1.2;">Active Customers</div>
+                    <div class="action-description" style="font-size: 0.75rem; color: var(--gh-text-light); line-height: 1.3; opacity: 0.7;">Sorted by expiry date</div>
+                </div>
+                <div class="action-arrow" style="color: var(--gh-text-light); transition: all 0.3s ease; font-size: 0.8rem; opacity: 0.6; flex-shrink: 0;">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
 
-                <a href="{{ route('customers.index') }}?status=expired&sort=contract_end_date&order=desc" class="action-card danger">
-                    <div class="action-icon">
-                        <i class="fas fa-ban"></i>
-                    </div>
-                    <div class="action-content">
-                        <div class="action-title">Expired Contracts</div>
-                        <div class="action-description">Most recent first</div>
-                    </div>
-                    <div class="action-arrow">
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                </a>
+            <a href="{{ route('customers.index') }}?status=expired&sort=contract_end_date&order=desc" class="action-card danger" style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--gh-surface); border: 1px solid var(--gh-border); border-radius: 12px; text-decoration: none; transition: all 0.3s ease; min-height: 70px; position: relative; overflow: hidden;">
+                <div class="action-icon" style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: white; flex-shrink: 0; background: linear-gradient(135deg, #ef4444, #f87171);">
+                    <i class="fas fa-ban"></i>
+                </div>
+                <div class="action-content" style="flex: 1; min-width: 0;">
+                    <div class="action-title" style="font-weight: 600; color: var(--gh-text); margin-bottom: 0.25rem; font-size: 0.9rem; line-height: 1.2;">Expired Contracts</div>
+                    <div class="action-description" style="font-size: 0.75rem; color: var(--gh-text-light); line-height: 1.3; opacity: 0.7;">Most recent first</div>
+                </div>
+                <div class="action-arrow" style="color: var(--gh-text-light); transition: all 0.3s ease; font-size: 0.8rem; opacity: 0.6; flex-shrink: 0;">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
 
-                <a href="{{ route('customers.index') }}?sort=name&order=asc" class="action-card info">
-                    <div class="action-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <div class="action-content">
-                        <div class="action-title">All Customers</div>
-                        <div class="action-description">A-Z sorted</div>
-                    </div>
-                    <div class="action-arrow">
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                </a>
-            </div>
+            <a href="{{ route('customers.index') }}?sort=name&order=asc" class="action-card info" style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--gh-surface); border: 1px solid var(--gh-border); border-radius: 12px; text-decoration: none; transition: all 0.3s ease; min-height: 70px; position: relative; overflow: hidden;">
+                <div class="action-icon" style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: white; flex-shrink: 0; background: linear-gradient(135deg, #06b6d4, #22d3ee);">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="action-content" style="flex: 1; min-width: 0;">
+                    <div class="action-title" style="font-weight: 600; color: var(--gh-text); margin-bottom: 0.25rem; font-size: 0.9rem; line-height: 1.2;">All Customers</div>
+                    <div class="action-description" style="font-size: 0.75rem; color: var(--gh-text-light); line-height: 1.3; opacity: 0.7;">A-Z sorted</div>
+                </div>
+                <div class="action-arrow" style="color: var(--gh-text-light); transition: all 0.3s ease; font-size: 0.8rem; opacity: 0.6; flex-shrink: 0;">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
         </div>
     </div>
 </div>
@@ -522,10 +521,8 @@
 }
 
 .alert-card, .section-card {
-    background: var(--gh-surface);
-    border: 1px solid var(--gh-border);
-    border-radius: 16px;
-    overflow: hidden;
+    padding: 1rem 1.5rem !important;
+    min-height: auto !important;
 }
 
 .alert-header, .section-header {
@@ -538,11 +535,12 @@
 }
 
 .alert-title, .section-title {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-weight: 600;
-    color: var(--gh-text);
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+}
+
+.alert-title i, .section-title i {
+    font-size: 0.8rem !important;
 }
 
 .alert-badge, .section-badge {
@@ -758,155 +756,151 @@
 
 .status-badge.expired { background: #fee2e2; color: #dc2626; }
 
-/* Quick Actions */
+/* ===== QUICK ACTIONS - COMPACT FIX ===== */
+/* Force compact styling - Override everything */
 .actions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+    gap: 0.75rem !important;
+    padding: 1rem !important;
+    margin: 0 !important;
 }
 
 .action-card {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.5rem;
-    background: var(--gh-surface);
-    border: 1px solid var(--gh-border);
-    border-radius: 12px;
-    text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.action-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-}
-
-.action-card.primary::before { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
-.action-card.success::before { background: linear-gradient(135deg, #10b981, #34d399); }
-.action-card.danger::before { background: linear-gradient(135deg, #ef4444, #f87171); }
-.action-card.info::before { background: linear-gradient(135deg, #06b6d4, #22d3ee); }
-
-.action-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--gh-shadow-lg);
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding: 1rem !important;
+    min-height: 70px !important;
+    border-radius: 12px !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    background: var(--gh-surface) !important;
+    border: 1px solid var(--gh-border) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    margin: 0 !important;
 }
 
 .action-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    color: white;
-    flex-shrink: 0;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.1rem !important;
+    color: white !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
 }
 
-.action-card.primary .action-icon { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
-.action-card.success .action-icon { background: linear-gradient(135deg, #10b981, #34d399); }
-.action-card.danger .action-icon { background: linear-gradient(135deg, #ef4444, #f87171); }
-.action-card.info .action-icon { background: linear-gradient(135deg, #06b6d4, #22d3ee); }
+.action-card.primary .action-icon {
+    background: linear-gradient(135deg, #3b82f6, #60a5fa) !important;
+}
+.action-card.success .action-icon {
+    background: linear-gradient(135deg, #10b981, #34d399) !important;
+}
+.action-card.danger .action-icon {
+    background: linear-gradient(135deg, #ef4444, #f87171) !important;
+}
+.action-card.info .action-icon {
+    background: linear-gradient(135deg, #06b6d4, #22d3ee) !important;
+}
 
 .action-content {
-    flex: 1;
+    flex: 1 !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .action-title {
-    font-weight: 600;
-    color: var(--gh-text);
-    margin-bottom: 0.25rem;
+    font-weight: 600 !important;
+    color: var(--gh-text) !important;
+    margin-bottom: 0.25rem !important;
+    font-size: 0.9rem !important;
+    line-height: 1.2 !important;
 }
 
 .action-description {
-    font-size: 0.875rem;
-    color: var(--gh-text-light);
+    font-size: 0.75rem !important;
+    color: var(--gh-text-light) !important;
+    line-height: 1.3 !important;
+    opacity: 0.7 !important;
+    margin: 0 !important;
 }
 
 .action-arrow {
-    color: var(--gh-text-light);
-    transition: transform 0.2s ease;
+    color: var(--gh-text-light) !important;
+    transition: all 0.3s ease !important;
+    font-size: 0.8rem !important;
+    opacity: 0.6 !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
 }
 
-.action-card:hover .action-arrow {
-    transform: translateX(4px);
-    color: var(--gh-primary);
+/* Section card compact styling */
+.section-card {
+    margin-bottom: 1.5rem !important;
 }
 
-/* Scrollbar Styling */
-.alert-content::-webkit-scrollbar,
-.section-content::-webkit-scrollbar {
-    width: 4px;
+.section-header {
+    padding: 1rem 1.5rem !important;
+    min-height: auto !important;
+    margin: 0 !important;
 }
 
-.alert-content::-webkit-scrollbar-track,
-.section-content::-webkit-scrollbar-track {
-    background: var(--gh-background);
+.section-title {
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
 }
 
-.alert-content::-webkit-scrollbar-thumb,
-.section-content::-webkit-scrollbar-thumb {
-    background: var(--gh-border);
-    border-radius: 2px;
+.section-title i {
+    font-size: 0.8rem !important;
 }
 
-.alert-content::-webkit-scrollbar-thumb:hover,
-.section-content::-webkit-scrollbar-thumb:hover {
-    background: var(--gh-text-light);
+.section-content {
+    padding: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
 }
 
-/* Responsive Design */
+/* Remove any extra spacing */
+.section-card:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Responsive fixes */
 @media (max-width: 768px) {
-    .dashboard-container {
-        padding: 0 0.5rem;
-    }
-
-    .header-content {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 1rem;
-    }
-
-    .dashboard-title {
-        font-size: 1.5rem;
-    }
-
-    .alerts-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-
-    .alert-item {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.75rem;
-    }
-
-    .alert-item-actions {
-        justify-content: between;
-    }
-
     .actions-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
+        padding: 0.75rem !important;
     }
 
-    .modern-table {
-        font-size: 0.875rem;
+    .action-card {
+        padding: 0.75rem !important;
+        min-height: 60px !important;
+        gap: 0.75rem !important;
     }
 
-    .modern-table th,
-    .modern-table td {
-        padding: 0.75rem 1rem;
+    .action-icon {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.9rem !important;
+    }
+
+    .action-title {
+        font-size: 0.85rem !important;
+        margin-bottom: 0.125rem !important;
+    }
+
+    .action-description {
+        font-size: 0.7rem !important;
     }
 }
-
 /* Animation for stats update */
 @keyframes pulseUpdate {
     0% { transform: scale(1); }
@@ -1015,9 +1009,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Compact stat card interactions
-const statCards = document.querySelectorAll('.stat-card');
-statCards.forEach(card => {
+    // Compact stat card interactions - Fixed version
+document.querySelectorAll('.stat-card').forEach(card => {
     card.addEventListener('mouseenter', function() {
         this.style.transform = 'translateY(-2px)';
     });
@@ -1025,7 +1018,7 @@ statCards.forEach(card => {
     card.addEventListener('mouseleave', function() {
         this.style.transform = 'translateY(0)';
     });
-})();
+});
 
     // Add flash animation
     const style = document.createElement('style');
@@ -1046,6 +1039,46 @@ statCards.forEach(card => {
 
     // Initialize any charts or additional components here
     console.log('GreenHome Dashboard initialized');
+
+    // Add hover effects to Quick Action cards
+document.querySelectorAll('.action-card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-2px)';
+        this.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.1)';
+        this.style.borderColor = 'transparent';
+
+        const arrow = this.querySelector('.action-arrow');
+        if (arrow) {
+            arrow.style.transform = 'translateX(3px)';
+            arrow.style.color = 'var(--gh-primary)';
+            arrow.style.opacity = '1';
+        }
+
+        const icon = this.querySelector('.action-icon');
+        if (icon) {
+            icon.style.transform = 'scale(1.05)';
+        }
+    });
+
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = 'none';
+        this.style.borderColor = 'var(--gh-border)';
+
+        const arrow = this.querySelector('.action-arrow');
+        if (arrow) {
+            arrow.style.transform = 'translateX(0)';
+            arrow.style.color = 'var(--gh-text-light)';
+            arrow.style.opacity = '0.6';
+        }
+
+        const icon = this.querySelector('.action-icon');
+        if (icon) {
+            icon.style.transform = 'scale(1)';
+        }
+    });
+});
+
 });
 </script>
 @endsection

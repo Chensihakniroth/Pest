@@ -55,6 +55,13 @@ class CustomerController extends Controller
             }
         }
 
+        // Maintenance due filter
+        if ($request->has('maintenance_due') && $request->maintenance_due == '1') {
+            $query->whereHas('maintenanceHistory', function($q) {
+                $q->where('maintenance_date', '<=', Carbon::today()->subDays(90));
+            })->orWhereDoesntHave('maintenanceHistory');
+        }
+
         // Sorting
         $sort = $request->get('sort', 'created_at');
         $order = $request->get('order', 'desc');
@@ -67,11 +74,28 @@ class CustomerController extends Controller
 
         $query->orderBy($sort, $order);
 
-        $customers = $query->paginate(10);
+        $customers = $query->paginate(15);
+
+        // AJAX request - return JSON for just the list and pagination
+        if ($request->ajax()) {
+            $view = view('customers.partials.customer_list', compact('customers'))->render();
+            $pagination = view('customers.partials.pagination', compact('customers'))->render();
+
+            return response()->json([
+                'success' => true,
+                'html' => $view,
+                'pagination' => $pagination,
+                'count' => $customers->total(),
+                'firstItem' => $customers->firstItem(),
+                'lastItem' => $customers->lastItem(),
+                'hasPages' => $customers->hasPages()
+            ]);
+        }
 
         return view('customers.index', compact('customers'));
     }
 
+    // ... keep all your other methods exactly as they were
     public function create()
     {
         return view('customers.create');
@@ -92,9 +116,7 @@ class CustomerController extends Controller
             'comments' => 'nullable|string',
         ]);
 
-        // Set initial status to 'active' for new customers
         $validated['status'] = 'active';
-
         Customer::create($validated);
 
         return redirect()->route('customers.index')
@@ -128,22 +150,15 @@ class CustomerController extends Controller
             'comments' => 'nullable|string',
         ]);
 
-        // Use the direct update that works
         DB::table('customers')
             ->where('id', $customer->id)
             ->update($validated);
 
-        // Force refresh the model
         $customer->refresh();
-
-        // Redirect with cache-busting parameter
         return redirect()->route('customers.show', [$customer, 't' => time()])
             ->with('success', 'Customer updated successfully!');
     }
 
-    /**
-     * Mark maintenance as done - FIXED VERSION
-     */
     public function markMaintenance(Request $request, Customer $customer)
     {
         $request->validate([
@@ -151,7 +166,6 @@ class CustomerController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        // Create maintenance record
         MaintenanceHistory::create([
             'customer_id' => $customer->id,
             'maintenance_date' => $request->maintenance_date,
@@ -160,7 +174,6 @@ class CustomerController extends Controller
             'performed_by' => Auth::user()->name,
         ]);
 
-        // Force recalculation of maintenance dates
         $customer->refresh();
         $customer->recalculateMaintenanceDates();
 
@@ -191,5 +204,4 @@ class CustomerController extends Controller
         return redirect()->route('customers.index')
             ->with('success', 'Customer deleted successfully.');
     }
-
 }
