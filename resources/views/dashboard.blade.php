@@ -21,10 +21,10 @@
         </div>
     </div>
 
-    <!-- Compact Statistics Grid -->
+    <!-- Full Color Statistics Grid -->
     <div class="stats-grid compact">
         <!-- Total Customers -->
-        <div class="stat-card gradient-primary">
+        <div class="stat-card full-color-primary">
             <div class="stat-icon">
                 <i class="fas fa-users"></i>
             </div>
@@ -39,7 +39,7 @@
         </div>
 
         <!-- Active Customers -->
-        <div class="stat-card gradient-success">
+        <div class="stat-card full-color-success">
             <div class="stat-icon">
                 <i class="fas fa-check-circle"></i>
             </div>
@@ -54,7 +54,7 @@
         </div>
 
         <!-- Expiring Contracts -->
-        <div class="stat-card gradient-warning">
+        <div class="stat-card full-color-warning">
             <div class="stat-icon">
                 <i class="fas fa-clock"></i>
             </div>
@@ -69,7 +69,7 @@
         </div>
 
         <!-- Maintenance Due -->
-        <div class="stat-card gradient-info">
+        <div class="stat-card full-color-info">
             <div class="stat-icon">
                 <i class="fas fa-tools"></i>
             </div>
@@ -606,6 +606,66 @@
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--gh-text-light);
+}
+
+/* Full Color Stat Cards */
+.stat-card.full-color-primary {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    color: white;
+}
+
+.stat-card.full-color-success {
+    background: linear-gradient(135deg, #059669, #047857) !important;
+    color: white;
+}
+
+.stat-card.full-color-warning {
+    background: linear-gradient(135deg, #d97706, #b45309) !important;
+    color: white;
+}
+
+.stat-card.full-color-info {
+    background: linear-gradient(135deg, #0e7490, #0c6b85) !important;
+    color: white;
+}
+
+/* Remove the top line for full color cards */
+.stat-card.full-color-primary::before,
+.stat-card.full-color-success::before,
+.stat-card.full-color-warning::before,
+.stat-card.full-color-info::before {
+    display: none;
+}
+
+/* Update text colors for full color cards */
+.stat-card.full-color-primary .stat-value,
+.stat-card.full-color-success .stat-value,
+.stat-card.full-color-warning .stat-value,
+.stat-card.full-color-info .stat-value {
+    color: white !important;
+}
+
+.stat-card.full-color-primary .stat-label,
+.stat-card.full-color-success .stat-label,
+.stat-card.full-color-warning .stat-label,
+.stat-card.full-color-info .stat-label {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.stat-card.full-color-primary .stat-trend,
+.stat-card.full-color-success .stat-trend,
+.stat-card.full-color-warning .stat-trend,
+.stat-card.full-color-info .stat-trend {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Update icon backgrounds for full color cards */
+.stat-card.full-color-primary .stat-icon,
+.stat-card.full-color-success .stat-icon,
+.stat-card.full-color-warning .stat-icon,
+.stat-card.full-color-info .stat-icon {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* Alerts Grid */

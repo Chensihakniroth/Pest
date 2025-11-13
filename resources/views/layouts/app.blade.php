@@ -62,69 +62,90 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Ultra Modern Navbar */
-        .navbar {
-            background: var(--gh-glass);
+        /* ===== FIXED NAVBAR STYLES ===== */
+        .modern-navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--gh-glass-border);
-            box-shadow: var(--gh-shadow);
-            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+            box-shadow: 0 1px 20px rgba(0, 0, 0, 0.08);
+            padding: 0.90rem 0;
             position: sticky;
             top: 0;
             z-index: 1000;
+            transition: all 0.3s ease;
         }
 
+        .dark-mode .modern-navbar {
+            background: rgba(30, 30, 30, 0.95) !important;
+            border-bottom-color: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Compact Brand */
         .brand-container {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.25rem 0;
+            gap: 0.5rem;
+            padding: 0.2rem 0;
         }
 
         .brand-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
-            border-radius: 10px;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1rem;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            font-size: 0.9rem;
             transition: all 0.3s ease;
         }
 
         .brand-icon:hover {
             transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-        }
-
-        .brand-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
         }
 
         .brand-primary {
-            font-weight: 800;
-            color: var(--gh-text);
-            font-size: 1.25rem;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-weight: 700;
+            color: #10b981;
+            font-size: 1.1rem;
+            letter-spacing: -0.3px;
         }
 
-        .brand-secondary {
-            font-weight: 500;
-            color: var(--gh-text-light);
-            font-size: 0.75rem;
-            letter-spacing: 0.3px;
+        /* Mobile Toggler */
+        .modern-toggler {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 0.4rem 0.6rem;
+            background: transparent;
+            transition: all 0.3s ease;
         }
 
-        /* Navigation */
+        .modern-toggler:hover {
+            border-color: #10b981;
+        }
+
+        .toggler-icon {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            width: 18px;
+            height: 14px;
+        }
+
+        .toggler-icon span {
+            display: block;
+            height: 2px;
+            background: #374151;
+            border-radius: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode .toggler-icon span {
+            background: #e5e7eb;
+        }
+
+        /* Fixed Navigation Items */
         .navbar-nav {
             gap: 0.25rem;
         }
@@ -133,35 +154,31 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.6rem 1rem;
-            border-radius: 12px;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
             text-decoration: none;
-            color: var(--gh-text-light);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1.5px solid transparent;
+            color: #6b7280;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
             font-weight: 500;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
         }
 
         .nav-item:hover {
-            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
+            background: #10b981;
             color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-            border-color: transparent;
+            transform: translateY(-1px);
         }
 
         .nav-item.active {
-            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
+            background: #10b981;
             color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
         }
 
         .nav-icon {
-            width: 20px;
+            width: 16px;
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
 
         .nav-text {
@@ -169,105 +186,145 @@
             white-space: nowrap;
         }
 
-        /* User Menu - SIMPLIFIED DROPDOWN */
-        .user-menu .dropdown-toggle {
+        /* Primary Nav Item (Register button) */
+        .nav-item-primary {
+            background: #10b981;
+            color: white !important;
+        }
+
+        .nav-item-primary:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        /* Fixed User Menu - NO PARENT HOVER */
+        .nav-item.dropdown.user-menu {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        .nav-item.dropdown.user-menu:hover {
+            background: transparent !important;
+            transform: none !important;
+        }
+
+        .user-menu .modern-dropdown {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
             padding: 0.5rem 0.75rem;
-            border-radius: 12px;
-            border: 1.5px solid var(--gh-border);
-            transition: all 0.3s ease;
-            background: var(--gh-glass);
-            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background: transparent;
             text-decoration: none;
-            color: var(--gh-text-light);
+            color: #6b7280;
         }
 
-        .user-menu .dropdown-toggle:hover {
-            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
-            border-color: transparent;
-            transform: translateY(-1px);
+        .user-menu .modern-dropdown:hover {
+            background: #10b981;
+            border-color: #10b981;
             color: white;
+            transform: translateY(-1px);
         }
 
-        .user-menu .dropdown-toggle:hover .user-name,
-        .user-menu .dropdown-toggle:hover .dropdown-arrow {
+        .user-menu .modern-dropdown:hover .user-name,
+        .user-menu .modern-dropdown:hover .dropdown-arrow {
             color: white;
         }
 
         .user-avatar {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
-            border-radius: 10px;
+            width: 28px;
+            height: 28px;
+            background: #10b981;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: white;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .user-name {
             font-weight: 500;
-            color: var(--gh-text);
-            max-width: 120px;
+            color: #374151;
+            max-width: 100px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            transition: color 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .dark-mode .user-name {
+            color: #e5e7eb;
         }
 
         .dropdown-arrow {
-            font-size: 0.7rem;
-            opacity: 0.7;
-            transition: all 0.3s ease;
-            color: var(--gh-text-light);
+            font-size: 0.6rem;
+            color: #9ca3af;
+            transition: transform 0.2s ease;
         }
 
         .user-menu.show .dropdown-arrow {
             transform: rotate(180deg);
         }
 
-        /* Dropdown Menu - LET BOOTSTRAP HANDLE POSITIONING */
-        .user-menu .dropdown-menu {
-            background: var(--gh-glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--gh-glass-border);
-            border-radius: 16px;
-            box-shadow: var(--gh-shadow-lg);
+        /* Fixed Dropdown Menu */
+        .modern-dropdown-menu {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             padding: 0.5rem;
-            min-width: 200px;
+            min-width: 180px;
+            margin-top: 8px !important;
         }
 
-        .dropdown-item {
+        .dark-mode .modern-dropdown-menu {
+            background: #1f2937;
+            border-color: #374151;
+        }
+
+        .modern-dropdown-menu .dropdown-item {
             display: flex;
             align-items: center;
-            padding: 0.75rem 1rem;
-            border-radius: 10px;
+            padding: 0.6rem 0.75rem;
+            border-radius: 8px;
             font-weight: 500;
-            color: var(--gh-text);
-            transition: all 0.3s ease;
+            color: #374151;
+            transition: all 0.2s ease;
             border: none;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             text-decoration: none;
             background: none;
             width: 100%;
             text-align: left;
+            gap: 0.5rem;
         }
 
-        .dropdown-item:hover {
-            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
+        .dark-mode .modern-dropdown-menu .dropdown-item {
+            color: #e5e7eb;
+        }
+
+        .modern-dropdown-menu .dropdown-item:hover {
+            background: #10b981;
             color: white;
-            transform: translateX(4px);
         }
 
-        .dropdown-item i {
-            width: 20px;
+        .modern-dropdown-menu .dropdown-item i {
+            width: 16px;
             text-align: center;
-            margin-right: 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        .modern-dropdown-menu .dropdown-divider {
+            border-color: #e5e7eb;
+            margin: 0.25rem 0;
+        }
+
+        .dark-mode .modern-dropdown-menu .dropdown-divider {
+            border-color: #374151;
         }
 
         /* Main Content */
@@ -475,28 +532,39 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Mobile Responsive */
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .navbar-nav {
-                gap: 0.5rem;
-                padding: 1rem 0;
+            .modern-navbar {
+                padding: 0.3rem 0;
             }
 
-            .brand-text {
-                display: none;
+            .navbar-nav {
+                gap: 0.25rem;
+                padding: 0.75rem 0;
+                background: white;
+                border-radius: 12px;
+                margin-top: 0.5rem;
+                border: 1px solid #e5e7eb;
+            }
+
+            .dark-mode .navbar-nav {
+                background: #1f2937;
+                border-color: #374151;
+            }
+
+            .nav-item {
+                padding: 0.6rem 1rem;
+                margin: 0 0.25rem;
+                font-size: 0.8rem;
             }
 
             .user-name {
                 display: none;
             }
 
-            .nav-item {
-                padding: 0.75rem 1rem;
-                justify-content: center;
-            }
-
-            .nav-text {
-                font-size: 0.8rem;
+            .modern-dropdown-menu {
+                min-width: calc(100vw - 2rem);
+                margin: 0.25rem 1rem !important;
             }
 
             .dark-mode-toggle {
@@ -516,6 +584,26 @@
 
             input:checked + .toggle-slider:before {
                 transform: translateX(22px);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .brand-text {
+                display: none;
+            }
+
+            .brand-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
+
+            .nav-item {
+                padding: 0.5rem 0.75rem;
+            }
+
+            .modern-toggler {
+                padding: 0.3rem 0.5rem;
             }
         }
 
@@ -609,10 +697,10 @@
     </style>
 </head>
 <body>
-    <!-- Ultra Modern Navbar -->
-    <nav class="navbar navbar-expand-lg">
+    <!-- Fixed Ultra Modern Navbar -->
+    <nav class="navbar navbar-expand-lg modern-navbar">
         <div class="container">
-            <!-- Brand Logo with Modern Design -->
+            <!-- Compact Brand Logo -->
             <a class="navbar-brand" href="{{ route('dashboard') }}">
                 <div class="brand-container">
                     <div class="brand-icon">
@@ -620,16 +708,18 @@
                     </div>
                     <div class="brand-text">
                         <span class="brand-primary">GreenHome</span>
-                        <span class="brand-secondary">Pest Control</span>
                     </div>
                 </div>
             </a>
 
             <!-- Mobile Toggle Button -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"
-                    style="border: 1.5px solid var(--gh-border); border-radius: 10px; padding: 0.5rem 0.75rem;">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler modern-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="toggler-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
             </button>
 
             <!-- Navigation Links -->
@@ -663,38 +753,40 @@
                             <span class="nav-text">Profile</span>
                         </a>
 
-                        <!-- User Menu with Dropdown - SIMPLIFIED -->
-                        <div class="nav-item dropdown user-menu">
-                            <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                               aria-expanded="false">
-                                <div class="user-avatar">
-                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                </div>
-                                <span class="user-name">{{ Auth::user()->name }}</span>
-                                <i class="fas fa-chevron-down dropdown-arrow"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                                        <i class="fas fa-user-edit"></i>Edit Profile
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('dashboard') }}">
-                                        <i class="fas fa-tachometer-alt"></i>Dashboard
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}" class="d-inline w-100">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item logout-btn w-100 text-start border-0 bg-transparent">
-                                            <i class="fas fa-sign-out-alt"></i>Logout
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
+                        <!-- Fixed User Menu - Clean & No Border -->
+<div class="nav-item dropdown user-menu">
+    <a class="dropdown-toggle modern-dropdown no-border" href="#" role="button" data-bs-toggle="dropdown"
+       aria-expanded="false">
+        <div class="user-avatar">
+            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+        </div>
+        <span class="user-name">{{ Auth::user()->name }}</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end modern-dropdown-menu">
+        <li>
+            <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                <i class="fas fa-user-edit"></i>
+                <span>Edit Profile</span>
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="{{ route('dashboard') }}">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+            <form method="POST" action="{{ route('logout') }}" class="d-inline w-100">
+                @csrf
+                <button type="submit" class="dropdown-item logout-btn w-100 text-start border-0 bg-transparent">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </form>
+        </li>
+    </ul>
+</div>
 
                     @else
                         <!-- Guest Navigation -->
@@ -705,8 +797,7 @@
                             <span class="nav-text">Login</span>
                         </a>
 
-                        <a class="nav-item" href="{{ route('register') }}"
-                           style="background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark)); color: white;">
+                        <a class="nav-item nav-item-primary" href="{{ route('register') }}">
                             <div class="nav-icon">
                                 <i class="fas fa-user-plus"></i>
                             </div>
@@ -790,107 +881,107 @@
     @vite(['resources/js/app.js'])
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Enhanced navbar scroll effect
-            let lastScrollTop = 0;
-            const navbar = document.querySelector('.navbar');
+document.addEventListener('DOMContentLoaded', function() {
+    // Enhanced navbar scroll effect
+    let lastScrollTop = 0;
+    const navbar = document.querySelector('.navbar');
 
-            window.addEventListener('scroll', function() {
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    window.addEventListener('scroll', function() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-                if (scrollTop > lastScrollTop && scrollTop > 100) {
-                    // Scrolling down
-                    navbar.style.transform = 'translateY(-100%)';
-                } else {
-                    // Scrolling up
-                    navbar.style.transform = 'translateY(0)';
-                }
+        if (scrollTop > lastScrollTop && scrollTop > 100) {
+            // Scrolling down
+            navbar.style.transform = 'translateY(-100%)';
+        } else {
+            // Scrolling up
+            navbar.style.transform = 'translateY(0)';
+        }
 
-                lastScrollTop = scrollTop;
-            });
+        lastScrollTop = scrollTop;
+    });
 
-            // Update dropdown arrow rotation when Bootstrap toggles dropdown
-            const userMenu = document.querySelector('.user-menu');
-            if (userMenu) {
-                const dropdownToggle = userMenu.querySelector('.dropdown-toggle');
-                const dropdownArrow = userMenu.querySelector('.dropdown-arrow');
+    // Update dropdown arrow rotation when Bootstrap toggles dropdown
+    const userMenu = document.querySelector('.user-menu');
+    if (userMenu) {
+        const dropdownToggle = userMenu.querySelector('.dropdown-toggle');
+        const dropdownArrow = userMenu.querySelector('.dropdown-arrow');
 
-                dropdownToggle.addEventListener('show.bs.dropdown', function () {
-                    dropdownArrow.style.transform = 'rotate(180deg)';
-                });
-
-                dropdownToggle.addEventListener('hide.bs.dropdown', function () {
-                    dropdownArrow.style.transform = 'rotate(0deg)';
-                });
-            }
-
-            // Smooth scrolling for anchor links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
-
-            // Auto-dismiss alerts after 5 seconds
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                setTimeout(() => {
-                    if (alert.classList.contains('show')) {
-                        const bsAlert = new bootstrap.Alert(alert);
-                        bsAlert.close();
-                    }
-                }, 5000);
-            });
-
-            // Enhanced dark mode toggle label update
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            const darkModeLabel = document.getElementById('darkModeLabel');
-
-            if (darkModeToggle && darkModeLabel) {
-                darkModeToggle.addEventListener('change', function() {
-                    darkModeLabel.textContent = this.checked ? 'Dark' : 'Light';
-                });
-            }
-
-            // Add loading state to forms
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', function() {
-                    const submitBtn = this.querySelector('button[type="submit"]');
-                    if (submitBtn && !submitBtn.classList.contains('btn-loading')) {
-                        submitBtn.classList.add('btn-loading');
-                        submitBtn.disabled = true;
-
-                        // Re-enable after 10 seconds in case of error
-                        setTimeout(() => {
-                            submitBtn.classList.remove('btn-loading');
-                            submitBtn.disabled = false;
-                        }, 10000);
-                    }
-                });
-            });
-
-            console.log('GreenHome Pest Control System initialized');
+        dropdownToggle.addEventListener('show.bs.dropdown', function () {
+            dropdownArrow.style.transform = 'rotate(180deg)';
         });
 
-        // Utility function for making AJAX requests
-        function makeRequest(url, options = {}) {
-            return fetch(url, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                },
-                ...options
-            });
-        }
-    </script>
+        dropdownToggle.addEventListener('hide.bs.dropdown', function () {
+            dropdownArrow.style.transform = 'rotate(0deg)';
+        });
+    }
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Auto-dismiss alerts after 5 seconds
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            if (alert.classList.contains('show')) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }
+        }, 5000);
+    });
+
+    // Enhanced dark mode toggle label update
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const darkModeLabel = document.getElementById('darkModeLabel');
+
+    if (darkModeToggle && darkModeLabel) {
+        darkModeToggle.addEventListener('change', function() {
+            darkModeLabel.textContent = this.checked ? 'Dark' : 'Light';
+        });
+    }
+
+    // Add loading state to forms
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function() {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn && !submitBtn.classList.contains('btn-loading')) {
+                submitBtn.classList.add('btn-loading');
+                submitBtn.disabled = true;
+
+                // Re-enable after 10 seconds in case of error
+                setTimeout(() => {
+                    submitBtn.classList.remove('btn-loading');
+                    submitBtn.disabled = false;
+                }, 10000);
+            }
+        });
+    });
+
+    console.log('GreenHome Pest Control System initialized');
+});
+
+// Utility function for making AJAX requests
+function makeRequest(url, options = {}) {
+    return fetch(url, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json',
+            ...options.headers
+        },
+        ...options
+    });
+}
+</script>
 
     @stack('scripts')
 </body>
