@@ -22,56 +22,72 @@
     </div>
 
     <!-- Compact Statistics Grid -->
-<div class="stats-grid compact">
-    <!-- Total Customers -->
-    <div class="stat-card gradient-primary">
-        <div class="stat-icon">
-            <i class="fas fa-users"></i>
+    <div class="stats-grid compact">
+        <!-- Total Customers -->
+        <div class="stat-card gradient-primary">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" data-stat="total-customers">{{ $totalCustomers ?? 0 }}</div>
+                <div class="stat-label">Total Customers</div>
+            </div>
+            <div class="stat-trend">
+                <i class="fas fa-arrow-up"></i>
+                <span>+12%</span>
+            </div>
         </div>
-        <div class="stat-content">
-            <div class="stat-value" data-stat="total-customers">{{ $totalCustomers ?? 0 }}</div>
-            <div class="stat-label">Total Customers</div>
-        </div>
-    </div>
 
-    <!-- Active Customers -->
-    <div class="stat-card gradient-success">
-        <div class="stat-icon">
-            <i class="fas fa-check-circle"></i>
+        <!-- Active Customers -->
+        <div class="stat-card gradient-success">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" data-stat="active-customers">{{ $activeCustomers ?? 0 }}</div>
+                <div class="stat-label">Active Customers</div>
+            </div>
+            <div class="stat-trend">
+                <i class="fas fa-arrow-up"></i>
+                <span>+8%</span>
+            </div>
         </div>
-        <div class="stat-content">
-            <div class="stat-value" data-stat="active-customers">{{ $activeCustomers ?? 0 }}</div>
-            <div class="stat-label">Active Customers</div>
-        </div>
-    </div>
 
-    <!-- Expiring Contracts -->
-    <div class="stat-card gradient-warning">
-        <div class="stat-icon">
-            <i class="fas fa-clock"></i>
+        <!-- Expiring Contracts -->
+        <div class="stat-card gradient-warning">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" data-stat="expiring-contracts">{{ $expiringContracts ?? 0 }}</div>
+                <div class="stat-label">Expiring Contracts</div>
+            </div>
+            <div class="stat-trend">
+                <i class="fas fa-exclamation"></i>
+                <span>Attention</span>
+            </div>
         </div>
-        <div class="stat-content">
-            <div class="stat-value" data-stat="expiring-contracts">{{ $expiringContracts ?? 0 }}</div>
-            <div class="stat-label">Expiring Contracts</div>
-        </div>
-    </div>
 
-    <!-- Maintenance Due -->
-    <div class="stat-card gradient-info">
-        <div class="stat-icon">
-            <i class="fas fa-tools"></i>
-        </div>
-        <div class="stat-content">
-            <div class="stat-value" data-stat="maintenance-alerts">{{ $maintenanceAlertsCount ?? 0 }}</div>
-            <div class="stat-label">Maintenance Due</div>
+        <!-- Maintenance Due -->
+        <div class="stat-card gradient-info">
+            <div class="stat-icon">
+                <i class="fas fa-tools"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" data-stat="maintenance-alerts">{{ $maintenanceAlertsCount ?? 0 }}</div>
+                <div class="stat-label">Maintenance Due</div>
+            </div>
+            <div class="stat-trend">
+                <i class="fas fa-bell"></i>
+                <span>Action</span>
+            </div>
         </div>
     </div>
-</div>
 
     <!-- Alerts Section -->
     <div class="alerts-grid">
         <!-- Maintenance Alerts -->
-        <div class="alert-card">
+        <div class="alert-card glass-morphism">
             <div class="alert-header">
                 <div class="alert-title">
                     <i class="fas fa-tools"></i>
@@ -93,12 +109,15 @@
                                 if ($days < 0) {
                                     $displayText = 'Overdue by ' . abs($days) . ' days';
                                     $badgeClass = 'danger';
+                                    $iconClass = 'fas fa-exclamation-triangle';
                                 } elseif ($days == 0) {
                                     $displayText = 'Due today';
                                     $badgeClass = 'warning';
+                                    $iconClass = 'fas fa-clock';
                                 } else {
                                     $displayText = 'Due in ' . $days . ' days';
                                     $badgeClass = 'info';
+                                    $iconClass = 'fas fa-calendar-check';
                                 }
                             } else {
                                 continue;
@@ -124,7 +143,10 @@
                                 </div>
                             </div>
                             <div class="alert-item-actions">
-                                <span class="alert-badge {{ $badgeClass }}">{{ $displayText }}</span>
+                                <span class="alert-badge {{ $badgeClass }}">
+                                    <i class="{{ $iconClass }} me-1"></i>
+                                    {{ $displayText }}
+                                </span>
                                 @if($customer)
                                 <a href="{{ route('customers.show', $customer) }}" class="action-btn view">
                                     <i class="fas fa-eye"></i>
@@ -146,7 +168,7 @@
         </div>
 
         <!-- Contract Alerts -->
-        <div class="alert-card">
+        <div class="alert-card glass-morphism">
             <div class="alert-header">
                 <div class="alert-title">
                     <i class="fas fa-calendar-times"></i>
@@ -159,7 +181,9 @@
                     @foreach($contractAlerts ?? [] as $customer)
                     @php
                         $daysLeft = $customer->getDisplayDaysUntilExpiration() ?? 0;
-                        $badgeClass = $daysLeft <= 7 ? 'danger' : ($daysLeft <= 30 ? 'warning' : 'secondary');
+                        $badgeClass = $daysLeft <= 7 ? 'danger' : ($daysLeft <= 30 ? 'warning' : 'info');
+                        $iconClass = $daysLeft <= 7 ? 'fas fa-exclamation-triangle' :
+                                    ($daysLeft <= 30 ? 'fas fa-clock' : 'fas fa-calendar-alt');
                     @endphp
                     <div class="alert-item">
                         <div class="alert-item-main">
@@ -180,7 +204,10 @@
                             </div>
                         </div>
                         <div class="alert-item-actions">
-                            <span class="alert-badge {{ $badgeClass }}">{{ $daysLeft }} days left</span>
+                            <span class="alert-badge {{ $badgeClass }}">
+                                <i class="{{ $iconClass }} me-1"></i>
+                                {{ $daysLeft }} days left
+                            </span>
                             <div class="action-group">
                                 <a href="{{ route('customers.show', $customer) }}" class="action-btn view">
                                     <i class="fas fa-eye"></i>
@@ -207,7 +234,7 @@
 
     <!-- Expired Contracts Section -->
     @if(isset($expiredContracts) && ($expiredContractsCount ?? 0) > 0)
-    <div class="section-card">
+    <div class="section-card glass-morphism">
         <div class="section-header">
             <div class="section-title">
                 <i class="fas fa-ban"></i>
@@ -261,6 +288,9 @@
                                     <a href="{{ route('customers.edit', $customer) }}" class="action-btn edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
+                                    <a href="{{ route('customers.renew', $customer) }}" class="action-btn renew">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -272,70 +302,148 @@
     </div>
     @endif
 
-<!-- Quick Actions - COMPACT FIX -->
-<div class="section-card">
-    <div class="section-header" style="padding: 1rem 1.5rem; min-height: auto;">
-        <div class="section-title" style="font-size: 0.9rem; font-weight: 600;">
-            <i class="fas fa-bolt" style="font-size: 0.8rem;"></i>
-            <span>Quick Actions</span>
+    <!-- Quick Actions -->
+    <div class="section-card glass-morphism">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-bolt"></i>
+                <span>Quick Actions</span>
+            </div>
+        </div>
+        <div class="section-content">
+            <div class="actions-grid">
+                <a href="{{ route('customers.create') }}" class="action-card primary">
+                    <div class="action-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="action-content">
+                        <div class="action-title">Add New Customer</div>
+                        <div class="action-description">Create new client profile</div>
+                    </div>
+                    <div class="action-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+
+                <a href="{{ route('customers.index') }}?status=active&sort=contract_end_date&order=asc" class="action-card success">
+                    <div class="action-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="action-content">
+                        <div class="action-title">Active Customers</div>
+                        <div class="action-description">Sorted by expiry date</div>
+                    </div>
+                    <div class="action-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+
+                <a href="{{ route('customers.index') }}?status=expired&sort=contract_end_date&order=desc" class="action-card danger">
+                    <div class="action-icon">
+                        <i class="fas fa-ban"></i>
+                    </div>
+                    <div class="action-content">
+                        <div class="action-title">Expired Contracts</div>
+                        <div class="action-description">Most recent first</div>
+                    </div>
+                    <div class="action-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+
+                <a href="{{ route('customers.index') }}?sort=name&order=asc" class="action-card info">
+                    <div class="action-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="action-content">
+                        <div class="action-title">All Customers</div>
+                        <div class="action-description">A-Z sorted</div>
+                    </div>
+                    <div class="action-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
-    <div class="section-content" style="padding: 0 !important; max-height: none !important;">
-        <div class="actions-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; padding: 1rem;">
-            <a href="{{ route('customers.create') }}" class="action-card primary" style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--gh-surface); border: 1px solid var(--gh-border); border-radius: 12px; text-decoration: none; transition: all 0.3s ease; min-height: 70px; position: relative; overflow: hidden;">
-                <div class="action-icon" style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: white; flex-shrink: 0; background: linear-gradient(135deg, #3b82f6, #60a5fa);">
-                    <i class="fas fa-plus-circle"></i>
-                </div>
-                <div class="action-content" style="flex: 1; min-width: 0;">
-                    <div class="action-title" style="font-weight: 600; color: var(--gh-text); margin-bottom: 0.25rem; font-size: 0.9rem; line-height: 1.2;">Add New Customer</div>
-                    <div class="action-description" style="font-size: 0.75rem; color: var(--gh-text-light); line-height: 1.3; opacity: 0.7;">Create new client</div>
-                </div>
-                <div class="action-arrow" style="color: var(--gh-text-light); transition: all 0.3s ease; font-size: 0.8rem; opacity: 0.6; flex-shrink: 0;">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </a>
 
-            <a href="{{ route('customers.index') }}?status=active&sort=contract_end_date&order=asc" class="action-card success" style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--gh-surface); border: 1px solid var(--gh-border); border-radius: 12px; text-decoration: none; transition: all 0.3s ease; min-height: 70px; position: relative; overflow: hidden;">
-                <div class="action-icon" style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: white; flex-shrink: 0; background: linear-gradient(135deg, #10b981, #34d399);">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <div class="action-content" style="flex: 1; min-width: 0;">
-                    <div class="action-title" style="font-weight: 600; color: var(--gh-text); margin-bottom: 0.25rem; font-size: 0.9rem; line-height: 1.2;">Active Customers</div>
-                    <div class="action-description" style="font-size: 0.75rem; color: var(--gh-text-light); line-height: 1.3; opacity: 0.7;">Sorted by expiry date</div>
-                </div>
-                <div class="action-arrow" style="color: var(--gh-text-light); transition: all 0.3s ease; font-size: 0.8rem; opacity: 0.6; flex-shrink: 0;">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </a>
+        <!-- Recent Activity - SELF-CONTAINED REAL DATA -->
+    <div class="section-card glass-morphism">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-history"></i>
+                <span>Recent Activity</span>
+            </div>
+        </div>
+        <div class="section-content">
+            <div class="activity-list">
+                @php
+                    use App\Models\Customer;
+                    use App\Models\MaintenanceHistory;
 
-            <a href="{{ route('customers.index') }}?status=expired&sort=contract_end_date&order=desc" class="action-card danger" style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--gh-surface); border: 1px solid var(--gh-border); border-radius: 12px; text-decoration: none; transition: all 0.3s ease; min-height: 70px; position: relative; overflow: hidden;">
-                <div class="action-icon" style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: white; flex-shrink: 0; background: linear-gradient(135deg, #ef4444, #f87171);">
-                    <i class="fas fa-ban"></i>
-                </div>
-                <div class="action-content" style="flex: 1; min-width: 0;">
-                    <div class="action-title" style="font-weight: 600; color: var(--gh-text); margin-bottom: 0.25rem; font-size: 0.9rem; line-height: 1.2;">Expired Contracts</div>
-                    <div class="action-description" style="font-size: 0.75rem; color: var(--gh-text-light); line-height: 1.3; opacity: 0.7;">Most recent first</div>
-                </div>
-                <div class="action-arrow" style="color: var(--gh-text-light); transition: all 0.3s ease; font-size: 0.8rem; opacity: 0.6; flex-shrink: 0;">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </a>
+                    $activities = [];
 
-            <a href="{{ route('customers.index') }}?sort=name&order=asc" class="action-card info" style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--gh-surface); border: 1px solid var(--gh-border); border-radius: 12px; text-decoration: none; transition: all 0.3s ease; min-height: 70px; position: relative; overflow: hidden;">
-                <div class="action-icon" style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: white; flex-shrink: 0; background: linear-gradient(135deg, #06b6d4, #22d3ee);">
-                    <i class="fas fa-search"></i>
-                </div>
-                <div class="action-content" style="flex: 1; min-width: 0;">
-                    <div class="action-title" style="font-weight: 600; color: var(--gh-text); margin-bottom: 0.25rem; font-size: 0.9rem; line-height: 1.2;">All Customers</div>
-                    <div class="action-description" style="font-size: 0.75rem; color: var(--gh-text-light); line-height: 1.3; opacity: 0.7;">A-Z sorted</div>
-                </div>
-                <div class="action-arrow" style="color: var(--gh-text-light); transition: all 0.3s ease; font-size: 0.8rem; opacity: 0.6; flex-shrink: 0;">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </a>
+                    // Get recent customer creations
+                    $recentCustomers = Customer::latest()->take(3)->get();
+                    foreach ($recentCustomers as $customer) {
+                        $activities[] = [
+                            'icon' => 'fas fa-user-plus',
+                            'color' => 'success',
+                            'text' => 'New customer "'.$customer->name.'" added',
+                            'time' => $customer->created_at->diffForHumans(),
+                            'link' => route('customers.show', $customer)
+                        ];
+                    }
+
+                    // Get recent maintenance
+                    $recentMaintenance = MaintenanceHistory::with('customer')
+                        ->latest()
+                        ->take(3)
+                        ->get();
+                    foreach ($recentMaintenance as $maintenance) {
+                        $activities[] = [
+                            'icon' => 'fas fa-tools',
+                            'color' => 'info',
+                            'text' => 'Maintenance completed for "'.$maintenance->customer->name.'"',
+                            'time' => $maintenance->maintenance_date->diffForHumans(),
+                            'link' => route('customers.show', $maintenance->customer)
+                        ];
+                    }
+
+                    // Sort by time (newest first) and take top 5
+                    usort($activities, function($a, $b) {
+                        return strtotime($b['time']) - strtotime($a['time']);
+                    });
+                    $activities = array_slice($activities, 0, 5);
+                @endphp
+
+                @if(count($activities) > 0)
+                    @foreach($activities as $activity)
+                    <div class="activity-item" onclick="window.location='{{ $activity['link'] }}'" style="cursor: pointer;">
+                        <div class="activity-icon {{ $activity['color'] }}">
+                            <i class="{{ $activity['icon'] }}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">{{ $activity['text'] }}</div>
+                            <div class="activity-time">{{ $activity['time'] }}</div>
+                        </div>
+                        <div class="activity-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    @endforeach
+                @else
+                    <div class="empty-state">
+                        <i class="fas fa-history fa-2x mb-3"></i>
+                        <div class="empty-text">
+                            <div class="empty-title">No recent activity</div>
+                            <div class="empty-description">Activity will appear here as you use the system</div>
+                        </div>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
-</div>
 
 <style>
 .dashboard-container {
@@ -351,7 +459,7 @@
 
 .header-content {
     display: flex;
-    justify-content: between;
+    justify-content: space-between;
     align-items: flex-end;
     gap: 2rem;
 }
@@ -362,7 +470,7 @@
 
 .dashboard-title {
     font-size: 2rem;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--gh-text);
     margin: 0 0 0.5rem 0;
     background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
@@ -388,80 +496,87 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: var(--gh-surface);
-    border: 1px solid var(--gh-border);
+    background: var(--gh-glass);
+    border: 1px solid var(--gh-glass-border);
     border-radius: 12px;
     font-size: 0.875rem;
     color: var(--gh-text-light);
+    backdrop-filter: blur(10px);
 }
 
 .current-time {
     padding: 0.5rem 1rem;
-    background: var(--gh-primary);
+    background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
     color: white;
     border-radius: 12px;
     font-weight: 600;
     font-size: 0.875rem;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
-/* Enhanced Statistics Grid with Full Gradients */
-/* Compact Statistics Grid */
+/* Enhanced Statistics Grid */
 .stats-grid.compact {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .stat-card {
-    background: linear-gradient(135deg, var(--card-color-1), var(--card-color-2));
-    border-radius: 12px;
-    padding: 1rem;
+    background: var(--gh-glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--gh-glass-border);
+    border-radius: 16px;
+    padding: 1.5rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    color: white;
-    min-height: 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, var(--card-color-1), var(--card-color-2));
 }
 
 .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 /* Gradient Variations */
-.stat-card.gradient-primary {
-    background: linear-gradient(135deg, #10b981, #059669);
-}
-
-.stat-card.gradient-success {
-    background: linear-gradient(135deg, #059669, #047857);
-}
-
-.stat-card.gradient-warning {
-    background: linear-gradient(135deg, #d97706, #b45309);
-}
-
-.stat-card.gradient-info {
-    background: linear-gradient(135deg, #0e7490, #0c6b85);
-}
+.stat-card.gradient-primary::before { background: linear-gradient(135deg, #10b981, #059669); }
+.stat-card.gradient-success::before { background: linear-gradient(135deg, #059669, #047857); }
+.stat-card.gradient-warning::before { background: linear-gradient(135deg, #d97706, #b45309); }
+.stat-card.gradient-info::before { background: linear-gradient(135deg, #0e7490, #0c6b85); }
 
 /* Stat Icon */
 .stat-icon {
-    width: 45px;
-    height: 45px;
-    border-radius: 10px;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     flex-shrink: 0;
+    color: white;
 }
+
+.stat-card.gradient-primary .stat-icon { background: rgba(16, 185, 129, 0.2); }
+.stat-card.gradient-success .stat-icon { background: rgba(5, 150, 105, 0.2); }
+.stat-card.gradient-warning .stat-icon { background: rgba(217, 119, 6, 0.2); }
+.stat-card.gradient-info .stat-icon { background: rgba(14, 116, 144, 0.2); }
 
 /* Stat Content */
 .stat-content {
@@ -469,41 +584,28 @@
 }
 
 .stat-value {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 2rem;
+    font-weight: 800;
     line-height: 1;
     margin-bottom: 0.25rem;
+    color: var(--gh-text);
 }
 
 .stat-label {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    opacity: 0.9;
+    color: var(--gh-text-light);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .stats-grid.compact {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
-    }
-
-    .stat-card {
-        padding: 0.75rem;
-        min-height: 70px;
-    }
-
-    .stat-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1rem;
-    }
-
-    .stat-value {
-        font-size: 1.25rem;
-    }
+.stat-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gh-text-light);
 }
 
 /* Alerts Grid */
@@ -520,58 +622,66 @@
     }
 }
 
-.alert-card, .section-card {
-    padding: 1rem 1.5rem !important;
-    min-height: auto !important;
+.alert-card {
+    border-radius: 16px;
+    overflow: hidden;
 }
 
-.alert-header, .section-header {
+.alert-header {
     padding: 1.25rem 1.5rem;
-    background: var(--gh-background);
-    border-bottom: 1px solid var(--gh-border);
+    background: var(--gh-glass);
+    border-bottom: 1px solid var(--gh-glass-border);
     display: flex;
-    justify-content: between;
+    justify-content: space-between;
     align-items: center;
 }
 
-.alert-title, .section-title {
-    font-size: 0.9rem !important;
-    font-weight: 600 !important;
+.alert-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gh-text);
 }
 
-.alert-title i, .section-title i {
-    font-size: 0.8rem !important;
+.alert-title i {
+    font-size: 1rem;
+    color: var(--gh-primary);
 }
 
-.alert-badge, .section-badge {
-    padding: 0.25rem 0.75rem;
+.alert-badge {
+    padding: 0.35rem 0.75rem;
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
-.alert-badge.warning, .section-badge.warning { background: #fef3c7; color: #d97706; }
-.alert-badge.danger, .section-badge.danger { background: #fee2e2; color: #dc2626; }
+.alert-badge.warning { background: #fef3c7; color: #d97706; }
+.alert-badge.danger { background: #fee2e2; color: #dc2626; }
 .alert-badge.info { background: #dbeafe; color: #2563eb; }
-.alert-badge.secondary { background: #f3f4f6; color: #6b7280; }
 
-.alert-content, .section-content {
+.alert-content {
     max-height: 400px;
     overflow-y: auto;
+    background: var(--gh-glass);
 }
 
 .alert-item {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--gh-border);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--gh-glass-border);
     display: flex;
-    justify-content: between;
+    justify-content: space-between;
     align-items: center;
     gap: 1rem;
     transition: background-color 0.2s ease;
 }
 
 .alert-item:hover {
-    background: var(--gh-background);
+    background: rgba(16, 185, 129, 0.05);
 }
 
 .alert-item:last-child {
@@ -656,12 +766,13 @@
     text-decoration: none;
     transition: all 0.2s ease;
     border: 1px solid var(--gh-border);
-    background: var(--gh-surface);
+    background: var(--gh-glass);
     color: var(--gh-text-light);
 }
 
 .action-btn.view:hover { background: #3b82f6; color: white; border-color: #3b82f6; }
 .action-btn.edit:hover { background: #10b981; color: white; border-color: #10b981; }
+.action-btn.renew:hover { background: #f59e0b; color: white; border-color: #f59e0b; }
 
 /* Empty State */
 .empty-state {
@@ -674,6 +785,7 @@
     font-size: 3rem;
     margin-bottom: 1rem;
     color: #10b981;
+    opacity: 0.5;
 }
 
 .empty-title {
@@ -684,6 +796,50 @@
 
 .empty-description {
     font-size: 0.875rem;
+    opacity: 0.7;
+}
+
+/* Section Cards */
+.section-card {
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.section-header {
+    padding: 1.25rem 1.5rem;
+    background: var(--gh-glass);
+    border-bottom: 1px solid var(--gh-glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gh-text);
+}
+
+.section-title i {
+    font-size: 1rem;
+    color: var(--gh-primary);
+}
+
+.section-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.section-badge.danger { background: #fee2e2; color: #dc2626; }
+
+.section-content {
+    background: var(--gh-glass);
 }
 
 /* Modern Table */
@@ -704,13 +860,13 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--gh-text-light);
-    border-bottom: 1px solid var(--gh-border);
-    background: var(--gh-background);
+    border-bottom: 1px solid var(--gh-glass-border);
+    background: var(--gh-glass);
 }
 
 .modern-table td {
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--gh-border);
+    border-bottom: 1px solid var(--gh-glass-border);
 }
 
 .modern-table tr:last-child td {
@@ -718,7 +874,7 @@
 }
 
 .modern-table tr:hover {
-    background: var(--gh-background);
+    background: rgba(16, 185, 129, 0.05);
 }
 
 .customer-cell {
@@ -756,151 +912,221 @@
 
 .status-badge.expired { background: #fee2e2; color: #dc2626; }
 
-/* ===== QUICK ACTIONS - COMPACT FIX ===== */
-/* Force compact styling - Override everything */
+/* Quick Actions */
 .actions-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
-    gap: 0.75rem !important;
-    padding: 1rem !important;
-    margin: 0 !important;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem;
 }
 
 .action-card {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.75rem !important;
-    padding: 1rem !important;
-    min-height: 70px !important;
-    border-radius: 12px !important;
-    text-decoration: none !important;
-    transition: all 0.3s ease !important;
-    background: var(--gh-surface) !important;
-    border: 1px solid var(--gh-border) !important;
-    position: relative !important;
-    overflow: hidden !important;
-    margin: 0 !important;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: var(--gh-glass);
+    border: 1px solid var(--gh-glass-border);
+    position: relative;
+    overflow: hidden;
+}
+
+.action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+}
+
+.action-card.primary::before { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.action-card.success::before { background: linear-gradient(135deg, #10b981, #059669); }
+.action-card.danger::before { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.action-card.info::before { background: linear-gradient(135deg, #06b6d4, #0e7490); }
+
+.action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .action-icon {
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 10px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 1.1rem !important;
-    color: white !important;
-    flex-shrink: 0 !important;
-    margin: 0 !important;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+    flex-shrink: 0;
 }
 
-.action-card.primary .action-icon {
-    background: linear-gradient(135deg, #3b82f6, #60a5fa) !important;
-}
-.action-card.success .action-icon {
-    background: linear-gradient(135deg, #10b981, #34d399) !important;
-}
-.action-card.danger .action-icon {
-    background: linear-gradient(135deg, #ef4444, #f87171) !important;
-}
-.action-card.info .action-icon {
-    background: linear-gradient(135deg, #06b6d4, #22d3ee) !important;
-}
+.action-card.primary .action-icon { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.action-card.success .action-icon { background: linear-gradient(135deg, #10b981, #059669); }
+.action-card.danger .action-icon { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.action-card.info .action-icon { background: linear-gradient(135deg, #06b6d4, #0e7490); }
 
 .action-content {
-    flex: 1 !important;
-    min-width: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    flex: 1;
 }
 
 .action-title {
-    font-weight: 600 !important;
-    color: var(--gh-text) !important;
-    margin-bottom: 0.25rem !important;
-    font-size: 0.9rem !important;
-    line-height: 1.2 !important;
+    font-weight: 600;
+    color: var(--gh-text);
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
 }
 
 .action-description {
-    font-size: 0.75rem !important;
-    color: var(--gh-text-light) !important;
-    line-height: 1.3 !important;
-    opacity: 0.7 !important;
-    margin: 0 !important;
+    font-size: 0.875rem;
+    color: var(--gh-text-light);
+    line-height: 1.4;
 }
 
 .action-arrow {
-    color: var(--gh-text-light) !important;
-    transition: all 0.3s ease !important;
-    font-size: 0.8rem !important;
-    opacity: 0.6 !important;
-    flex-shrink: 0 !important;
-    margin: 0 !important;
+    color: var(--gh-text-light);
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
 }
 
-/* Section card compact styling */
-.section-card {
-    margin-bottom: 1.5rem !important;
+.action-card:hover .action-arrow {
+    color: var(--gh-primary);
+    transform: translateX(4px);
 }
 
-.section-header {
-    padding: 1rem 1.5rem !important;
-    min-height: auto !important;
-    margin: 0 !important;
+/* Recent Activity */
+.activity-list {
+    padding: 1rem 0;
 }
 
-.section-title {
-    font-size: 0.9rem !important;
-    font-weight: 600 !important;
-    margin: 0 !important;
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--gh-glass-border);
+    transition: background-color 0.2s ease;
 }
 
-.section-title i {
-    font-size: 0.8rem !important;
+.activity-item:hover {
+    background: rgba(16, 185, 129, 0.05);
 }
 
-.section-content {
-    padding: 0 !important;
-    max-height: none !important;
-    margin: 0 !important;
+.activity-item:last-child {
+    border-bottom: none;
 }
 
-/* Remove any extra spacing */
-.section-card:last-child {
-    margin-bottom: 0 !important;
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: white;
+    flex-shrink: 0;
 }
 
-/* Responsive fixes */
+.activity-icon.success { background: linear-gradient(135deg, #10b981, #059669); }
+.activity-icon.info { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.activity-icon.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.activity-icon.danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-text {
+    font-weight: 500;
+    color: var(--gh-text);
+    margin-bottom: 0.25rem;
+}
+
+.activity-time {
+    font-size: 0.875rem;
+    color: var(--gh-text-light);
+}
+
+/* Glass morphism */
+.glass-morphism {
+    background: var(--gh-glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--gh-glass-border);
+}
+
+/* Dark mode support */
+.dark .glass-morphism {
+    background: rgba(30, 30, 30, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .stat-card,
+.dark .alert-card,
+.dark .section-card,
+.dark .action-card {
+    background: rgba(30, 30, 30, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .alert-item:hover,
+.dark .activity-item:hover,
+.dark .modern-table tr:hover {
+    background: rgba(16, 185, 129, 0.1);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
+    .dashboard-container {
+        padding: 0 0.5rem;
+    }
+
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .stats-grid.compact {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .stat-card {
+        padding: 1.25rem;
+    }
+
     .actions-grid {
-        grid-template-columns: 1fr !important;
-        gap: 0.5rem !important;
-        padding: 0.75rem !important;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        padding: 1rem;
     }
 
     .action-card {
-        padding: 0.75rem !important;
-        min-height: 60px !important;
-        gap: 0.75rem !important;
+        padding: 1.25rem;
     }
 
-    .action-icon {
-        width: 32px !important;
-        height: 32px !important;
-        font-size: 0.9rem !important;
+    .alert-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
     }
 
-    .action-title {
-        font-size: 0.85rem !important;
-        margin-bottom: 0.125rem !important;
-    }
-
-    .action-description {
-        font-size: 0.7rem !important;
+    .alert-item-actions {
+        width: 100%;
+        justify-content: space-between;
     }
 }
+
 /* Animation for stats update */
 @keyframes pulseUpdate {
     0% { transform: scale(1); }
@@ -910,6 +1136,16 @@
 
 .stat-value.updating {
     animation: pulseUpdate 0.6s ease;
+}
+
+/* Loading animation */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.refresh-indicator.loading i {
+    animation: spin 1s linear infinite;
 }
 </style>
 
@@ -923,7 +1159,10 @@ document.addEventListener('DOMContentLoaded', function() {
             minute: '2-digit',
             hour12: true
         });
-        document.getElementById('currentTime').textContent = timeString;
+        const timeElement = document.getElementById('currentTime');
+        if (timeElement) {
+            timeElement.textContent = timeString;
+        }
     }
 
     // Update time immediately and every minute
@@ -931,32 +1170,29 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(updateCurrentTime, 60000);
 
     // Auto-refresh dashboard every 60 seconds
-    let refreshTimer = setInterval(refreshDashboardStats, 60000);
+    let refreshInterval = setInterval(refreshDashboardStats, 60000);
 
     // Enhanced stat card interactions
     const statCards = document.querySelectorAll('.stat-card');
     statCards.forEach(card => {
         card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-8px) scale(1.02)';
+            this.style.transform = 'translateY(-4px)';
         });
 
         card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
-
-        // Add click effect
-        card.addEventListener('mousedown', function() {
-            this.style.transform = 'translateY(-4px) scale(0.98)';
-        });
-
-        card.addEventListener('mouseup', function() {
-            this.style.transform = 'translateY(-8px) scale(1.02)';
+            this.style.transform = 'translateY(0)';
         });
     });
 
     // AJAX stats refresh function
     function refreshDashboardStats() {
         if (window.location.pathname === '/dashboard' || window.location.pathname === '/') {
+            // Show loading state
+            const refreshIndicator = document.querySelector('.refresh-indicator');
+            if (refreshIndicator) {
+                refreshIndicator.classList.add('loading');
+            }
+
             fetch('/dashboard/stats')
                 .then(response => {
                     if (!response.ok) throw new Error('Network response was not ok');
@@ -967,6 +1203,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .catch(error => {
                     console.log('Auto-refresh failed:', error);
+                })
+                .finally(() => {
+                    if (refreshIndicator) {
+                        refreshIndicator.classList.remove('loading');
+                    }
                 });
         }
     }
@@ -985,10 +1226,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (element && element.textContent != value) {
                 // Flash animation
                 const card = element.closest('.stat-card');
-                card.style.animation = 'none';
-                setTimeout(() => {
-                    card.style.animation = 'statFlash 0.6s ease';
-                }, 10);
+                if (card) {
+                    card.style.animation = 'none';
+                    setTimeout(() => {
+                        card.style.animation = 'pulseUpdate 0.6s ease';
+                    }, 10);
+                }
 
                 // Update value
                 element.textContent = value;
@@ -1001,84 +1244,75 @@ document.addEventListener('DOMContentLoaded', function() {
         const refreshIndicator = document.querySelector('.refresh-indicator');
         if (refreshIndicator) {
             const now = new Date();
-            refreshIndicator.innerHTML = `<i class="fas fa-sync-alt"></i><span>Updated: ${now.toLocaleTimeString()}</span>`;
-            refreshIndicator.style.animation = 'none';
-            setTimeout(() => {
-                refreshIndicator.style.animation = 'pulseUpdate 0.6s ease';
-            }, 10);
+            const timeSpan = refreshIndicator.querySelector('span');
+            if (timeSpan) {
+                timeSpan.textContent = `Updated: ${now.toLocaleTimeString()}`;
+            }
         }
     }
 
-    // Compact stat card interactions - Fixed version
-document.querySelectorAll('.stat-card').forEach(card => {
-    card.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-2px)';
+    // Add hover effects to action cards
+    document.querySelectorAll('.action-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            const arrow = this.querySelector('.action-arrow');
+            if (arrow) {
+                arrow.style.transform = 'translateX(4px)';
+                arrow.style.color = 'var(--gh-primary)';
+            }
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            const arrow = this.querySelector('.action-arrow');
+            if (arrow) {
+                arrow.style.transform = 'translateX(0)';
+                arrow.style.color = 'var(--gh-text-light)';
+            }
+        });
     });
 
-    card.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
+    // Add click effects to alert items
+    document.querySelectorAll('.alert-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            if (!e.target.closest('.action-btn')) {
+                const viewLink = this.querySelector('.action-btn.view');
+                if (viewLink) {
+                    window.location.href = viewLink.href;
+                }
+            }
+        });
     });
-});
 
-    // Add flash animation
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes statFlash {
-            0% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
-            50% { box-shadow: 0 8px 32px rgba(255, 255, 255, 0.3); }
-            100% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + K for search focus
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            window.location.href = "{{ route('customers.index') }}";
         }
 
-        @keyframes pulseUpdate {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        // Number keys for quick actions
+        if (e.key >= '1' && e.key <= '4' && !e.ctrlKey && !e.metaKey) {
+            e.preventDefault();
+            const actionCards = document.querySelectorAll('.action-card');
+            const index = parseInt(e.key) - 1;
+            if (actionCards[index]) {
+                actionCards[index].click();
+            }
         }
-    `;
-    document.head.appendChild(style);
+    });
 
     // Initialize any charts or additional components here
     console.log('GreenHome Dashboard initialized');
 
-    // Add hover effects to Quick Action cards
-document.querySelectorAll('.action-card').forEach(card => {
-    card.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-2px)';
-        this.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.1)';
-        this.style.borderColor = 'transparent';
-
-        const arrow = this.querySelector('.action-arrow');
-        if (arrow) {
-            arrow.style.transform = 'translateX(3px)';
-            arrow.style.color = 'var(--gh-primary)';
-            arrow.style.opacity = '1';
-        }
-
-        const icon = this.querySelector('.action-icon');
-        if (icon) {
-            icon.style.transform = 'scale(1.05)';
+    // Add smooth scroll to alerts container
+    const alertContainers = document.querySelectorAll('.alert-content');
+    alertContainers.forEach(container => {
+        if (container.scrollHeight > container.clientHeight) {
+            container.style.scrollBehavior = 'smooth';
         }
     });
-
-    card.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = 'none';
-        this.style.borderColor = 'var(--gh-border)';
-
-        const arrow = this.querySelector('.action-arrow');
-        if (arrow) {
-            arrow.style.transform = 'translateX(0)';
-            arrow.style.color = 'var(--gh-text-light)';
-            arrow.style.opacity = '0.6';
-        }
-
-        const icon = this.querySelector('.action-icon');
-        if (icon) {
-            icon.style.transform = 'scale(1)';
-        }
-    });
-});
-
 });
 </script>
 @endsection
