@@ -71,56 +71,62 @@ class Customer extends Model
      * Update contract status based on dates
      */
     public function updateContractStatus()
-    {
-        $today = Carbon::today();
-        $endDate = Carbon::parse($this->contract_end_date);
+{
+    $today = Carbon::today();
+    $endDate = Carbon::parse($this->contract_end_date);
 
-        // FIXED: If today is greater than OR EQUAL to end date, contract is expired
-        if ($today->gte($endDate)) {
-            $this->status = 'expired';
-        } elseif ($this->isContractExpiring()) {
-            $this->status = 'active'; // Keep as active but show alert
-        } else {
-            $this->status = 'active';
-        }
+    // Don't update status if customer is manually set to "pending"
+    if ($this->status === 'pending') {
+        return; // Keep as pending - account on hold
     }
+
+    // Only update status for non-pending customers
+    if ($today->gte($endDate)) {
+        $this->status = 'expired';
+    } elseif ($this->isContractExpiring()) {
+        $this->status = 'active'; // Keep as active but show alert
+    } else {
+        $this->status = 'active';
+    }
+}
 
     /**
-     * Get all overdue maintenance dates
-     */
-    public function getOverdueMaintenanceDates()
-    {
-        if ($this->hasContractExpired()) {
-            return collect();
-        }
-
-        $overdueDates = collect();
-        $lastMaintenance = $this->maintenanceHistory()->latest()->first();
-
-        // Start from the appropriate date
-        if ($lastMaintenance) {
-            $startDate = Carbon::parse($lastMaintenance->maintenance_date)->startOfDay();
-        } else {
-            $startDate = Carbon::parse($this->contract_start_date)->startOfDay();
-        }
-
-        $interval = $this->getMaintenanceInterval();
-        $today = Carbon::today()->startOfDay();
-
-        // Calculate next expected maintenance date from last maintenance
-        $nextExpectedDate = $startDate->copy()->addMonths($interval);
-
-        // If next expected date is in the past, it's overdue
-        while ($nextExpectedDate->lt($today)) {
-            // Check if this overdue date was already completed
-            if (!$this->isMaintenanceDateCompleted($nextExpectedDate)) {
-                $overdueDates->push($nextExpectedDate->copy());
-            }
-            $nextExpectedDate = $nextExpectedDate->copy()->addMonths($interval);
-        }
-
-        return $overdueDates;
+ * Get all overdue maintenance dates
+ */
+public function getOverdueMaintenanceDates()
+{
+    // If contract expired OR status is pending, no maintenance due
+    if ($this->hasContractExpired() || $this->status === 'pending') {
+        return collect();
     }
+
+    $overdueDates = collect();
+    $lastMaintenance = $this->maintenanceHistory()->latest()->first();
+
+    // Start from the appropriate date
+    if ($lastMaintenance) {
+        $startDate = Carbon::parse($lastMaintenance->maintenance_date)->startOfDay();
+    } else {
+        $startDate = Carbon::parse($this->contract_start_date)->startOfDay();
+    }
+
+    $interval = $this->getMaintenanceInterval();
+    $today = Carbon::today()->startOfDay();
+
+    // Calculate next expected maintenance date from last maintenance
+    $nextExpectedDate = $startDate->copy()->addMonths($interval);
+
+    // If next expected date is in the past, it's overdue
+    while ($nextExpectedDate->lt($today)) {
+        // Check if this overdue date was already completed
+        if (!$this->isMaintenanceDateCompleted($nextExpectedDate)) {
+            $overdueDates->push($nextExpectedDate->copy());
+        }
+        $nextExpectedDate = $nextExpectedDate->copy()->addMonths($interval);
+    }
+
+    return $overdueDates;
+}
 
     /**
      * Get next scheduled maintenance date (not overdue)
@@ -263,23 +269,19 @@ class Customer extends Model
     /**
      * Check if maintenance is due (has overdue or upcoming within 7 days)
      */
-    public function isMaintenanceDue()
-    {
-        try {
-            // If contract is expired, maintenance is not due
-            if ($this->hasContractExpired()) {
-                return false;
-            }
-
-            if ($this->status !== 'active') {
-                return false;
-            }
-
-            return $this->getMostUrgentMaintenanceAlert() !== null;
-        } catch (\Exception $e) {
+public function isMaintenanceDue()
+{
+    try {
+        // If contract is expired OR status is pending, maintenance is not due
+        if ($this->hasContractExpired() || $this->status === 'pending') {
             return false;
         }
+
+        return $this->getMostUrgentMaintenanceAlert() !== null;
+    } catch (\Exception $e) {
+        return false;
     }
+}
 
     /**
      * Check if contract is expiring (within 90 days)

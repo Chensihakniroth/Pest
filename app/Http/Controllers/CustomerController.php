@@ -40,10 +40,10 @@ class CustomerController extends Controller
     if ($request->has('contract_status') && $request->contract_status != '') {
         $today = Carbon::today();
 
-        if ($request->contract_status === 'active') {
-            $query->where('status', 'active')
+    if ($request->contract_status === 'active') {
+            $query->where('status', 'active') // Only truly active, not pending
                   ->where('contract_end_date', '>=', $today);
-        } elseif ($request->contract_status === 'expiring') {
+                    } elseif ($request->contract_status === 'expiring') {
             $query->where('status', 'active')
                   ->where('contract_end_date', '<=', $today->copy()->addDays(90))
                   ->where('contract_end_date', '>=', $today);
