@@ -11,89 +11,87 @@ use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
-    public function index(Request $request)
-    {
-        $query = Customer::query();
+   public function index(Request $request)
+{
+    $query = Customer::query();
 
-        // Search filter
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('customer_id', 'like', "%{$search}%")
-                  ->orWhere('phone_number', 'like', "%{$search}%")
-                  ->orWhere('address', 'like', "%{$search}%");
+    // Search filter
+    if ($request->has('search') && $request->search != '') {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('customer_id', 'like', "%{$search}%")
+              ->orWhere('phone_number', 'like', "%{$search}%")
+              ->orWhere('address', 'like', "%{$search}%");
+        });
+    }
+
+    // Service type filter
+    if ($request->has('service_type') && $request->service_type != '') {
+        $query->where('service_type', $request->service_type);
+    }
+
+    // Status filter
+    if ($request->has('status') && $request->status != '') {
+        $query->where('status', $request->status);
+    }
+
+    // Contract status filter
+    if ($request->has('contract_status') && $request->contract_status != '') {
+        $today = Carbon::today();
+
+        if ($request->contract_status === 'active') {
+            $query->where('status', 'active')
+                  ->where('contract_end_date', '>=', $today);
+        } elseif ($request->contract_status === 'expiring') {
+            $query->where('status', 'active')
+                  ->where('contract_end_date', '<=', $today->copy()->addDays(90))
+                  ->where('contract_end_date', '>=', $today);
+        } elseif ($request->contract_status === 'expired') {
+            $query->where(function($q) use ($today) {
+                $q->where('contract_end_date', '<', $today)
+                  ->orWhere('status', 'expired');
             });
         }
-
-        // Service type filter
-        if ($request->has('service_type') && $request->service_type != '') {
-            $query->where('service_type', $request->service_type);
-        }
-
-        // Status filter
-        if ($request->has('status') && $request->status != '') {
-            $query->where('status', $request->status);
-        }
-
-        // Contract status filter
-        if ($request->has('contract_status') && $request->contract_status != '') {
-            $today = Carbon::today();
-
-            if ($request->contract_status === 'active') {
-                $query->where('status', 'active')
-                      ->where('contract_end_date', '>=', $today);
-            } elseif ($request->contract_status === 'expiring') {
-                $query->where('status', 'active')
-                      ->where('contract_end_date', '<=', $today->copy()->addDays(90))
-                      ->where('contract_end_date', '>=', $today);
-            } elseif ($request->contract_status === 'expired') {
-                $query->where(function($q) use ($today) {
-                    $q->where('contract_end_date', '<', $today)
-                      ->orWhere('status', 'expired');
-                });
-            }
-        }
-
-        // Maintenance due filter
-        if ($request->has('maintenance_due') && $request->maintenance_due == '1') {
-            $query->whereHas('maintenanceHistory', function($q) {
-                $q->where('maintenance_date', '<=', Carbon::today()->subDays(90));
-            })->orWhereDoesntHave('maintenanceHistory');
-        }
-
-        // Sorting
-        $sort = $request->get('sort', 'created_at');
-        $order = $request->get('order', 'desc');
-
-        // Validate sortable columns
-        $sortableColumns = ['name', 'customer_id', 'service_type', 'contract_end_date', 'created_at'];
-        if (!in_array($sort, $sortableColumns)) {
-            $sort = 'created_at';
-        }
-
-        $query->orderBy($sort, $order);
-
-        $customers = $query->paginate(15);
-
-        // AJAX request - return JSON for just the list and pagination
-        if ($request->ajax()) {
-            $view = view('customers.partials.customer_list', compact('customers'))->render();
-            $pagination = view('customers.partials.pagination', compact('customers'))->render();
-
-            return response()->json([
-                'success' => true,
-                'html' => $view,
-                'pagination' => $pagination,
-                'count' => $customers->total(),
-                'firstItem' => $customers->firstItem(),
-                'lastItem' => $customers->lastItem(),
-                'hasPages' => $customers->hasPages()
-            ]);
-        }
-
-        return view('customers.index', compact('customers'));
     }
+
+    // Maintenance due filter
+    if ($request->has('maintenance_due') && $request->maintenance_due == '1') {
+        $query->whereHas('maintenanceHistory', function($q) {
+            $q->where('maintenance_date', '<=', Carbon::today()->subDays(90));
+        })->orWhereDoesntHave('maintenanceHistory');
+    }
+
+    // Sorting
+    $sort = $request->get('sort', 'created_at');
+    $order = $request->get('order', 'desc');
+
+    // Validate sortable columns
+    $sortableColumns = ['name', 'customer_id', 'service_type', 'contract_end_date', 'created_at'];
+    if (!in_array($sort, $sortableColumns)) {
+        $sort = 'created_at';
+    }
+
+    $query->orderBy($sort, $order);
+
+    $customers = $query->paginate(15);
+
+    // AJAX request - return JSON for just the list
+    if ($request->ajax()) {
+        $html = view('customers.partials.customer_list', compact('customers'))->render();
+
+        return response()->json([
+            'success' => true,
+            'html' => $html,
+            'count' => $customers->total(),
+            'firstItem' => $customers->firstItem(),
+            'lastItem' => $customers->lastItem(),
+            'hasPages' => $customers->hasPages()
+        ]);
+    }
+
+    return view('customers.index', compact('customers'));
+}
 
     public function create()
     {
@@ -179,25 +177,25 @@ class CustomerController extends Controller
         return redirect()->back()->with('success', 'Maintenance recorded successfully. Dashboard will update immediately.');
     }
 
-public function renewContract(Request $request, Customer $customer)
-{
-    $request->validate([
-        'contract_start_date' => 'required|date',
-        'contract_end_date' => 'required|date|after:contract_start_date',
-        'service_type' => 'required|in:baiting_system_complete,baiting_system_not_complete,host_system,drill_injection',
-        'service_price' => 'required|numeric|min:0',
-    ]);
+    public function renewContract(Request $request, Customer $customer)
+    {
+        $request->validate([
+            'contract_start_date' => 'required|date',
+            'contract_end_date' => 'required|date|after:contract_start_date',
+            'service_type' => 'required|in:baiting_system_complete,baiting_system_not_complete,host_system,drill_injection',
+            'service_price' => 'required|numeric|min:0',
+        ]);
 
-    $customer->update([
-        'contract_start_date' => $request->contract_start_date,
-        'contract_end_date' => $request->contract_end_date,
-        'service_type' => $request->service_type,
-        'service_price' => $request->service_price,
-        'status' => 'active',
-    ]);
+        $customer->update([
+            'contract_start_date' => $request->contract_start_date,
+            'contract_end_date' => $request->contract_end_date,
+            'service_type' => $request->service_type,
+            'service_price' => $request->service_price,
+            'status' => 'active',
+        ]);
 
-    return redirect()->back()->with('success', 'Contract renewed successfully.');
-}
+        return redirect()->back()->with('success', 'Contract renewed successfully.');
+    }
 
     public function destroy(Customer $customer)
     {
