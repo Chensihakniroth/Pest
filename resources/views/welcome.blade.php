@@ -3,93 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreenHome Pest Control - Professional Pest Management</title>
+    <title>GreenHome Pest Control - Professional Pest Management Solutions</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-green: #198754;
-            --dark-green: #146c43;
-            --light-green: #d1e7dd;
-            --accent: #ffc107;
-            --dark: #2c3e50;
-            --light: #f8f9fa;
+            --gh-primary: #10b981;
+            --gh-primary-dark: #059669;
+            --gh-secondary: #047857;
+            --gh-accent: #f59e0b;
+            --gh-dark: #1f2937;
+            --gh-light: #f8fafc;
+            --gh-text: #374151;
+            --gh-text-light: #6b7280;
+            --gh-glass: rgba(255, 255, 255, 0.95);
+            --gh-glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            color: #333;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--gh-text);
+            background: var(--gh-light);
             overflow-x: hidden;
-            background: #fafbfc;
         }
 
         /* Modern Navigation */
         .navbar {
-            background: rgba(255, 255, 255, 0.98);
+            background: var(--gh-glass);
             backdrop-filter: blur(20px);
-            box-shadow: 0 2px 30px rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 1rem 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         .navbar-brand {
             font-weight: 800;
-            color: var(--dark) !important;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
+            color: var(--gh-dark) !important;
             display: flex;
             align-items: center;
+            gap: 0.75rem;
         }
 
         .brand-icon {
             width: 40px;
             height: 40px;
-            background: var(--primary-green);
+            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 12px;
             color: white;
+            font-size: 1.2rem;
         }
 
         .nav-link {
             font-weight: 500;
-            color: var(--dark) !important;
-            margin: 0 0.5rem;
-            padding: 0.5rem 1rem !important;
-            border-radius: 8px;
+            color: var(--gh-text) !important;
+            margin: 0 0.25rem;
+            padding: 0.75rem 1.25rem !important;
+            border-radius: 10px;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .nav-link:hover {
-            background: rgba(25, 135, 84, 0.1);
-            color: var(--primary-green) !important;
+            color: var(--gh-primary) !important;
+            background: rgba(16, 185, 129, 0.05);
             transform: translateY(-1px);
         }
 
+        .nav-link.active {
+            color: var(--gh-primary) !important;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
         .admin-login {
-            background: var(--primary-green);
+            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
             color: white !important;
-            border-radius: 8px;
-            padding: 0.6rem 1.5rem !important;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem !important;
             font-weight: 600;
             transition: all 0.3s ease;
-            border: 2px solid var(--primary-green);
+            border: none;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .admin-login:hover {
-            background: transparent;
-            color: var(--primary-green) !important;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, var(--gh-primary-dark), var(--gh-secondary));
+            color: white !important;
         }
 
         /* Enhanced Hero Section */
         .hero-section {
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            background: linear-gradient(135deg, var(--gh-primary) 0%, var(--gh-primary-dark) 100%);
             color: white;
-            padding: 180px 0 120px;
+            padding: 160px 0 100px;
             position: relative;
             overflow: hidden;
         }
@@ -99,15 +124,17 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.03" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,192C1248,192,1344,128,1392,96L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="rgba(255,255,255,0.1)"></path></svg>');
             background-size: cover;
+            background-position: center;
         }
 
         .hero-badge {
             display: inline-flex;
             align-items: center;
+            gap: 0.75rem;
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -116,7 +143,7 @@
             border-radius: 50px;
             font-weight: 600;
             margin-bottom: 2rem;
-            letter-spacing: 0.5px;
+            font-size: 0.9rem;
         }
 
         .hero-content h1 {
@@ -124,11 +151,14 @@
             font-size: 3.5rem;
             line-height: 1.1;
             margin-bottom: 1.5rem;
-            letter-spacing: -1px;
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.9) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .text-accent {
-            background: linear-gradient(135deg, var(--accent) 0%, #e0a800 100%);
+        .hero-accent {
+            background: linear-gradient(135deg, var(--gh-accent), #e0a800);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -140,8 +170,6 @@
             margin-bottom: 2.5rem;
             line-height: 1.6;
             max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
         }
 
         .btn-hero {
@@ -153,19 +181,19 @@
             text-decoration: none;
             display: inline-flex;
             align-items: center;
+            gap: 0.75rem;
             border: 2px solid transparent;
-            margin: 0 0.5rem 1rem;
         }
 
         .btn-hero-primary {
-            background: linear-gradient(135deg, var(--accent) 0%, #e0a800 100%);
+            background: linear-gradient(135deg, var(--gh-accent), #e0a800);
             color: #000;
-            border-color: var(--accent);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
         }
 
         .btn-hero-primary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(255, 193, 7, 0.3);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
             color: #000;
         }
 
@@ -191,13 +219,13 @@
 
         .section-title {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 4rem;
         }
 
         .section-title h2 {
             font-weight: 700;
             font-size: 2.5rem;
-            color: var(--dark);
+            color: var(--gh-dark);
             margin-bottom: 1rem;
             position: relative;
         }
@@ -210,15 +238,15 @@
             transform: translateX(-50%);
             width: 60px;
             height: 4px;
-            background: var(--primary-green);
+            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
             border-radius: 2px;
         }
 
         .section-title p {
             font-size: 1.125rem;
-            color: #6c757d;
+            color: var(--gh-text-light);
             max-width: 600px;
-            margin: 0 auto;
+            margin: 1.5rem auto 0;
         }
 
         .service-card {
@@ -227,8 +255,8 @@
             border-radius: 16px;
             text-align: center;
             height: 100%;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid #e9ecef;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #f1f5f9;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             position: relative;
             overflow: hidden;
@@ -241,19 +269,19 @@
             left: 0;
             width: 100%;
             height: 4px;
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
         }
 
         .service-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            border-color: var(--primary-green);
+            border-color: var(--gh-primary);
         }
 
         .service-icon {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -270,13 +298,13 @@
 
         .service-card h4 {
             font-weight: 600;
-            color: var(--dark);
+            color: var(--gh-dark);
             margin-bottom: 1rem;
             font-size: 1.25rem;
         }
 
         .service-card p {
-            color: #6c757d;
+            color: var(--gh-text-light);
             line-height: 1.6;
             margin-bottom: 1.5rem;
         }
@@ -284,45 +312,45 @@
         .service-price {
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--primary-green);
+            color: var(--gh-primary);
             margin-bottom: 1.5rem;
         }
 
         .btn-service {
-            background: var(--primary-green);
+            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
             color: white;
-            border: 2px solid var(--primary-green);
-            border-radius: 8px;
+            border: none;
+            border-radius: 10px;
             padding: 0.75rem 1.5rem;
             font-weight: 600;
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .btn-service:hover {
-            background: transparent;
-            color: var(--primary-green);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            color: white;
         }
 
         /* Enhanced About Section */
         .about-section {
             padding: 100px 0;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }
 
         .about-content {
-            padding-right: 2rem;
+            padding-right: 3rem;
         }
 
         .about-image {
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             position: relative;
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
             height: 400px;
             display: flex;
             align-items: center;
@@ -346,19 +374,46 @@
             display: flex;
             align-items: center;
             font-weight: 500;
+            color: var(--gh-text);
         }
 
         .feature-list i {
-            color: var(--primary-green);
+            color: var(--gh-primary);
             margin-right: 12px;
             font-size: 1.2rem;
-            background: var(--light-green);
+            background: rgba(16, 185, 129, 0.1);
             width: 32px;
             height: 32px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--gh-dark), #111827);
+            color: white;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--gh-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 1.125rem;
+            color: #d1d5db;
+            font-weight: 500;
         }
 
         /* Modern Testimonials */
@@ -375,7 +430,7 @@
             margin: 1rem;
             height: 100%;
             position: relative;
-            border: 1px solid #f1f3f4;
+            border: 1px solid #f1f5f9;
             transition: all 0.3s ease;
         }
 
@@ -390,14 +445,14 @@
             top: 20px;
             right: 30px;
             font-size: 4rem;
-            color: var(--light-green);
+            color: rgba(16, 185, 129, 0.1);
             font-family: Georgia, serif;
             line-height: 1;
         }
 
         .testimonial-text {
             font-style: italic;
-            color: #6c757d;
+            color: var(--gh-text-light);
             margin-bottom: 2rem;
             line-height: 1.6;
             font-size: 1.05rem;
@@ -412,7 +467,7 @@
             width: 50px;
             height: 50px;
             border-radius: 12px;
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
             color: white;
             display: flex;
             align-items: center;
@@ -425,21 +480,40 @@
         .author-info h5 {
             margin: 0;
             font-weight: 600;
-            color: var(--dark);
+            color: var(--gh-dark);
         }
 
         .author-info p {
             margin: 0;
-            color: #6c757d;
+            color: var(--gh-text-light);
             font-size: 0.9rem;
         }
 
         /* Modern CTA Section */
         .cta-section {
             padding: 100px 0;
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
             color: white;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="rgba(255,255,255,0.1)"></path></svg>');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 2;
         }
 
         .cta-content h3 {
@@ -458,8 +532,8 @@
 
         /* Modern Footer */
         .footer {
-            background: var(--dark);
-            color: #adb5bd;
+            background: var(--gh-dark);
+            color: #9ca3af;
             padding: 80px 0 30px;
         }
 
@@ -470,11 +544,7 @@
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
-        }
-
-        .footer-brand i {
-            margin-right: 12px;
-            color: var(--primary-green);
+            gap: 0.75rem;
         }
 
         .footer-text {
@@ -501,29 +571,25 @@
         }
 
         .footer-links a {
-            color: #adb5bd;
+            color: #9ca3af;
             text-decoration: none;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
+            gap: 0.5rem;
         }
 
         .footer-links a:hover {
-            color: white;
+            color: var(--gh-primary);
             transform: translateX(5px);
         }
 
-        .footer-links a i {
-            margin-right: 8px;
-            width: 16px;
-        }
-
         .footer-bottom {
-            border-top: 1px solid #343a40;
+            border-top: 1px solid #374151;
             padding-top: 2rem;
             margin-top: 3rem;
             text-align: center;
-            color: #6c757d;
+            color: #6b7280;
             font-size: 0.9rem;
         }
 
@@ -543,6 +609,7 @@
         @media (max-width: 768px) {
             .hero-section {
                 padding: 140px 0 80px;
+                text-align: center;
             }
 
             .hero-content h1 {
@@ -576,6 +643,39 @@
             .service-card {
                 padding: 2rem 1.5rem;
             }
+
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .hero-badge {
+                font-size: 0.8rem;
+                padding: 0.5rem 1rem;
+            }
+
+            .section-title h2 {
+                font-size: 1.75rem;
+            }
+
+            .service-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .cta-content h3 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
@@ -597,6 +697,9 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
+                        <a class="nav-link active" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#services">Services</a>
                     </li>
                     <li class="nav-item">
@@ -604,9 +707,6 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#testimonials">Testimonials</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
                     </li>
                     <li class="nav-item ms-2">
                         <a class="nav-link admin-login" href="{{ route('login') }}">
@@ -619,28 +719,62 @@
     </nav>
 
     <!-- Enhanced Hero Section -->
-    <section class="hero-section">
+    <section class="hero-section" id="home">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-lg-8 mx-auto text-center hero-content fade-in-up">
-                    <span class="hero-badge">
-                        <i class="fas fa-shield-alt me-2"></i>Professional Pest Management
-                    </span>
-                    <h1 class="display-4 fw-bold">
-                        Pest-Free Living<br>
-                        <span class="text-accent">Guaranteed</span>
-                    </h1>
-                    <p class="hero-lead">
-                        We provide effective, eco-friendly pest control solutions to protect your home and family.
-                        Our expert technicians use the latest methods to eliminate pests and prevent future infestations.
-                    </p>
-                    <div class="hero-buttons">
-                        <a href="#services" class="btn btn-hero btn-hero-primary">
-                            Our Services <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
-                        <a href="#contact" class="btn btn-hero btn-hero-outline">
-                            <i class="fas fa-phone me-2"></i> Call Now
-                        </a>
+                <div class="col-lg-8 mx-auto text-center">
+                    <div class="hero-content fade-in-up">
+                        <span class="hero-badge">
+                            <i class="fas fa-shield-alt me-2"></i>Professional Pest Management Since 2008
+                        </span>
+                        <h1>
+                            Pest-Free Living<br>
+                            <span class="hero-accent">Guaranteed</span>
+                        </h1>
+                        <p class="hero-lead">
+                            We provide effective, eco-friendly pest control solutions to protect your home and family.
+                            Our expert technicians use the latest methods to eliminate pests and prevent future infestations.
+                        </p>
+                        <div class="hero-buttons">
+                            <a href="#services" class="btn btn-hero btn-hero-primary">
+                                <i class="fas fa-clipboard-list me-2"></i>Our Services
+                            </a>
+                            <a href="tel:+15551234567" class="btn btn-hero btn-hero-outline">
+                                <i class="fas fa-phone me-2"></i> Call Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-item fade-in-up">
+                        <div class="stat-number">2,500+</div>
+                        <div class="stat-label">Happy Customers</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-item fade-in-up" style="animation-delay: 0.1s;">
+                        <div class="stat-number">15+</div>
+                        <div class="stat-label">Years Experience</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-item fade-in-up" style="animation-delay: 0.2s;">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Emergency Service</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-item fade-in-up" style="animation-delay: 0.3s;">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Satisfaction Guarantee</div>
                     </div>
                 </div>
             </div>
@@ -651,19 +785,21 @@
     <section class="services-section" id="services">
         <div class="container">
             <div class="section-title fade-in-up">
-                <h2>Our Pest Control Services</h2>
-                <p>Comprehensive solutions for all your pest problems with guaranteed results</p>
+                <h2>Our Professional Services</h2>
+                <p>Comprehensive pest control solutions tailored to your specific needs</p>
             </div>
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6">
                     <div class="service-card fade-in-up">
                         <div class="service-icon">
-                            <i class="fas fa-bug"></i>
+                            <i class="fas fa-home"></i>
                         </div>
                         <h4>Residential Pest Control</h4>
-                        <p>Protect your home from common pests like ants, roaches, spiders, and rodents with our safe and effective treatments.</p>
+                        <p>Complete protection for your home against common pests with our safe, family-friendly treatments and preventive solutions.</p>
                         <div class="service-price">From $99</div>
-                        <a href="#contact" class="btn btn-service">Get Quote</a>
+                        <a href="#contact" class="btn btn-service">
+                            <i class="fas fa-calendar-check me-2"></i>Schedule Service
+                        </a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6">
@@ -671,21 +807,25 @@
                         <div class="service-icon">
                             <i class="fas fa-building"></i>
                         </div>
-                        <h4>Commercial Pest Control</h4>
-                        <p>Keep your business pest-free with our customized commercial solutions that meet industry standards and regulations.</p>
+                        <h4>Commercial Solutions</h4>
+                        <p>Customized pest management programs for businesses, restaurants, and commercial properties with compliance guarantees.</p>
                         <div class="service-price">Custom Quote</div>
-                        <a href="#contact" class="btn btn-service">Get Quote</a>
+                        <a href="#contact" class="btn btn-service">
+                            <i class="fas fa-briefcase me-2"></i>Business Inquiry
+                        </a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6">
                     <div class="service-card fade-in-up" style="animation-delay: 0.2s;">
                         <div class="service-icon">
-                            <i class="fas fa-mosquito"></i>
+                            <i class="fas fa-shield-alt"></i>
                         </div>
-                        <h4>Mosquito Control</h4>
-                        <p>Enjoy your outdoor spaces with our effective mosquito control treatments that reduce populations by up to 90%.</p>
-                        <div class="service-price">From $79</div>
-                        <a href="#contact" class="btn btn-service">Get Quote</a>
+                        <h4>Termite Protection</h4>
+                        <p>Advanced termite detection and elimination services with long-term protection plans and damage warranties.</p>
+                        <div class="service-price">From $299</div>
+                        <a href="#contact" class="btn btn-service">
+                            <i class="fas fa-search me-2"></i>Free Inspection
+                        </a>
                     </div>
                 </div>
             </div>
@@ -700,25 +840,28 @@
                     <div class="about-content fade-in-up">
                         <div class="section-title text-start">
                             <h2>Why Choose GreenHome?</h2>
+                            <p class="mt-3">Experience the difference with our professional approach</p>
                         </div>
                         <p class="mb-4 fs-5">
-                            With over 15 years of experience in the pest control industry, GreenHome Pest Control has established
-                            itself as a trusted provider of effective and environmentally responsible pest management solutions.
+                            With over 15 years of experience, GreenHome Pest Control combines cutting-edge technology
+                            with environmentally responsible practices to deliver exceptional results you can trust.
                         </p>
                         <ul class="feature-list">
-                            <li><i class="fas fa-check"></i> Licensed and certified technicians</li>
-                            <li><i class="fas fa-check"></i> Eco-friendly treatment options</li>
-                            <li><i class="fas fa-check"></i> Same-day emergency service available</li>
-                            <li><i class="fas fa-check"></i> 100% satisfaction guarantee</li>
-                            <li><i class="fas fa-check"></i> Free inspections and estimates</li>
-                            <li><i class="fas fa-check"></i> Pet and family-safe treatments</li>
+                            <li><i class="fas fa-check"></i> Licensed & Certified Technicians</li>
+                            <li><i class="fas fa-check"></i> Eco-Friendly Treatment Options</li>
+                            <li><i class="fas fa-check"></i> Same-Day Emergency Service</li>
+                            <li><i class="fas fa-check"></i> 100% Satisfaction Guarantee</li>
+                            <li><i class="fas fa-check"></i> Free Inspections & Estimates</li>
+                            <li><i class="fas fa-check"></i> Pet & Family Safe Solutions</li>
                         </ul>
-                        <a href="#contact" class="btn btn-service btn-lg mt-3">Contact Us Today</a>
+                        <a href="#contact" class="btn btn-service btn-lg mt-3">
+                            <i class="fas fa-phone me-2"></i>Contact Us Today
+                        </a>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="about-image fade-in-up" style="animation-delay: 0.2s;">
-                        <i class="fas fa-user-tie"></i>
+                        <i class="fas fa-award"></i>
                     </div>
                 </div>
             </div>
@@ -729,14 +872,14 @@
     <section class="testimonials-section" id="testimonials">
         <div class="container">
             <div class="section-title fade-in-up">
-                <h2>What Our Customers Say</h2>
-                <p>Don't just take our word for it - hear from our satisfied customers</p>
+                <h2>Trusted by Our Customers</h2>
+                <p>See what homeowners and businesses are saying about our services</p>
             </div>
             <div class="row">
                 <div class="col-lg-4">
                     <div class="testimonial-card fade-in-up">
                         <div class="testimonial-text">
-                            "GreenHome eliminated our ant problem in just one treatment. The technician was professional, knowledgeable, and took the time to explain everything. Highly recommend!"
+                            "GreenHome eliminated our ant problem in just one treatment. The technician was professional, knowledgeable, and took the time to explain everything. Highly recommend their services!"
                         </div>
                         <div class="testimonial-author">
                             <div class="author-avatar">SJ</div>
@@ -750,7 +893,7 @@
                 <div class="col-lg-4">
                     <div class="testimonial-card fade-in-up" style="animation-delay: 0.1s;">
                         <div class="testimonial-text">
-                            "As a restaurant owner, pest control is critical to our business. GreenHome has kept our establishment pest-free for 3 years now. Their commercial program is excellent."
+                            "As a restaurant owner, pest control is critical to our business. GreenHome has kept our establishment pest-free for 3 years now. Their commercial program is excellent and reliable."
                         </div>
                         <div class="testimonial-author">
                             <div class="author-avatar">MR</div>
@@ -764,7 +907,7 @@
                 <div class="col-lg-4">
                     <div class="testimonial-card fade-in-up" style="animation-delay: 0.2s;">
                         <div class="testimonial-text">
-                            "We had a serious bed bug issue that other companies couldn't solve. GreenHome came in with a comprehensive plan and eliminated them completely. Worth every penny!"
+                            "We had a serious bed bug issue that other companies couldn't solve. GreenHome came in with a comprehensive plan and eliminated them completely. Professional service worth every penny!"
                         </div>
                         <div class="testimonial-author">
                             <div class="author-avatar">TW</div>
@@ -783,8 +926,8 @@
     <section class="cta-section" id="contact">
         <div class="container">
             <div class="cta-content fade-in-up">
-                <h3>Ready for a Pest-Free Home?</h3>
-                <p>Contact us today for a free inspection and estimate. Our team is ready to help you reclaim your space from unwanted pests.</p>
+                <h3>Ready for a Pest-Free Environment?</h3>
+                <p>Contact us today for a free inspection and estimate. Our expert team is ready to help you reclaim your space from unwanted pests with guaranteed results.</p>
                 <a href="tel:+15551234567" class="btn btn-hero btn-hero-primary me-3">
                     <i class="fas fa-phone me-2"></i> Call Now
                 </a>
@@ -806,7 +949,7 @@
                     </div>
                     <p class="footer-text">
                         Professional pest control services with a focus on effectiveness, safety, and environmental responsibility.
-                        Serving residential and commercial clients for over 15 years.
+                        Serving residential and commercial clients with excellence since 2008.
                     </p>
                 </div>
                 <div class="col-lg-2 col-md-4 mb-4">
@@ -815,8 +958,8 @@
                         <ul>
                             <li><a href="#services"><i class="fas fa-chevron-right"></i> Residential</a></li>
                             <li><a href="#services"><i class="fas fa-chevron-right"></i> Commercial</a></li>
-                            <li><a href="#services"><i class="fas fa-chevron-right"></i> Mosquito Control</a></li>
-                            <li><a href="#services"><i class="fas fa-chevron-right"></i> Termite Treatment</a></li>
+                            <li><a href="#services"><i class="fas fa-chevron-right"></i> Termite Control</a></li>
+                            <li><a href="#services"><i class="fas fa-chevron-right"></i> Emergency Service</a></li>
                         </ul>
                     </div>
                 </div>
@@ -824,22 +967,23 @@
                     <div class="footer-links">
                         <h5>Quick Links</h5>
                         <ul>
+                            <li><a href="#home"><i class="fas fa-chevron-right"></i> Home</a></li>
                             <li><a href="#services"><i class="fas fa-chevron-right"></i> Services</a></li>
                             <li><a href="#about"><i class="fas fa-chevron-right"></i> About Us</a></li>
                             <li><a href="#testimonials"><i class="fas fa-chevron-right"></i> Testimonials</a></li>
-                            <li><a href="#contact"><i class="fas fa-chevron-right"></i> Contact</a></li>
                             <li><a href="{{ route('login') }}"><i class="fas fa-chevron-right"></i> Admin Login</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-4 mb-4">
                     <div class="footer-links">
-                        <h5>Contact</h5>
+                        <h5>Contact Info</h5>
                         <ul>
-                            <li><a href="mailto:info@greenhomepest.com"><i class="fas fa-envelope"></i> info@greenhomepest.com</a></li>
                             <li><a href="tel:+15551234567"><i class="fas fa-phone"></i> +1 (555) 123-4567</a></li>
+                            <li><a href="mailto:info@greenhomepest.com"><i class="fas fa-envelope"></i> info@greenhomepest.com</a></li>
                             <li><a href="#"><i class="fas fa-map-marker-alt"></i> 123 Pest Control Ave</a></li>
                             <li><a href="#"><i class="fas fa-clock"></i> Mon-Fri: 8am-6pm</a></li>
+                            <li><a href="#"><i class="fas fa-clock"></i> Sat: 9am-4pm</a></li>
                         </ul>
                     </div>
                 </div>
@@ -858,11 +1002,9 @@
             const navbar = document.querySelector('.navbar');
             window.addEventListener('scroll', function() {
                 if (window.scrollY > 50) {
-                    navbar.style.background = 'rgba(255, 255, 255, 0.98)';
-                    navbar.style.boxShadow = '0 2px 30px rgba(0, 0, 0, 0.1)';
+                    navbar.classList.add('navbar-scrolled');
                 } else {
-                    navbar.style.background = 'rgba(255, 255, 255, 0.98)';
-                    navbar.style.boxShadow = '0 2px 30px rgba(0, 0, 0, 0.08)';
+                    navbar.classList.remove('navbar-scrolled');
                 }
             });
 
@@ -898,8 +1040,20 @@
                             top: targetElement.offsetTop - 80,
                             behavior: 'smooth'
                         });
+
+                        // Update active nav link
+                        document.querySelectorAll('.nav-link').forEach(link => {
+                            link.classList.remove('active');
+                        });
+                        this.classList.add('active');
                     }
                 });
+            });
+
+            // Add loading animation to elements
+            const cards = document.querySelectorAll('.service-card, .testimonial-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
             });
         });
     </script>
