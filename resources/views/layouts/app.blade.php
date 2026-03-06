@@ -1,988 +1,180 @@
 <!DOCTYPE html>
-<html lang="en" class="{{ session('dark_mode') ? 'dark-mode' : '' }}">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'GreenHome Pest Control')</title>
-
-    <!-- Vite CSS -->
-    @vite(['resources/css/app.css'])
+    <title>@yield('title', 'SkyConnect - Flight Reservation')</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
+    <link href="{{ asset('css/iphone-theme.css') }}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --gh-primary: #10b981;
-            --gh-primary-dark: #059669;
-            --gh-primary-light: #34d399;
-            --gh-secondary: #6b7280;
-            --gh-accent: #3b82f6;
-            --gh-success: #10b981;
-            --gh-warning: #f59e0b;
-            --gh-danger: #ef4444;
-            --gh-surface: #ffffff;
-            --gh-background: #f8fafc;
-            --gh-text: #1e293b;
-            --gh-text-light: #64748b;
-            --gh-border: #e2e8f0;
-            --gh-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --gh-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --gh-glass: rgba(255, 255, 255, 0.95);
-            --gh-glass-border: rgba(255, 255, 255, 0.2);
-        }
-
-        .dark-mode {
-            --gh-surface: #1e293b;
-            --gh-background: #0f172a;
-            --gh-text: #f1f5f9;
-            --gh-text-light: #cbd5e1;
-            --gh-border: #334155;
-            --gh-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
-            --gh-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3);
-            --gh-glass: rgba(30, 30, 30, 0.95);
-            --gh-glass-border: rgba(255, 255, 255, 0.1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--gh-background);
-            color: var(--gh-text);
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* ===== FIXED NAVBAR STYLES ===== */
-        .modern-navbar {
-            background: rgba(255, 255, 255, 0.95) !important;
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(16, 185, 129, 0.1);
-            box-shadow: 0 1px 20px rgba(0, 0, 0, 0.08);
-            padding: 0.90rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        .dark-mode .modern-navbar {
-            background: rgba(30, 30, 30, 0.95) !important;
-            border-bottom-color: rgba(255, 255, 255, 0.08);
-        }
-
-        /* Compact Brand */
-        .brand-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.2rem 0;
-        }
-
-        .brand-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+        .footer-link {
+            color: var(--sc-secondary);
+            text-decoration: none;
+            transition: all 0.2s ease;
             font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .brand-icon:hover {
-            transform: scale(1.05);
-        }
-
-        .brand-primary {
-            font-weight: 700;
-            color: #10b981;
-            font-size: 1.1rem;
-            letter-spacing: -0.3px;
-        }
-
-        /* Mobile Toggler */
-        .modern-toggler {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 0.4rem 0.6rem;
-            background: transparent;
-            transition: all 0.3s ease;
-        }
-
-        .modern-toggler:hover {
-            border-color: #10b981;
-        }
-
-        .toggler-icon {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            width: 18px;
-            height: 14px;
-        }
-
-        .toggler-icon span {
             display: block;
-            height: 2px;
-            background: #374151;
-            border-radius: 1px;
-            transition: all 0.3s ease;
-        }
-
-        .dark-mode .toggler-icon span {
-            background: #e5e7eb;
-        }
-
-        /* Fixed Navigation Items */
-        .navbar-nav {
-            gap: 0.25rem;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #6b7280;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
-            font-weight: 500;
-            font-size: 0.8rem;
-        }
-
-        .nav-item:hover {
-            background: #10b981;
-            color: white;
-            transform: translateY(-1px);
-        }
-
-        .nav-item.active {
-            background: #10b981;
-            color: white;
-        }
-
-        .nav-icon {
-            width: 16px;
-            text-align: center;
-            font-size: 0.8rem;
-        }
-
-        .nav-text {
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        /* Primary Nav Item (Register button) */
-        .nav-item-primary {
-            background: #10b981;
-            color: white !important;
-        }
-
-        .nav-item-primary:hover {
-            background: #059669;
-            transform: translateY(-1px);
-        }
-
-        /* Fixed User Menu - NO PARENT HOVER */
-        .nav-item.dropdown.user-menu {
-            background: transparent !important;
-            border: none !important;
-            padding: 0 !important;
-        }
-
-        .nav-item.dropdown.user-menu:hover {
-            background: transparent !important;
-            transform: none !important;
-        }
-
-        .user-menu .modern-dropdown {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            background: transparent;
-            text-decoration: none;
-            color: #6b7280;
-        }
-
-        .user-menu .modern-dropdown:hover {
-            background: #10b981;
-            border-color: #10b981;
-            color: white;
-            transform: translateY(-1px);
-        }
-
-        .user-menu .modern-dropdown:hover .user-name,
-        .user-menu .modern-dropdown:hover .dropdown-arrow {
-            color: white;
-        }
-
-        .user-avatar {
-            width: 28px;
-            height: 28px;
-            background: #10b981;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: white;
-        }
-
-        .user-name {
-            font-weight: 500;
-            color: #374151;
-            max-width: 100px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-size: 0.8rem;
-        }
-
-        .dark-mode .user-name {
-            color: #e5e7eb;
-        }
-
-        .dropdown-arrow {
-            font-size: 0.6rem;
-            color: #9ca3af;
-            transition: transform 0.2s ease;
-        }
-
-        .user-menu.show .dropdown-arrow {
-            transform: rotate(180deg);
-        }
-
-        /* Fixed Dropdown Menu */
-        .modern-dropdown-menu {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-            padding: 0.5rem;
-            min-width: 180px;
-            margin-top: 8px !important;
-        }
-
-        .dark-mode .modern-dropdown-menu {
-            background: #1f2937;
-            border-color: #374151;
-        }
-
-        .modern-dropdown-menu .dropdown-item {
-            display: flex;
-            align-items: center;
-            padding: 0.6rem 0.75rem;
-            border-radius: 8px;
-            font-weight: 500;
-            color: #374151;
-            transition: all 0.2s ease;
-            border: none;
-            font-size: 0.8rem;
-            text-decoration: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            gap: 0.5rem;
-        }
-
-        .dark-mode .modern-dropdown-menu .dropdown-item {
-            color: #e5e7eb;
-        }
-
-        .modern-dropdown-menu .dropdown-item:hover {
-            background: #10b981;
-            color: white;
-        }
-
-        .modern-dropdown-menu .dropdown-item i {
-            width: 16px;
-            text-align: center;
-            font-size: 0.7rem;
-        }
-
-        .modern-dropdown-menu .dropdown-divider {
-            border-color: #e5e7eb;
-            margin: 0.25rem 0;
-        }
-
-        .dark-mode .modern-dropdown-menu .dropdown-divider {
-            border-color: #374151;
-        }
-
-        /* Main Content */
-        main {
-            flex: 1;
-            padding: 1.5rem 0;
-        }
-
-        /* Alerts */
-        .alert {
-            border-radius: 12px;
-            border: none;
-            backdrop-filter: blur(10px);
-        }
-
-        .alert-success {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
-            color: var(--gh-text);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .alert-danger {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
-            color: var(--gh-text);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-
-        /* Ultra Modern Slim Footer */
-        .main-footer {
-            background: var(--gh-glass);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--gh-glass-border);
-            padding: 1.5rem 0;
-            margin-top: auto;
-        }
-
-        .footer-content {
-            text-align: center;
-        }
-
-        .footer-brand {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
-            font-weight: 700;
-            color: var(--gh-text);
-            font-size: 1.1rem;
-        }
-
-        .footer-brand i {
-            color: var(--gh-primary);
-        }
-
-        .footer-text {
-            color: var(--gh-text-light);
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-        }
-
-        .footer-copyright {
-            color: var(--gh-text-light);
-            font-size: 0.75rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--gh-border);
-        }
-
-        /* Compact Dark Mode Toggle */
-        .dark-mode-section {
-            margin: 1rem 0 0.5rem;
-        }
-
-        .dark-mode-toggle {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            background: var(--gh-glass);
-            border: 1px solid var(--gh-glass-border);
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            max-width: 200px;
-            margin: 0 auto;
-        }
-
-        .dark-mode-toggle:hover {
-            border-color: var(--gh-primary);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 48px;
-            height: 24px;
-            flex-shrink: 0;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, var(--gh-secondary), #9ca3af);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 24px;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background: linear-gradient(135deg, #ffffff, #f8fafc);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        input:checked + .toggle-slider {
-            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
-        }
-
-        input:checked + .toggle-slider:before {
-            transform: translateX(24px);
-        }
-
-        .toggle-icon {
-            font-size: 0.8rem;
-            color: var(--gh-text-light);
-            flex-shrink: 0;
-            transition: all 0.3s ease;
-        }
-
-        .toggle-icon.sun {
-            color: #f59e0b;
-        }
-
-        .toggle-icon.moon {
-            color: #cbd5e1;
-        }
-
-        input:checked ~ .toggle-icon.sun {
-            transform: scale(0.8);
-            opacity: 0.7;
-        }
-
-        input:not(:checked) ~ .toggle-icon.moon {
-            transform: scale(0.8);
-            opacity: 0.7;
-        }
-
-        .toggle-label {
-            font-size: 0.75rem;
-            color: var(--gh-text-light);
-            font-weight: 600;
-            min-width: 45px;
-            text-align: center;
-            letter-spacing: -0.2px;
-        }
-
-        /* Enhanced loading states */
-        .btn-loading {
-            position: relative;
-            color: transparent !important;
-        }
-
-        .btn-loading::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            top: 50%;
-            left: 50%;
-            margin-left: -10px;
-            margin-top: -10px;
-            border: 2px solid #ffffff;
-            border-radius: 50%;
-            border-right-color: transparent;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* Smooth transitions */
-        .card, .btn, .nav-item, .table tr, .dropdown-item {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .modern-navbar {
-                padding: 0.3rem 0;
-            }
-
-            .navbar-nav {
-                gap: 0.25rem;
-                padding: 0.75rem 0;
-                background: white;
-                border-radius: 12px;
-                margin-top: 0.5rem;
-                border: 1px solid #e5e7eb;
-            }
-
-            .dark-mode .navbar-nav {
-                background: #1f2937;
-                border-color: #374151;
-            }
-
-            .nav-item {
-                padding: 0.6rem 1rem;
-                margin: 0 0.25rem;
-                font-size: 0.8rem;
-            }
-
-            .user-name {
-                display: none;
-            }
-
-            .modern-dropdown-menu {
-                min-width: calc(100vw - 2rem);
-                margin: 0.25rem 1rem !important;
-            }
-
-            .dark-mode-toggle {
-                padding: 0.6rem 0.8rem;
-                gap: 0.6rem;
-            }
-
-            .toggle-switch {
-                width: 44px;
-                height: 22px;
-            }
-
-            .toggle-slider:before {
-                height: 16px;
-                width: 16px;
-            }
-
-            input:checked + .toggle-slider:before {
-                transform: translateX(22px);
-            }
-        }
-
-        @media (max-width: 576px) {
-            .brand-text {
-                display: none;
-            }
-
-            .brand-icon {
-                width: 30px;
-                height: 30px;
-                font-size: 0.8rem;
-            }
-
-            .nav-item {
-                padding: 0.5rem 0.75rem;
-            }
-
-            .modern-toggler {
-                padding: 0.3rem 0.5rem;
-            }
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--gh-background);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, var(--gh-primary-dark), #047857);
-        }
-
-        /* Container fluid padding */
-        .container-fluid {
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-
-        @media (min-width: 1200px) {
-            .container-fluid {
-                padding-left: 2rem;
-                padding-right: 2rem;
-            }
-        }
-
-        /* Glass morphism utility */
-        .glass-morphism {
-            background: var(--gh-glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--gh-glass-border);
-            border-radius: 12px;
-        }
-
-        /* Custom button styles */
-        .btn-gh-primary {
-            background: linear-gradient(135deg, var(--gh-primary), var(--gh-primary-dark));
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-gh-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-        }
-
-        /* Animation classes */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .fade-in-up {
-            animation: fadeInUp 0.6s ease forwards;
-        }
-
-        /* Focus states for accessibility */
-        .nav-item:focus,
-        .dropdown-item:focus,
-        .btn:focus {
-            outline: 2px solid var(--gh-primary);
-            outline-offset: 2px;
-        }
-
-        /* Print styles */
-        @media print {
-            .navbar,
-            .main-footer {
-                display: none;
-            }
+            margin-bottom: 10px;
+        }
+        .footer-link:hover {
+            color: var(--sc-primary);
+            transform: translateX(5px);
         }
     </style>
 </head>
-<body>
-    <!-- Fixed Ultra Modern Navbar -->
-    <nav class="navbar navbar-expand-lg modern-navbar">
-        <div class="container">
-            <!-- Compact Brand Logo -->
-            <a class="navbar-brand" href="{{ route('dashboard') }}">
-                <div class="brand-container">
-                    <div class="brand-icon">
-                        <i class="fas fa-leaf"></i>
-                    </div>
-                    <div class="brand-text">
-                        <span class="brand-primary">GreenHome</span>
-                    </div>
-                </div>
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg fixed-top shadow-none" id="mirrorNav">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
+                <i class="fas fa-plane-departure brand-icon me-2" style="font-size: 1.8rem;"></i>
+                <span class="fw-800" style="letter-spacing: -1.5px;">SkyConnect</span>
             </a>
-
-            <!-- Mobile Toggle Button -->
-            <button class="navbar-toggler modern-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="toggler-icon">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </span>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars-staggered"></i>
             </button>
-
-            <!-- Navigation Links -->
             <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="navbar-nav ms-auto align-items-center">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
+                            Explore
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('flights.*') ? 'active' : '' }}" href="{{ route('flights.searchForm') }}">
+                            Book
+                        </a>
+                    </li>
                     @auth
-                        <!-- Dashboard -->
-                        <a class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}"
-                           href="{{ route('dashboard') }}">
-                            <div class="nav-icon">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-
-                        <!-- Customers -->
-                        <a class="nav-item {{ request()->routeIs('customers.*') ? 'active' : '' }}"
-                           href="{{ route('customers.index') }}">
-                            <div class="nav-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <span class="nav-text">Customers</span>
-                        </a>
-
-                        <!-- Profile -->
-                        <a class="nav-item {{ request()->routeIs('profile.*') ? 'active' : '' }}"
-                           href="{{ route('profile.edit') }}">
-                            <div class="nav-icon">
-                                <i class="fas fa-user-cog"></i>
-                            </div>
-                            <span class="nav-text">Profile</span>
-                        </a>
-
-                        <!-- Fixed User Menu - Clean & No Border -->
-<div class="nav-item dropdown user-menu">
-    <a class="dropdown-toggle modern-dropdown no-border" href="#" role="button" data-bs-toggle="dropdown"
-       aria-expanded="false">
-        <div class="user-avatar">
-            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-        </div>
-        <span class="user-name">{{ Auth::user()->name }}</span>
-    </a>
-    <ul class="dropdown-menu dropdown-menu-end modern-dropdown-menu">
-        <li>
-            <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                <i class="fas fa-user-edit"></i>
-                <span>Edit Profile</span>
-            </a>
-        </li>
-        <li>
-            <a class="dropdown-item" href="{{ route('dashboard') }}">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-            </a>
-        </li>
-        <li><hr class="dropdown-divider"></li>
-        <li>
-            <form method="POST" action="{{ route('logout') }}" class="d-inline w-100">
-                @csrf
-                <button type="submit" class="dropdown-item logout-btn w-100 text-start border-0 bg-transparent">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </button>
-            </form>
-        </li>
-    </ul>
-</div>
-
-                    @else
-                        <!-- Guest Navigation -->
-                        <a class="nav-item" href="{{ route('login') }}">
-                            <div class="nav-icon">
-                                <i class="fas fa-sign-in-alt"></i>
-                            </div>
-                            <span class="nav-text">Login</span>
-                        </a>
-
-                        <a class="nav-item nav-item-primary" href="{{ route('register') }}">
-                            <div class="nav-icon">
-                                <i class="fas fa-user-plus"></i>
-                            </div>
-                            <span class="nav-text">Register</span>
-                        </a>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('my-bookings.index') ? 'active' : '' }}" href="{{ route('my-bookings.index') }}">
+                                My Trips
+                            </a>
+                        </li>
                     @endauth
-                </div>
+                </ul>
+                <ul class="navbar-nav align-items-center">
+                    @auth
+                        <li class="nav-item dropdown">
+                            <a class="nav-link user-nav-item dropdown-toggle border-0" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <div class="user-nav-avatar shadow-sm">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
+                                <span class="d-none d-lg-inline fw-bold" id="userNameText">{{ Auth::user()->name }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-3" style="border-radius: 24px; padding: 12px; background: rgba(255,255,255,0.9); backdrop-filter: blur(20px);">
+                                <li><a class="dropdown-item py-2 px-4 rounded-pill mb-1" href="{{ route('profile.edit') }}"><i class="fas fa-user-circle me-2 text-primary"></i>Profile</a></li>
+                                <li><a class="dropdown-item py-2 px-4 rounded-pill mb-1" href="{{ route('my-bookings.index') }}"><i class="fas fa-history me-2 text-primary"></i>History</a></li>
+                                @if(Auth::user()->role == 'admin' || Auth::user()->role == 'employee')
+                                    <li><hr class="dropdown-divider mx-3"></li>
+                                    <li><a class="dropdown-item py-2 px-4 rounded-pill mb-1 fw-bold text-primary" href="{{ route('admin.dashboard') }}"><i class="fas fa-user-shield me-2"></i>Staff Portal</a></li>
+                                @endif
+                                <li><hr class="dropdown-divider mx-3"></li>
+                                <li>
+                                    <form action="{{ route('logout') }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item py-2 px-4 rounded-pill text-danger"><i class="fas fa-sign-out-alt me-2"></i>Sign Out</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a class="nav-link px-4" href="{{ route('login') }}">Sign In</a>
+                        </li>
+                        <li class="nav-item ms-lg-2">
+                            <a class="nav-link btn btn-primary text-white" href="{{ route('register') }}" style="padding: 10px 25px !important; border-radius: 50px;">Join Now</a>
+                        </li>
+                    @endauth
+                </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="container">
+    <main class="container py-4 flex-grow-1">
         @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show mb-4 fade-in-up" role="alert">
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 20px; background: rgba(52, 199, 89, 0.15); backdrop-filter: blur(10px);">
                 <div class="d-flex align-items-center">
-                    <i class="fas fa-check-circle me-2"></i>
-                    <div class="flex-grow-1">
-                        {{ session('success') }}
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <i class="fas fa-check-circle me-3 fa-lg text-success"></i>
+                    <div class="fw-bold">{{ session('success') }}</div>
                 </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
 
         @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show mb-4 fade-in-up" role="alert">
+            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 20px; background: rgba(255, 59, 48, 0.15); backdrop-filter: blur(10px);">
                 <div class="d-flex align-items-center">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <div class="flex-grow-1">
-                        {{ session('error') }}
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <i class="fas fa-exclamation-circle me-3 fa-lg text-danger"></i>
+                    <div class="fw-bold">{{ session('error') }}</div>
                 </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
 
         @yield('content')
     </main>
 
-    <!-- Ultra Modern Slim Footer -->
-    <footer class="main-footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <i class="fas fa-leaf"></i>
-                    <span>GreenHome Pest Control</span>
+    <!-- PREMIUM CORPORATE FOOTER -->
+    <footer class="py-5 mt-5" style="background: #1c1c1e; color: white;">
+        <div class="container py-4">
+            <div class="row g-5 text-center text-md-start">
+                <div class="col-lg-4">
+                    <a class="navbar-brand d-flex align-items-center mb-4" href="#">
+                        <i class="fas fa-plane-departure text-primary me-2"></i>
+                        <span class="fw-800 text-white" style="letter-spacing: -1px;">SkyConnect</span>
+                    </a>
+                    <p class="text-secondary small pe-lg-5 mb-4">Redefining boutique air travel with curated routes and luxury experiences for the discerning traveler. Experience the art of flight.</p>
+                    <div class="social-links d-flex justify-content-center justify-content-md-start gap-3">
+                        <a href="#" class="text-white opacity-50"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-white opacity-50"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-white opacity-50"><i class="fab fa-linkedin fa-lg"></i></a>
+                    </div>
                 </div>
-                <p class="footer-text">Professional pest control & customer management system</p>
-
-                <!-- Compact Dark Mode Toggle -->
-                <div class="dark-mode-section">
-                    <form method="POST" action="/dark-mode/toggle" id="darkModeForm">
-                        @csrf
-                        <div class="dark-mode-toggle">
-                            <i class="fas fa-sun toggle-icon sun"></i>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="darkModeToggle" name="dark_mode"
-                                       {{ session('dark_mode') ? 'checked' : '' }}
-                                       onchange="document.getElementById('darkModeForm').submit()">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <i class="fas fa-moon toggle-icon moon"></i>
-                            <span class="toggle-label" id="darkModeLabel">
-                                {{ session('dark_mode') ? 'Dark' : 'Light' }}
-                            </span>
-                        </div>
-                    </form>
+                <div class="col-lg-2 col-6">
+                    <h6 class="fw-bold mb-4 text-white">Company</h6>
+                    <a href="#" class="footer-link">About Us</a>
+                    <a href="#" class="footer-link">Our Fleet</a>
+                    <a href="#" class="footer-link">Destinations</a>
+                    <a href="#" class="footer-link">Careers</a>
                 </div>
-
-                <div class="footer-copyright">
-                    &copy; {{ date('Y') }} GreenHome Pest Control. All rights reserved.
+                <div class="col-lg-2 col-6">
+                    <h6 class="fw-bold mb-4 text-white">Support</h6>
+                    <a href="#" class="footer-link">Help Center</a>
+                    <a href="#" class="footer-link">Flight Status</a>
+                    <a href="#" class="footer-link">Refund Policy</a>
+                    <a href="#" class="footer-link">Privacy Policy</a>
                 </div>
+                <div class="col-lg-4">
+                    <h6 class="fw-bold mb-4 text-white">Newsletter</h6>
+                    <p class="text-secondary small mb-4">Subscribe for exclusive travel offers and global destination updates.</p>
+                    <div class="input-group">
+                        <input type="text" class="form-control bg-dark border-0 text-white rounded-start-pill px-4" placeholder="Email Address">
+                        <button class="btn btn-primary rounded-end-pill px-4">Join</button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-top border-white border-opacity-10 mt-5 pt-4 text-center">
+                <p class="text-secondary small mb-0" style="font-size: 0.75rem;">&copy; {{ date('Y') }} SkyConnect Aviation Group. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Vite JS -->
-    @vite(['resources/js/app.js'])
-
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Enhanced navbar scroll effect
-    let lastScrollTop = 0;
-    const navbar = document.querySelector('.navbar');
-
-    window.addEventListener('scroll', function() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-        if (scrollTop > lastScrollTop && scrollTop > 100) {
-            // Scrolling down
-            navbar.style.transform = 'translateY(-100%)';
-        } else {
-            // Scrolling up
-            navbar.style.transform = 'translateY(0)';
-        }
-
-        lastScrollTop = scrollTop;
-    });
-
-    // Update dropdown arrow rotation when Bootstrap toggles dropdown
-    const userMenu = document.querySelector('.user-menu');
-    if (userMenu) {
-        const dropdownToggle = userMenu.querySelector('.dropdown-toggle');
-        const dropdownArrow = userMenu.querySelector('.dropdown-arrow');
-
-        dropdownToggle.addEventListener('show.bs.dropdown', function () {
-            dropdownArrow.style.transform = 'rotate(180deg)';
+        document.addEventListener('DOMContentLoaded', function() {
+            const nav = document.getElementById('mirrorNav');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 30) {
+                    nav.classList.add('scrolled');
+                    nav.style.margin = '0';
+                    nav.style.borderRadius = '0';
+                } else {
+                    nav.classList.remove('scrolled');
+                    nav.style.margin = '15px 20px';
+                    nav.style.borderRadius = '100px';
+                }
+            });
         });
-
-        dropdownToggle.addEventListener('hide.bs.dropdown', function () {
-            dropdownArrow.style.transform = 'rotate(0deg)';
-        });
-    }
-
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-
-    // Auto-dismiss alerts after 5 seconds
-    const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(alert => {
-        setTimeout(() => {
-            if (alert.classList.contains('show')) {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            }
-        }, 5000);
-    });
-
-    // Enhanced dark mode toggle label update
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    const darkModeLabel = document.getElementById('darkModeLabel');
-
-    if (darkModeToggle && darkModeLabel) {
-        darkModeToggle.addEventListener('change', function() {
-            darkModeLabel.textContent = this.checked ? 'Dark' : 'Light';
-        });
-    }
-
-    // Add loading state to forms
-    document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', function() {
-            const submitBtn = this.querySelector('button[type="submit"]');
-            if (submitBtn && !submitBtn.classList.contains('btn-loading')) {
-                submitBtn.classList.add('btn-loading');
-                submitBtn.disabled = true;
-
-                // Re-enable after 10 seconds in case of error
-                setTimeout(() => {
-                    submitBtn.classList.remove('btn-loading');
-                    submitBtn.disabled = false;
-                }, 10000);
-            }
-        });
-    });
-
-    console.log('GreenHome Pest Control System initialized');
-});
-
-// Utility function for making AJAX requests
-function makeRequest(url, options = {}) {
-    return fetch(url, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/json',
-            ...options.headers
-        },
-        ...options
-    });
-}
-</script>
-
-    @stack('scripts')
+    </script>
 </body>
 </html>

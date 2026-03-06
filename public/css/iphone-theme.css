@@ -1,0 +1,177 @@
+:root {
+    --sc-primary: #007aff;
+    --sc-primary-dark: #0056b3;
+    --sc-secondary: #8e8e93;
+    --sc-accent: #34c759;
+    --sc-danger: #ff3b30;
+    --sc-warning: #ffcc00;
+    --sc-light: #f2f2f7;
+    --sc-dark: #1c1c1e;
+    --sc-text: #000000;
+    --sc-text-light: #6a6a6a;
+    
+    /* Mirror Glass Variables */
+    --sc-mirror-bg: rgba(255, 255, 255, 0.35);
+    --sc-mirror-border: rgba(255, 255, 255, 0.5);
+    --sc-mirror-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    
+    --sc-border-radius-sm: 12px;
+    --sc-border-radius-md: 18px;
+    --sc-border-radius-lg: 28px;
+}
+
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f2f2f7;
+    color: var(--sc-text);
+    padding-top: 90px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- THE MIRROR NAVBAR --- */
+.navbar {
+    background: var(--sc-mirror-bg);
+    backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+    -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+    border-bottom: 1px solid var(--sc-mirror-border);
+    box-shadow: var(--sc-mirror-shadow);
+    margin: 15px 20px;
+    border-radius: 100px;
+    padding: 10px 25px !important;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navbar.scrolled {
+    margin: 0 !important;
+    border-radius: 0 !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+}
+
+.nav-link {
+    font-weight: 600;
+    border-radius: 50px;
+    padding: 10px 20px !important;
+    color: var(--sc-dark) !important;
+}
+
+.nav-link:hover {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--sc-primary) !important;
+}
+
+.nav-link.active {
+    background: var(--sc-primary);
+    color: white !important;
+}
+
+/* --- USER NAV PILL FIX --- */
+.user-nav-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 5px 15px 5px 5px !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+    border-radius: 50px !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease;
+    text-decoration: none !important;
+}
+
+.user-nav-item:hover {
+    background: rgba(0, 0, 0, 0.08) !important;
+}
+
+.user-nav-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--sc-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 700;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+#userNameText {
+    white-space: nowrap;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--sc-dark);
+}
+
+/* --- MIRROR GLASS CARDS --- */
+.card, .mirror-glass {
+    background: var(--sc-mirror-bg);
+    backdrop-filter: blur(25px) saturate(180%) brightness(1.05);
+    -webkit-backdrop-filter: blur(25px) saturate(180%) brightness(1.05);
+    border: 1px solid var(--sc-mirror-border);
+    border-radius: var(--sc-border-radius-lg);
+    box-shadow: var(--sc-mirror-shadow);
+    overflow: hidden;
+}
+
+/* --- PREMIUM TABLE & LISTS --- */
+.premium-list-item {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--sc-border-radius-md);
+    margin-bottom: 12px;
+    padding: 15px 20px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.premium-list-item:hover {
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(1.01) translateX(5px);
+    border-color: var(--sc-primary);
+}
+
+.badge-ios {
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- BUTTONS --- */
+.btn {
+    border-radius: 50px;
+    font-weight: 700;
+    padding: 12px 28px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007aff, #0056b3);
+    box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4);
+}
+
+/* Custom avatar for profile/summary */
+.avatar-circle {
+    background-color: var(--sc-primary);
+    color: white;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50%;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+/* --- Responsive adjustments --- */
