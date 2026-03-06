@@ -24,7 +24,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <h6 class="text-secondary small fw-bold mb-2">REVENUE GENERATED</h6>
-                        <h2 class="fw-800 mb-0">${{ number_format($bookings->sum('total_price'), 0) }}</h2>
+                        <h2 class="fw-800 mb-0">${{ number_format($stats['total_revenue'] ?? 0, 0) }}</h2>
                     </div>
                     <div class="bg-primary bg-opacity-10 p-3 rounded-4">
                         <i class="fas fa-chart-line text-primary fa-2x"></i>
@@ -37,7 +37,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <h6 class="text-secondary small fw-bold mb-2">ACTIVE BOOKINGS</h6>
-                        <h2 class="fw-800 mb-0 text-success">{{ $bookings->where('status', 'confirmed')->count() }}</h2>
+                        <h2 class="fw-800 mb-0 text-success">{{ $stats['active_bookings'] ?? 0 }}</h2>
                     </div>
                     <div class="bg-success bg-opacity-10 p-3 rounded-4">
                         <i class="fas fa-ticket-alt text-success fa-2x"></i>
@@ -50,7 +50,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <h6 class="text-secondary small fw-bold mb-2">GLOBAL CLIENTS</h6>
-                        <h2 class="fw-800 mb-0">{{ $users->count() }}</h2>
+                        <h2 class="fw-800 mb-0">{{ $stats['total_users'] ?? 0 }}</h2>
                     </div>
                     <div class="bg-dark bg-opacity-10 p-3 rounded-4">
                         <i class="fas fa-users text-dark fa-2x"></i>
@@ -81,10 +81,10 @@
                 </li>
             </ul>
         </div>
-        
+
         <div class="card-body p-4 pt-0">
             <div class="tab-content" id="dashboardTabsContent">
-                
+
                 <!-- CUSTOMER LIST REVAMP (Users Tab) -->
                 <div class="tab-pane fade show active" id="users" role="tabpanel">
                     <div class="d-flex align-items-center justify-content-between mb-4 mt-2">
@@ -94,7 +94,7 @@
                             <input type="text" class="form-control border-start-0 rounded-end-pill shadow-none" placeholder="Search clients...">
                         </div>
                     </div>
-                    
+
                     <div class="row g-3">
                         @foreach ($users as $user)
                             <div class="col-xl-4 col-md-6">
