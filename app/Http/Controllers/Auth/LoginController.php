@@ -12,23 +12,28 @@ class LoginController extends Controller
     {
         return view('auth.login');
     }
+public function login(Request $request)
+{
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
 
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+    if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $request->session()->regenerate();
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/dashboard');
+        $user = Auth::user();
+        if ($user->role === 'admin' || $user->role === 'employee') {
+            return redirect()->route('admin.dashboard');
+        } else {
+            return redirect()->route('flights.searchForm');
         }
-
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
     }
+
+    return back()->withErrors([
+        'email' => 'The provided credentials do not match our records.',
+    ])->onlyInput('email');
+}
 
     public function logout(Request $request)
     {
