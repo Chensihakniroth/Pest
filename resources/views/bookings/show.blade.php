@@ -25,10 +25,51 @@
         </div>
     </div>
 
+    <!-- Payment Section -->
+    @if(!$booking->payment && $booking->status !== 'cancelled')
+        <div class="card mb-4 border-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title text-warning mb-2">Payment Required</h5>
+                        <p class="card-text text-muted mb-0">Complete your payment to confirm this booking.</p>
+                    </div>
+                    <div>
+                        <a href="{{ route('payments.show', $booking) }}" class="btn btn-warning btn-lg">
+                            <i class="fas fa-credit-card me-2"></i>Process Payment
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @elseif($booking->payment)
+        <div class="card mb-4 border-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title text-success mb-2">Payment Completed</h5>
+                        <p class="card-text text-muted mb-0">Payment Reference: {{ $booking->payment->payment_reference }}</p>
+                        <p class="card-text text-muted mb-0">Paid: {{ $booking->payment->paid_at->format('M d, Y \a\t h:i A') }}</p>
+                    </div>
+                    <div>
+                        <span class="badge bg-success fs-6">
+                            <i class="fas fa-check-circle me-2"></i> Paid
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div class="text-center mt-3">
-        <a href="{{ route('my-bookings.index') }}" class="btn btn-secondary btn-lg">
+        <a href="{{ route('my-bookings.index') }}" class="btn btn-secondary btn-lg me-2">
             <i class="fas fa-arrow-left me-2"></i>Back to My Bookings
         </a>
+        @if($booking->payment)
+            <a href="{{ route('payments.index') }}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-history me-2"></i>Payment History
+            </a>
+        @endif
     </div>
 </div>
 @endsection

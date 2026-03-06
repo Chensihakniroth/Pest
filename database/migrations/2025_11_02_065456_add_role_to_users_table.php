@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', ['admin', 'employee'])->default('employee');
+            $table->enum('role', ['admin', 'employee', 'customer'])->default('customer');
             $table->boolean('is_active')->default(true);
         });
     }

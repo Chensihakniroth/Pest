@@ -150,7 +150,7 @@
             opacity: 1;
             transform: translateY(0);
         }
-        
+
         .destination-card {
             transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             border: none;
@@ -209,7 +209,7 @@
                 <i class="fas fa-bars-staggered text-white" id="navToggler"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto" id="centerNav" style="opacity: 0; visibility: hidden;">
+                <ul class="navbar-nav ms-auto me-auto" id="centerNav" style="opacity: 0; visibility: hidden; max-width: 60%;">
                     <li class="nav-item">
                         <a class="nav-link text-white fw-bold" href="{{ route('home') }}">Explore</a>
                     </li>
@@ -461,7 +461,7 @@
                     if(navToggler) navToggler.style.setProperty('color', '#1c1c1e', 'important');
                     if(userNameText) userNameText.style.setProperty('color', '#1c1c1e', 'important');
                     if(loginLink) loginLink.style.setProperty('color', '#1c1c1e', 'important');
-                    
+
                     if(centerNav) {
                         centerNav.style.opacity = '1';
                         centerNav.style.visibility = 'visible';
@@ -478,7 +478,7 @@
                     if(navToggler) navToggler.style.setProperty('color', '#ffffff', 'important');
                     if(userNameText) userNameText.style.setProperty('color', '#ffffff', 'important');
                     if(loginLink) loginLink.style.setProperty('color', '#ffffff', 'important');
-                    
+
                     if(centerNav) {
                         centerNav.style.opacity = '0';
                         centerNav.style.visibility = 'hidden';

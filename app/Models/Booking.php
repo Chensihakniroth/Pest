@@ -12,6 +12,8 @@ class Booking extends Model
         'booking_reference',
         'status',
         'total_price',
+        'fare_class',
+        'seat_number',
     ];
 
     public function user()
@@ -27,5 +29,10 @@ class Booking extends Model
     public function passengers()
     {
         return $this->hasMany(Passenger::class);
+    }
+
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
     }
 }

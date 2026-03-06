@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\FlightController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\EmployeeDashboardController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +41,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
     Route::get('/bookings/{booking}/boarding-pass', [BookingController::class, 'boardingPass'])->name('bookings.boardingPass');
     Route::get('/my-bookings', [BookingController::class, 'index'])->name('my-bookings.index');
+
+    // Payment Routes
+    Route::get('/payments/{booking}/process', [PaymentController::class, 'show'])->name('payments.show');
+    Route::post('/payments/{booking}/process', [PaymentController::class, 'process'])->name('payments.process');
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
 });
 
 // Admin/Employee Routes
