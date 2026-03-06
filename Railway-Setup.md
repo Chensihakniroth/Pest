@@ -47,6 +47,26 @@ You can also set these if needed:
 4. Add the required environment variables listed above
 5. Deploy your application
 
+## Admin Account
+
+An admin account is automatically created during seeding with:
+- **Email**: `admin@example.com`
+- **Password**: `admin123`
+- **Role**: `admin`
+
+### Creating Admin Account Manually
+
+If you need to create an admin account manually, you can use:
+
+```bash
+# Run the seeder
+php artisan db:seed --class=AdminSeeder
+
+# Or use the custom command
+php artisan admin:create
+php artisan admin:create your-email@example.com your-password
+```
+
 ## Troubleshooting
 
 If you encounter database connection issues:
