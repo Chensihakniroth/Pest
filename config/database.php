@@ -113,6 +113,12 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'mongodb' => [
+            'driver' => 'mongodb',
+            'dsn' => env('MONGO_URL', 'mongodb://localhost:27017/laravel'),
+            'database' => env('DB_DATABASE', 'laravel'),
+        ],
+
     ],
 
     /*

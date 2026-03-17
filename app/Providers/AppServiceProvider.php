@@ -28,6 +28,29 @@ class AppServiceProvider extends ServiceProvider
         if(config('app.env') === 'production') {
             URL::forceScheme('https');
         }
+
+        // Debug database connections (logged to Railway console)
+        $this->checkDatabaseConnections();
+    }
+
+    /**
+     * Check and log database connection status
+     */
+    protected function checkDatabaseConnections()
+    {
+        try {
+            \Illuminate\Support\Facades\DB::connection('mongodb')->getMongoClient()->listDatabases();
+            \Illuminate\Support\Facades\Log::info('MongoDB Connection: SUCCESS (✧ω✧)');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('MongoDB Connection: FAILED - ' . $e->getMessage());
+        }
+
+        try {
+            \Illuminate\Support\Facades\DB::connection('mysql')->getPdo();
+            \Illuminate\Support\Facades\Log::info('MySQL Connection: SUCCESS (•̀ᴗ•́)و');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('MySQL Connection: FAILED (Expected if not migrating) - ' . $e->getMessage());
+        }
     }
 
     /**
@@ -53,24 +76,20 @@ class AppServiceProvider extends ServiceProvider
         }
 
         // Override database settings for Railway
+        if ($mongoUrl = getenv('MONGO_URL')) {
+            config(['database.default' => 'mongodb']);
+            config(['database.connections.mongodb.dsn' => $mongoUrl]);
+            if ($mongoDb = getenv('MONGODATABASE')) {
+                config(['database.connections.mongodb.database' => $mongoDb]);
+            }
+        }
+
         if ($host = getenv('MYSQLHOST')) {
             config(['database.connections.mysql.host' => $host]);
-        }
-
-        if ($port = getenv('MYSQLPORT')) {
-            config(['database.connections.mysql.port' => $port]);
-        }
-
-        if ($database = getenv('MYSQLDATABASE')) {
-            config(['database.connections.mysql.database' => $database]);
-        }
-
-        if ($username = getenv('MYSQLUSER')) {
-            config(['database.connections.mysql.username' => $username]);
-        }
-
-        if ($password = getenv('MYSQLPASSWORD')) {
-            config(['database.connections.mysql.password' => $password]);
+            config(['database.connections.mysql.port' => getenv('MYSQLPORT')]);
+            config(['database.connections.mysql.database' => getenv('MYSQLDATABASE')]);
+            config(['database.connections.mysql.username' => getenv('MYSQLUSER')]);
+            config(['database.connections.mysql.password' => getenv('MYSQLPASSWORD')]);
         }
     }
 }
