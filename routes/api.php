@@ -2,18 +2,20 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\FlightController;
-use App\Models\Flight;
+use App\Http\Controllers\Api\FlightController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\BookingController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-// Example API route to fetch flights from MongoDB
-Route::get('/flights', function () {
-    return Flight::all();
-});
+// Flights API
+Route::apiResource('flights', FlightController::class);
 
-Route::get('/flights/{id}', function ($id) {
-    return Flight::find($id);
-});
+// Users API
+Route::apiResource('users', UserController::class);
+Route::post('users/{id}/toggle-restriction', [UserController::class, 'toggleRestriction']);
+
+// Bookings API
+Route::apiResource('bookings', BookingController::class);

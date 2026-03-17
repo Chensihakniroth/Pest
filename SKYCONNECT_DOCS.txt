@@ -1,0 +1,85 @@
+========================================================================
+✈️ SKYCONNECT - PREMIUM HYBRID AVIATION SYSTEM DOCUMENTATION ✈️
+========================================================================
+
+1. PROJECT OVERVIEW
+-------------------
+SkyConnect is a boutique flight reservation system utilizing a high-end 
+"Hybrid Stack" architecture. The system separates the database logic 
+and API into a Node.js "Brain" while maintaining a beautiful, 
+interactive frontend using Laravel "Skin" and Blade templates.
+
+2. HYBRID ARCHITECTURE (Dual-Port Setup)
+----------------------------------------
+- BACKEND (The Brain): Node.js + Express.js + Mongoose
+  Port: 3000 (http://localhost:3000)
+  Duty: Handles MongoDB connections, CRUD operations, and JSON API.
+
+- FRONTEND (The Skin): Laravel 12 + Blade + JavaScript (Fetch)
+  Port: 8000 (http://localhost:8000)
+  Duty: Renders premium UI, handles routing, and initiates API handshakes.
+
+3. TECH STACK
+-------------
+- Frameworks: Node.js (Express), Laravel 12.x
+- Database: MongoDB (Railway Hosted)
+- UI/UX: Blade, Vanilla CSS, Glassmorphism, Premium Shimmers
+- Communication: RESTful API via AJAX (Fetch API)
+
+4. MASTER CRUD API (Brain Endpoints)
+------------------------------------
+All logic is fully powered by Node.js. Method logging is visible in the 
+browser console in [Status] METHOD -> LINK format.
+
+[FLIGHTS]
+- GET    /api/flights           : List all active fleet routes
+- POST   /api/flights           : Register new flight (INSERT)
+- GET    /api/flights/{id}      : Fetch specific flight intel
+- PUT    /api/flights/{id}      : Update flight operations (UPDATE)
+- DELETE /api/flights/{id}      : Remove flight from system (DELETE)
+
+[USERS]
+- GET    /api/users             : List all managed clients
+- POST   /api/users             : Register new member (INSERT)
+- PUT    /api/users/{id}        : Update profile details (UPDATE)
+- DELETE /api/users/{id}        : Permanent account removal (DELETE)
+- POST   /api/users/{id}/toggle-restriction : Access control toggle
+
+[BOOKINGS]
+- GET    /api/bookings          : Global reservation stream
+- POST   /api/bookings          : Create booking + passengers (INSERT)
+- GET    /api/bookings/{id}     : Detailed manifest & flight intel
+- PUT    /api/bookings/{id}     : Modify status (e.g. Revoke) (UPDATE)
+- DELETE /api/bookings/{id}     : Purge reservation (DELETE)
+
+5. PREMIUM MODULES
+------------------
+- Command Center (Admin): Unified dashboard for real-time fleet & user management.
+- Booking Engine: Interactive flow from search to passenger details.
+- Boarding Pass: Print-ready premium ticket generation.
+- Profile Sync: Real-time user updates without page reloads.
+
+6. DEVELOPMENT COMMANDS
+-----------------------
+To run the full hybrid system, use two terminal windows:
+
+Quest 1 (Start Brain): npm run node-dev
+Quest 2 (Start Skin):  php artisan serve
+
+7. DATA MIGRATION (Legacy Support)
+----------------------------------
+If you need to move data from MySQL to MongoDB:
+Command: php artisan migrate:mongo
+
+8. SENIOR DEV MONITORING
+------------------------
+Open Browser Console (F12) to see high-visibility API traffic:
+- 💚 GET: Data Retrieval
+- 🧡 POST: New Records
+- ❤️ PUT: Data Updates
+- 💜 DELETE: Record Removal
+
+------------------------------------------------------------------------
+Documentation Updated: March 17, 2026
+Status: HYBRID SYSTEM OPERATIONAL (✧ω✧)
+========================================================================

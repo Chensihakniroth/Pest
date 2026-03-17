@@ -1,0 +1,9 @@
+<%- include('../partials/header', { title: 'Edit Profile - SkyConnect' }) %>
+<div class="container py-5">
+    <h1 class="display-4 fw-800 text-dark mb-4">Account Settings</h1>
+    <div class="card p-5 border-0">
+        <h5 class="fw-bold"><%= user.name %></h5>
+        <p class="text-secondary"><%= user.email %></p>
+    </div>
+</div>
+<%- include('../partials/footer') %>

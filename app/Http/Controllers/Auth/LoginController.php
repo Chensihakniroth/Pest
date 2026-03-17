@@ -23,6 +23,15 @@ public function login(Request $request)
         $request->session()->regenerate();
 
         $user = Auth::user();
+
+        // Check if user is restricted
+        if (!($user->is_active ?? true)) {
+            Auth::logout();
+            return back()->withErrors([
+                'email' => 'Your account has been restricted. Please contact support.',
+            ])->onlyInput('email');
+        }
+
         if ($user->role === 'admin' || $user->role === 'employee') {
             return redirect()->route('admin.dashboard');
         } else {

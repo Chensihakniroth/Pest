@@ -1,75 +1,133 @@
 @extends('layouts.app')
 
+@section('title', 'Reservation Details - SkyConnect')
+
 @section('content')
-<div class="container py-4">
-    <h1 class="mb-4 text-center text-dark">Booking Details - {{ $booking->booking_reference }}</h1>
-
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title text-dark">Booking Information</h5>
-            <p class="card-text text-secondary"><strong>Booking Reference:</strong> <span class="text-dark">{{ $booking->booking_reference }}</span></p>
-            <p class="card-text text-secondary"><strong>Status:</strong> <span class="text-dark">{{ ucfirst($booking->status) }}</span></p>
-            <p class="card-text text-secondary"><strong>Total Price:</strong> <span class="text-primary fw-bold">${{ number_format($booking->total_price, 2) }}</span></p>
-            <p class="card-text text-secondary"><strong>Booked On:</strong> <span class="text-dark">{{ \Carbon\Carbon::parse($booking->created_at)->format('M d, Y H:i A') }}</span></p>
-        </div>
-    </div>
-
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title text-dark">Flight Information</h5>
-            <p class="card-text text-secondary"><strong>Flight Number:</strong> <span class="text-dark">{{ $booking->flight->flight_number }}</span></p>
-            <p class="card-text text-secondary"><strong>Airline:</strong> <span class="text-dark">{{ $booking->flight->airline }}</span></p>
-            <p class="card-text text-secondary"><strong>Route:</strong> <span class="text-dark">{{ $booking->flight->originAirport->code }} to {{ $booking->flight->destinationAirport->code }}</span></p>
-            <p class="card-text text-secondary"><strong>Departure:</strong> <span class="text-dark">{{ \Carbon\Carbon::parse($booking->flight->departure_time)->format('M d, Y H:i A') }}</span></p>
-            <p class="card-text text-secondary"><strong>Arrival:</strong> <span class="text-dark">{{ \Carbon\Carbon::parse($booking->flight->arrival_time)->format('M d, Y H:i A') }}</span></p>
-        </div>
-    </div>
-
-    <!-- Payment Section -->
-    @if(!$booking->payment && $booking->status !== 'cancelled')
-        <div class="card mb-4 border-warning">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="card-title text-warning mb-2">Payment Required</h5>
-                        <p class="card-text text-muted mb-0">Complete your payment to confirm this booking.</p>
-                    </div>
-                    <div>
-                        <a href="{{ route('payments.show', $booking) }}" class="btn btn-warning btn-lg">
-                            <i class="fas fa-credit-card me-2"></i>Process Payment
-                        </a>
-                    </div>
-                </div>
+<div class="container py-5 px-lg-5">
+    <div id="booking-details-root">
+        <!-- Skeleton Loading -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="shimmer rounded-5" style="height: 600px;"></div>
             </div>
         </div>
-    @elseif($booking->payment)
-        <div class="card mb-4 border-success">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="card-title text-success mb-2">Payment Completed</h5>
-                        <p class="card-text text-muted mb-0">Payment Reference: {{ $booking->payment->payment_reference }}</p>
-                        <p class="card-text text-muted mb-0">Paid: {{ $booking->payment->paid_at->format('M d, Y \a\t h:i A') }}</p>
-                    </div>
-                    <div>
-                        <span class="badge bg-success fs-6">
-                            <i class="fas fa-check-circle me-2"></i> Paid
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    <div class="text-center mt-3">
-        <a href="{{ route('my-bookings.index') }}" class="btn btn-secondary btn-lg me-2">
-            <i class="fas fa-arrow-left me-2"></i>Back to My Bookings
-        </a>
-        @if($booking->payment)
-            <a href="{{ route('payments.index') }}" class="btn btn-outline-primary btn-lg">
-                <i class="fas fa-history me-2"></i>Payment History
-            </a>
-        @endif
     </div>
 </div>
+
+<style>
+    .shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .premium-card { border-radius: 35px; border: 0; box-shadow: 0 20px 40px rgba(0,0,0,0.05); overflow: hidden; background: white; }
+    .ticket-header { background: linear-gradient(135deg, #007aff, #5856d6); color: white; padding: 40px; }
+</style>
+
+@push('scripts')
+<script>
+const NODE_API = 'http://localhost:3000';
+const bookingId = "{{ $id }}";
+
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('%c 🎫 FETCHING RESERVATION DETAILS ', 'background: #1c1c1e; color: #007aff; font-weight: bold; padding: 5px; border-radius: 5px;');
+    loadDetails();
+});
+
+async function loadMyBookings() {
+    // This is a helper for the API status indicator in layouts if needed
+}
+
+async function loadDetails() {
+    try {
+        const response = await fetch(`${NODE_API}/api/bookings/${bookingId}`);
+        const data = await response.json();
+        
+        console.log('%c 📡 API DATA: ', 'color: #34c759; font-weight: bold;', data);
+        
+        if (data.success) {
+            renderDetails(data.booking, data.passengers);
+        } else {
+            document.getElementById('booking-details-root').innerHTML = `<div class="alert alert-danger">Failed to load booking: ${data.error}</div>`;
+        }
+    } catch (err) {
+        console.error('Fetch Error:', err);
+    }
+}
+
+function renderDetails(b, passengers) {
+    const root = document.getElementById('booking-details-root');
+    const f = b.flight;
+    
+    root.innerHTML = `
+        <div class="row justify-content-center reveal">
+            <div class="col-lg-10">
+                <div class="premium-card">
+                    <div class="ticket-header">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h6 class="text-white-50 small fw-bold text-uppercase mb-1">Booking Reference</h6>
+                                <h3 class="fw-800 mb-0">${b.booking_reference}</h3>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-white text-primary rounded-pill px-4 py-2 fw-800">${b.status.toUpperCase()}</span>
+                            </div>
+                        </div>
+                        <div class="row align-items-center text-center">
+                            <div class="col-md-4">
+                                <h1 class="display-3 fw-800 mb-0">${f.origin_airport_id.code}</h1>
+                                <p class="mb-0 opacity-75">${f.origin_airport_id.city}</p>
+                            </div>
+                            <div class="col-md-4 py-4 py-md-0"><i class="fas fa-plane fa-3x opacity-50"></i></div>
+                            <div class="col-md-4">
+                                <h1 class="display-3 fw-800 mb-0">${f.destination_airport_id.code}</h1>
+                                <p class="mb-0 opacity-75">${f.destination_airport_id.city}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="row g-5">
+                            <div class="col-md-7">
+                                <h4 class="fw-800 text-dark mb-4">Passenger Manifest</h4>
+                                ${passengers.map(p => `
+                                    <div class="d-flex align-items-center p-3 mb-3 bg-light rounded-4">
+                                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3 text-primary"><i class="fas fa-user"></i></div>
+                                        <div>
+                                            <h6 class="fw-bold mb-0">${p.first_name} ${p.last_name}</h6>
+                                            <p class="small text-secondary mb-0">Passport: ${p.passport_number || 'N/A'}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="col-md-5">
+                                <div class="bg-light p-4 rounded-5">
+                                    <h4 class="fw-800 text-dark mb-4">Flight Intel</h4>
+                                    <div class="mb-3">
+                                        <label class="small fw-bold text-secondary text-uppercase d-block mb-1">Airline</label>
+                                        <p class="fw-bold text-dark mb-0">${f.airline}</p>
+                                    </div>
+                                    <div class="mb-3 border-top pt-3">
+                                        <label class="small fw-bold text-secondary text-uppercase d-block mb-1">Departure</label>
+                                        <p class="fw-bold text-dark mb-0">${new Date(f.departure_time).toLocaleString()}</p>
+                                    </div>
+                                    <div class="mb-3 border-top pt-3">
+                                        <label class="small fw-bold text-secondary text-uppercase d-block mb-1">Total Fare Paid</label>
+                                        <h3 class="fw-800 text-primary mb-0">$${b.total_price.toLocaleString()}</h3>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    ${b.status === 'confirmed' ? `
+                                        <a href="/bookings/${b._id}/boarding-pass" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-lg">
+                                            <i class="fas fa-ticket-alt me-2"></i> GET BOARDING PASS
+                                        </a>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+</script>
+@endpush
 @endsection

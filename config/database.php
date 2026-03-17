@@ -117,6 +117,9 @@ return [
             'driver' => 'mongodb',
             'dsn' => env('MONGO_URL', 'mongodb://localhost:27017/laravel'),
             'database' => env('DB_DATABASE', 'laravel'),
+            'options' => [
+                'database' => 'admin', // Required for some MongoDB setups
+            ],
         ],
 
     ],

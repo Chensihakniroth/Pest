@@ -1,0 +1,210 @@
+<%- include('../partials/header', { title: 'Staff Portal - SkyConnect' }) %>
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h6 class="text-primary fw-bold text-uppercase small mb-1">Management Console</h6>
+            <h1 class="display-5 fw-800 text-dark mb-0">Staff Portal (Node.js)</h1>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-5 g-4">
+        <div class="col-md-4">
+            <div class="card p-4 border-0 shadow-sm">
+                <h6 class="text-secondary small fw-bold mb-2">REVENUE</h6>
+                <h2 class="fw-800 mb-0">$<%= stats.total_revenue.toLocaleString() %></h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4 border-0 shadow-sm">
+                <h6 class="text-secondary small fw-bold mb-2">BOOKINGS</h6>
+                <h2 class="fw-800 mb-0 text-success"><%= stats.active_bookings %></h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4 border-0 shadow-sm">
+                <h6 class="text-secondary small fw-bold mb-2">CLIENTS</h6>
+                <h2 class="fw-800 mb-0"><%= stats.total_users %></h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 mb-5 shadow-sm">
+        <div class="card-header bg-transparent border-0 p-3">
+            <ul class="nav nav-pills nav-justified" id="dashboardTabs" role="tablist">
+                <li class="nav-item"><button class="nav-link active py-3 rounded-pill" data-bs-toggle="tab" data-bs-target="#users" type="button">Users (GET/POST)</button></li>
+                <li class="nav-item"><button class="nav-link py-3 rounded-pill" data-bs-toggle="tab" data-bs-target="#bookings" type="button">Bookings (GET/PUT)</button></li>
+                <li class="nav-item"><button class="nav-link py-3 rounded-pill" data-bs-toggle="tab" data-bs-target="#flights" type="button">Flights (GET/DELETE)</button></li>
+            </ul>
+        </div>
+
+        <div class="card-body p-4 pt-0">
+            <div class="tab-content" id="dashboardTabsContent">
+
+                <!-- USERS TAB -->
+                <div class="tab-pane fade show active" id="users" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-800 mb-0">Client Network</h4>
+                        <button onclick="refreshData('/api/users', 'GET')" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <i class="fas fa-sync-alt me-1"></i> Refresh (GET)
+                        </button>
+                    </div>
+                    <div class="row g-3">
+                        <% users.forEach(user => { %>
+                            <div class="col-xl-4 col-md-6">
+                                <div class="premium-list-item h-100 p-3 bg-light rounded-4">
+                                    <h6 class="fw-bold mb-1" id="user-name-<%= user._id %>">
+                                        <%= user.name %>
+                                        <% if (!user.is_active) { %><span class="badge bg-dark ms-1 restricted-badge">RESTRICTED</span><% } %>
+                                    </h6>
+                                    <p class="small text-secondary mb-3"><%= user.email %></p>
+                                    <button onclick="toggleUserRestriction('<%= user._id %>')" class="btn btn-sm btn-dark w-100 rounded-pill">
+                                        <span id="restrict-text-<%= user._id %>"><%= user.is_active ? 'Restrict (POST)' : 'Unrestrict (POST)' %></span>
+                                    </button>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+
+                <!-- BOOKINGS TAB -->
+                <div class="tab-pane fade" id="bookings" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-800 mb-0">Reservations</h4>
+                        <button onclick="refreshData('/api/bookings', 'GET')" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <i class="fas fa-sync-alt me-1"></i> Refresh (GET)
+                        </button>
+                    </div>
+                    <table class="table align-middle">
+                        <thead><tr><th>REF</th><th>STATUS</th><th class="text-end">ACTION</th></tr></thead>
+                        <tbody>
+                            <% bookings.forEach(booking => { %>
+                                <tr>
+                                    <td><code><%= booking.booking_reference %></code></td>
+                                    <td id="booking-status-<%= booking._id %>"><%= booking.status %></td>
+                                    <td class="text-end" id="booking-action-<%= booking._id %>">
+                                        <% if (booking.status === 'confirmed') { %>
+                                            <button onclick="cancelBooking('<%= booking._id %>')" class="btn btn-sm btn-outline-danger rounded-pill">Revoke (PUT)</button>
+                                        <% } else { %><span>CLOSED</span><% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- FLIGHTS TAB -->
+                <div class="tab-pane fade" id="flights" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-800 mb-0">Active Fleet</h4>
+                        <button onclick="refreshData('/api/flights', 'GET')" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <i class="fas fa-sync-alt me-1"></i> Refresh (GET)
+                        </button>
+                    </div>
+                    <div class="row g-3">
+                        <% flights.forEach(flight => { %>
+                            <div class="col-md-6" id="flight-card-<%= flight._id %>">
+                                <div class="p-3 bg-light rounded-4">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="badge bg-primary rounded-pill"><%= flight.flight_number %></span>
+                                        <button onclick="deleteFlight('<%= flight._id %>')" class="btn btn-sm btn-link text-danger p-0">Delete (DELETE)</button>
+                                    </div>
+                                    <h5 class="mt-2 mb-0"><%= flight.airline %></h5>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const logStyle = (color) => `background: ${color}; color: #fff; font-weight: bold; padding: 2px 5px; border-radius: 3px;`;
+
+// [GET] Method Example
+function refreshData(endpoint, method) {
+    const fullUrl = window.location.origin + endpoint;
+    console.group(`%c ${method} %c FETCHING DATA `, logStyle('#007aff'), 'color: #007aff; font-weight: bold;');
+    console.log('%c 🔗 URL: ', 'font-weight: bold;', fullUrl);
+    
+    fetch(endpoint)
+    .then(res => {
+        console.log('%c 📡 STATUS: ', 'font-weight: bold;', res.status);
+        return res.json();
+    })
+    .then(data => {
+        console.log('%c 📦 DATA: ', 'font-weight: bold;', data);
+        console.log('%c ✅ SUCCESS ', 'color: #34c759; font-weight: bold;');
+        console.groupEnd();
+        alert(`Successfully fetched ${data.length} items via GET! Check console for details.`);
+    });
+}
+
+// [POST] Method Example
+function toggleUserRestriction(userId) {
+    const endpoint = `/api/users/${userId}/toggle-restriction`;
+    console.group(`%c POST %c TOGGLE RESTRICTION `, logStyle('#ff9500'), 'color: #ff9500; font-weight: bold;');
+    console.log('%c 🔗 URL: ', 'font-weight: bold;', window.location.origin + endpoint);
+
+    fetch(endpoint, { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+        console.log('%c 📦 RESPONSE: ', 'font-weight: bold;', data);
+        if (data.success) {
+            const header = document.getElementById(`user-name-${userId}`);
+            const btnText = document.getElementById(`restrict-text-${userId}`);
+            if (data.is_active) {
+                const b = header.querySelector('.restricted-badge'); if(b) b.remove();
+                btnText.innerText = 'Restrict (POST)';
+            } else {
+                header.innerHTML += ' <span class="badge bg-dark ms-1 restricted-badge">RESTRICTED</span>';
+                btnText.innerText = 'Unrestrict (POST)';
+            }
+        }
+        console.groupEnd();
+    });
+}
+
+// [PUT] Method Example
+function cancelBooking(bookingId) {
+    const endpoint = `/api/bookings/${bookingId}`;
+    console.group(`%c PUT %c CANCEL BOOKING `, logStyle('#ff3b30'), 'color: #ff3b30; font-weight: bold;');
+    console.log('%c 🔗 URL: ', 'font-weight: bold;', window.location.origin + endpoint);
+
+    fetch(endpoint, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'cancelled' })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log('%c 📦 RESPONSE: ', 'font-weight: bold;', data);
+        document.getElementById(`booking-status-${bookingId}`).innerText = 'cancelled';
+        document.getElementById(`booking-action-${bookingId}`).innerHTML = '<span>CLOSED</span>';
+        console.groupEnd();
+    });
+}
+
+// [DELETE] Method Example
+function deleteFlight(flightId) {
+    const endpoint = `/api/flights/${flightId}`;
+    console.group(`%c DELETE %c REMOVE FLIGHT `, logStyle('#5856d6'), 'color: #5856d6; font-weight: bold;');
+    console.log('%c 🔗 URL: ', 'font-weight: bold;', window.location.origin + endpoint);
+
+    fetch(endpoint, { method: 'DELETE' })
+    .then(res => res.json())
+    .then(data => {
+        console.log('%c 📦 RESPONSE: ', 'font-weight: bold;', data);
+        const card = document.getElementById(`flight-card-${flightId}`);
+        card.style.opacity = '0';
+        setTimeout(() => card.remove(), 300);
+        console.groupEnd();
+    });
+}
+</script>
+
+<%- include('../partials/footer') %>
