@@ -17,6 +17,54 @@
         </div>
     </div>
 
+    <!-- Stats Overview -->
+    <div class="row g-4 mb-5 reveal">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 rounded-5 p-4 shadow-sm bg-white h-100">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-4 text-primary me-3"><i class="fas fa-users fa-lg"></i></div>
+                    <div>
+                        <h6 class="text-secondary small fw-bold text-uppercase mb-1">Total Clients</h6>
+                        <h3 class="fw-800 mb-0" id="stat-total-users">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 rounded-5 p-4 shadow-sm bg-white h-100">
+                <div class="d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 p-3 rounded-4 text-success me-3"><i class="fas fa-dollar-sign fa-lg"></i></div>
+                    <div>
+                        <h6 class="text-secondary small fw-bold text-uppercase mb-1">Revenue</h6>
+                        <h3 class="fw-800 mb-0" id="stat-revenue">$0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 rounded-5 p-4 shadow-sm bg-white h-100">
+                <div class="d-flex align-items-center">
+                    <div class="bg-warning bg-opacity-10 p-3 rounded-4 text-warning me-3"><i class="fas fa-plane fa-lg"></i></div>
+                    <div>
+                        <h6 class="text-secondary small fw-bold text-uppercase mb-1">Active Fleet</h6>
+                        <h3 class="fw-800 mb-0" id="stat-total-flights">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 rounded-5 p-4 shadow-sm bg-white h-100">
+                <div class="d-flex align-items-center">
+                    <div class="bg-info bg-opacity-10 p-3 rounded-4 text-info me-3"><i class="fas fa-ticket-alt fa-lg"></i></div>
+                    <div>
+                        <h6 class="text-secondary small fw-bold text-uppercase mb-1">Bookings</h6>
+                        <h3 class="fw-800 mb-0" id="stat-total-bookings">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Management Console -->
     <div class="card border-0 rounded-5 shadow-sm bg-white overflow-hidden">
         <div class="card-header bg-light bg-opacity-50 border-0 p-0">
@@ -30,11 +78,25 @@
         <div class="card-body p-4 p-lg-5">
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="users-panel">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-800 text-dark mb-0">Member Directory</h4>
+                        <div class="input-group w-auto">
+                            <span class="input-group-text bg-light border-0 rounded-start-pill ps-4"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" id="user-search" class="form-control bg-light border-0 rounded-end-pill px-3" placeholder="Search users..." onkeyup="filterData('users')">
+                        </div>
+                    </div>
                     <div id="user-list" class="row g-4 mb-4"></div>
                     <div id="user-pagination" class="d-flex justify-content-center gap-2 mt-4"></div>
                 </div>
                 
                 <div class="tab-pane fade" id="bookings-panel">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-800 text-dark mb-0">Global Stream</h4>
+                        <div class="input-group w-auto">
+                            <span class="input-group-text bg-light border-0 rounded-start-pill ps-4"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" id="booking-search" class="form-control bg-light border-0 rounded-end-pill px-3" placeholder="Search reference..." onkeyup="filterData('bookings')">
+                        </div>
+                    </div>
                     <div class="table-responsive mb-4">
                         <table class="table align-middle">
                             <thead><tr><th class="ps-4">Reference</th><th>Passenger</th><th>Status</th><th class="text-end pe-4">Command</th></tr></thead>
@@ -47,7 +109,13 @@
                 <!-- FLIGHTS PANEL -->
                 <div class="tab-pane fade" id="flights-panel">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h4 class="fw-800 text-dark mb-0">Active Fleet</h4>
+                        <div class="d-flex align-items-center gap-4">
+                            <h4 class="fw-800 text-dark mb-0">Active Fleet</h4>
+                            <div class="input-group w-auto">
+                                <span class="input-group-text bg-light border-0 rounded-start-pill ps-4"><i class="fas fa-search text-muted"></i></span>
+                                <input type="text" id="flight-search" class="form-control bg-light border-0 rounded-end-pill px-3" placeholder="Search number..." onkeyup="filterData('flights')">
+                            </div>
+                        </div>
                         <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="showAddFlightForm()">+ REGISTER FLIGHT</button>
                     </div>
                     
@@ -141,6 +209,11 @@ let state = {
     users: [],
     flights: [],
     bookings: [],
+    filtered: {
+        users: [],
+        flights: [],
+        bookings: []
+    },
     pages: {
         users: 1,
         flights: 1,
@@ -194,12 +267,43 @@ async function syncApi() {
         state.users = users;
         state.flights = flights;
         state.bookings = bookings;
+        
+        state.filtered.users = [...users];
+        state.filtered.flights = [...flights];
+        state.filtered.bookings = [...bookings];
 
+        updateStats();
         renderAll();
     } catch (err) {
         document.getElementById('api-indicator').className = 'bg-danger rounded-circle me-2';
         document.getElementById('api-status-text').innerText = 'Backend Offline';
     }
+}
+
+function updateStats() {
+    document.getElementById('stat-total-users').innerText = state.users.length;
+    document.getElementById('stat-total-flights').innerText = state.flights.length;
+    document.getElementById('stat-total-bookings').innerText = state.bookings.length;
+    
+    const revenue = state.bookings.filter(b => b.status === 'confirmed').reduce((acc, b) => acc + (b.total_price || 0), 0);
+    document.getElementById('stat-revenue').innerText = '$' + revenue.toLocaleString();
+}
+
+function filterData(type) {
+    const query = document.getElementById(`${type.slice(0, -1)}-search`).value.toLowerCase();
+    
+    if (type === 'users') {
+        state.filtered.users = state.users.filter(u => u.name.toLowerCase().includes(query) || u.email.toLowerCase().includes(query));
+    } else if (type === 'flights') {
+        state.filtered.flights = state.flights.filter(f => f.flight_number.toLowerCase().includes(query) || f.airline.toLowerCase().includes(query));
+    } else if (type === 'bookings') {
+        state.filtered.bookings = state.bookings.filter(b => b.booking_reference.toLowerCase().includes(query) || (b.user?.name || '').toLowerCase().includes(query));
+    }
+    
+    state.pages[type] = 1;
+    if (type === 'users') renderUsers();
+    if (type === 'flights') renderFlights();
+    if (type === 'bookings') renderBookings();
 }
 
 function renderAll() {
@@ -242,7 +346,7 @@ function changePage(type, newPage) {
 }
 
 function renderUsers() {
-    const users = paginate(state.users, state.pages.users, ITEMS_PER_PAGE);
+    const users = paginate(state.filtered.users, state.pages.users, ITEMS_PER_PAGE);
     document.getElementById('user-list').innerHTML = users.map(user => {
         const roleColor = user.role === 'admin' ? 'danger' : (user.role === 'employee' ? 'primary' : 'secondary');
         return `
@@ -270,11 +374,11 @@ function renderUsers() {
             </div>
         </div>
     `}).join('');
-    renderPaginationControls('users', state.users.length);
+    renderPaginationControls('users', state.filtered.users.length);
 }
 
 function renderBookings() {
-    const bookings = paginate(state.bookings, state.pages.bookings, ITEMS_PER_PAGE);
+    const bookings = paginate(state.filtered.bookings, state.pages.bookings, ITEMS_PER_PAGE);
     document.getElementById('booking-list').className = 'table-hover-custom';
     document.getElementById('booking-list').innerHTML = bookings.map(b => `
         <tr>
@@ -310,11 +414,11 @@ function renderBookings() {
             </td>
         </tr>
     `).join('');
-    renderPaginationControls('bookings', state.bookings.length);
+    renderPaginationControls('bookings', state.filtered.bookings.length);
 }
 
 function renderFlights() {
-    const flights = paginate(state.flights, state.pages.flights, ITEMS_PER_PAGE);
+    const flights = paginate(state.filtered.flights, state.pages.flights, ITEMS_PER_PAGE);
     document.getElementById('flight-list').innerHTML = flights.map(f => `
         <div class="col-lg-6" id="flight-card-${f._id}">
             <div class="card border-0 rounded-5 p-0 shadow-sm premium-flight-card overflow-hidden h-100">
@@ -361,7 +465,7 @@ function renderFlights() {
             </div>
         </div>
     `).join('');
-    renderPaginationControls('flights', state.flights.length);
+    renderPaginationControls('flights', state.filtered.flights.length);
 }
 
 // --- CRUD ACTIONS ---
