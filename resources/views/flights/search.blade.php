@@ -72,8 +72,12 @@ document.addEventListener('DOMContentLoaded', () => {
 async function apiCall(endpoint, method = 'GET') {
     const url = NODE_API + endpoint;
     const colors = { 'GET': '#34c759', 'POST': '#ff9500' };
+    
+    const options = { method, headers: { 'Accept': 'application/json' } };
+    if (window.API_TOKEN) options.headers['Authorization'] = 'Bearer ' + window.API_TOKEN;
+
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, options);
         const data = await response.json();
         console.log(`%c ${response.status} %c ${method} %c → %c ${url}`, `background: #1c1c1e; color: #34c759; padding: 2px 6px; border-radius: 3px; font-weight: bold;`, `background: #34c759; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;`, '', 'color: #5856d6;');
         return data;

@@ -23,6 +23,9 @@
             transform: translateX(5px);
         }
     </style>
+    <script>
+        window.API_TOKEN = '{{ auth()->check() ? auth()->user()->api_token : "" }}';
+    </script>
 </head>
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg fixed-top shadow-none" id="mirrorNav">

@@ -18,18 +18,37 @@
             <div class="mirror-card p-4 p-lg-5 rounded-5 shadow-lg border-0 bg-white bg-opacity-50 mb-5" style="backdrop-filter: blur(20px);">
                 <h4 class="fw-800 text-dark mb-4">Passenger Details</h4>
                 <form id="booking-form">
+                    @php
+                        $nameParts = explode(' ', auth()->user()->name, 2);
+                        $firstName = $nameParts[0] ?? '';
+                        $lastName = $nameParts[1] ?? '';
+                    @endphp
                     <div class="row g-4">
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-secondary text-uppercase ms-2">First Name</label>
-                            <input type="text" id="p-first-name" class="form-control border-0 bg-light rounded-pill py-3 px-4 shadow-none fw-bold" required>
+                            <input type="text" id="p-first-name" class="form-control border-0 bg-light rounded-pill py-3 px-4 shadow-none fw-bold" value="{{ $firstName }}" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-secondary text-uppercase ms-2">Last Name</label>
-                            <input type="text" id="p-last-name" class="form-control border-0 bg-light rounded-pill py-3 px-4 shadow-none fw-bold" required>
+                            <input type="text" id="p-last-name" class="form-control border-0 bg-light rounded-pill py-3 px-4 shadow-none fw-bold" value="{{ $lastName }}" required>
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold text-secondary text-uppercase ms-2">Passport Number</label>
                             <input type="text" id="p-passport" class="form-control border-0 bg-light rounded-pill py-3 px-4 shadow-none fw-bold" placeholder="A1234567" required>
+                        </div>
+                        
+                        <!-- Seat Selection -->
+                        <div class="col-12 mt-4">
+                            <h5 class="fw-bold mb-3"><i class="fas fa-chair me-2 text-primary"></i>Seat Selection</h5>
+                            <div class="seat-map p-4 rounded-5 border bg-white text-center overflow-auto" style="min-height: 200px;">
+                                <div id="seat-grid" class="d-inline-block">
+                                    <div class="spinner-border text-primary" role="status"></div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="p-seat" required>
+                            <div class="text-center mt-3">
+                                <span class="badge bg-primary px-4 py-2 fs-6 rounded-pill shadow-sm" id="selected-seat-display">Select a seat</span>
+                            </div>
                         </div>
                     </div>
 
@@ -60,6 +79,8 @@ const NODE_API = 'http://localhost:3000';
 const urlParams = new URLSearchParams(window.location.search);
 const flightId = urlParams.get('flight_id');
 let currentFlight = null;
+let occupiedSeats = [];
+let selectedSeat = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (!flightId) {
@@ -68,11 +89,70 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     loadFlightDetails();
+    loadSeats();
 });
+
+async function loadSeats() {
+    try {
+        const res = await fetch(`${NODE_API}/api/flights/${flightId}/seats`, {
+            headers: window.API_TOKEN ? { 'Authorization': 'Bearer ' + window.API_TOKEN } : {}
+        });
+        const data = await res.json();
+        if (data.success) {
+            occupiedSeats = data.occupiedSeats;
+            renderSeatGrid();
+        }
+    } catch (err) {
+        console.error('Failed to load seats', err);
+    }
+}
+
+function renderSeatGrid() {
+    const rows = 10;
+    const cols = ['A', 'B', 'C', 'D', 'E', 'F'];
+    let html = '<div class="d-inline-flex flex-column gap-2">';
+    
+    for (let r = 1; r <= rows; r++) {
+        html += '<div class="d-flex gap-2 justify-content-center">';
+        cols.forEach((c, index) => {
+            if (index === 3) html += '<div style="width: 30px;"></div>'; // Aisle
+            const seatNumber = `${r}${c}`;
+            const isOccupied = occupiedSeats.includes(seatNumber);
+            const btnClass = isOccupied ? 'btn-secondary opacity-50' : 'btn-outline-primary';
+            const disabled = isOccupied ? 'disabled' : '';
+            
+            html += `<button type="button" class="btn ${btnClass} seat-btn fw-bold p-0" style="width:40px; height:40px;" ${disabled} onclick="selectSeat('${seatNumber}')">${seatNumber}</button>`;
+        });
+        html += '</div>';
+    }
+    html += '</div>';
+    document.getElementById('seat-grid').innerHTML = html;
+}
+
+function selectSeat(seatNumber) {
+    selectedSeat = seatNumber;
+    document.getElementById('p-seat').value = seatNumber;
+    document.getElementById('selected-seat-display').innerText = 'Seat: ' + seatNumber;
+    
+    document.querySelectorAll('.seat-btn').forEach(btn => {
+        if (!btn.disabled) {
+            btn.classList.remove('btn-primary', 'text-white');
+            btn.classList.add('btn-outline-primary');
+        }
+    });
+    
+    const selectedBtn = Array.from(document.querySelectorAll('.seat-btn')).find(b => b.innerText === seatNumber);
+    if (selectedBtn) {
+        selectedBtn.classList.remove('btn-outline-primary');
+        selectedBtn.classList.add('btn-primary', 'text-white');
+    }
+}
 
 async function loadFlightDetails() {
     try {
-        const res = await fetch(`${NODE_API}/api/flights/${flightId}`);
+        const res = await fetch(`${NODE_API}/api/flights/${flightId}`, {
+            headers: window.API_TOKEN ? { 'Authorization': 'Bearer ' + window.API_TOKEN } : {}
+        });
         currentFlight = await res.json();
         
         renderFlightSummary(currentFlight);
@@ -116,12 +196,11 @@ document.getElementById('booking-form').addEventListener('submit', async (e) => 
     btn.disabled = true;
     btn.innerText = 'PROCESSING...';
 
-    // In a real app, user_id would come from the auth session.
-    // For this demo, we'll fetch the first user.
-    const usersRes = await fetch(`${NODE_API}/api/users`);
-    const users = await usersRes.json();
-    const activeUser = users[0]; // This is the user we are using for the demo
-    const mockUserId = activeUser?._id;
+    const activeUser = {
+        _id: '{{ auth()->user()->id }}',
+        role: '{{ auth()->user()->role ?? "user" }}'
+    };
+    const mockUserId = activeUser._id;
 
     const payload = {
         user_id: mockUserId,
@@ -130,7 +209,8 @@ document.getElementById('booking-form').addEventListener('submit', async (e) => 
         passengers: [{
             first_name: document.getElementById('p-first-name').value,
             last_name: document.getElementById('p-last-name').value,
-            passport_number: document.getElementById('p-passport').value
+            passport_number: document.getElementById('p-passport').value,
+            seat_number: document.getElementById('p-seat').value
         }]
     };
 
@@ -139,23 +219,19 @@ document.getElementById('booking-form').addEventListener('submit', async (e) => 
     try {
         const res = await fetch(`${NODE_API}/api/bookings`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                ...(window.API_TOKEN ? { 'Authorization': 'Bearer ' + window.API_TOKEN } : {})
+            },
             body: JSON.stringify(payload)
         });
         const data = await res.json();
         
         if (data.success) {
             console.log('%c ✅ BOOKING SUCCESS ', 'background: #34c759; color: white; padding: 2px 6px; border-radius: 3px;');
-            alert(`RESERVATION SUCCESS!\nReference: ${data.booking_reference}`);
             
-            // Smart Redirection
-            if (activeUser.role === 'admin' || activeUser.role === 'employee') {
-                console.log('Redirecting to Staff Portal...');
-                window.location.href = '/admin/dashboard';
-            } else {
-                console.log('Redirecting to My Bookings...');
-                window.location.href = '/my-bookings';
-            }
+            // Redirect to Payment Gateway
+            window.location.href = `/payments/${data.booking_id}/process`;
         }
     } catch (err) {
         console.error('Booking failed:', err);

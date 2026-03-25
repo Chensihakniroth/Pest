@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         // Debug database connections (logged to Railway console)
-        $this->checkDatabaseConnections();
+        // $this->checkDatabaseConnections();
     }
 
     /**

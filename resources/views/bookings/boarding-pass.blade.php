@@ -45,7 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadPass() {
-    const res = await fetch(`${NODE_API}/api/bookings/${bookingId}`);
+    const res = await fetch(`${NODE_API}/api/bookings/${bookingId}`, {
+        headers: window.API_TOKEN ? { 'Authorization': 'Bearer ' + window.API_TOKEN } : {}
+    });
     const data = await res.json();
     if (data.success) renderPass(data.booking, data.passengers[0]);
 }

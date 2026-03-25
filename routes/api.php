@@ -11,11 +11,11 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // Flights API
-Route::apiResource('flights', FlightController::class);
+Route::apiResource('flights', FlightController::class)->names('api.flights');
 
 // Users API
-Route::apiResource('users', UserController::class);
-Route::post('users/{id}/toggle-restriction', [UserController::class, 'toggleRestriction']);
+Route::apiResource('users', UserController::class)->names('api.users');
+Route::post('users/{id}/toggle-restriction', [UserController::class, 'toggleRestriction'])->name('api.users.toggle-restriction');
 
 // Bookings API
-Route::apiResource('bookings', BookingController::class);
+Route::apiResource('bookings', BookingController::class)->names('api.bookings');

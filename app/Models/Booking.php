@@ -7,8 +7,8 @@ use MongoDB\Laravel\Eloquent\Model;
 class Booking extends Model
 {
     protected $fillable = [
-        'user_id',
-        'flight_id',
+        'user',
+        'flight',
         'booking_reference',
         'status',
         'total_price',
@@ -16,14 +16,14 @@ class Booking extends Model
         'seat_number',
     ];
 
-    public function user()
+    public function customer()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user');
     }
 
-    public function flight()
+    public function flightDetails()
     {
-        return $this->belongsTo(Flight::class);
+        return $this->belongsTo(Flight::class, 'flight');
     }
 
     public function passengers()

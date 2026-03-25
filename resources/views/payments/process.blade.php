@@ -27,8 +27,8 @@
                             <div>
                                 <h6 class="mb-1 fw-bold">Booking Summary</h6>
                                 <p class="mb-0 small">
-                                    <strong>Flight:</strong> {{ $booking->flight->flight_number }}<br>
-                                    <strong>Route:</strong> {{ $booking->flight->originAirport->city }} → {{ $booking->flight->destinationAirport->city }}<br>
+                                    <strong>Flight:</strong> {{ $booking->flightDetails->flight_number }}<br>
+                                    <strong>Route:</strong> {{ $booking->flightDetails->originAirport->city }} → {{ $booking->flightDetails->destinationAirport->city }}<br>
                                     <strong>Class:</strong> {{ ucfirst($booking->fare_class) }}<br>
                                     <strong>Amount:</strong> ${{ number_format($booking->total_price, 2) }}
                                 </p>

@@ -32,6 +32,12 @@ public function login(Request $request)
             ])->onlyInput('email');
         }
 
+        // Generate API token for Node.js backend
+        if (!$user->api_token) {
+            $user->api_token = \Illuminate\Support\Str::random(60);
+            $user->save();
+        }
+
         if ($user->role === 'admin' || $user->role === 'employee') {
             return redirect()->route('admin.dashboard');
         } else {

@@ -50,13 +50,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadMyBookings() {
     try {
-        // In a real app, we'd filter by current user ID. 
-        // For the demo, we'll fetch all and show the first user's bookings.
-        const users = await apiCall('/api/users');
-        const activeUser = users[0];
+        const currentUserId = '{{ auth()->user()->id }}';
         
         const allBookings = await apiCall('/api/bookings');
-        const myBookings = allBookings.filter(b => b.user && b.user._id === activeUser._id);
+        const myBookings = allBookings.filter(b => b.user === currentUserId || (b.user && b.user._id === currentUserId));
 
         const statusBadge = document.getElementById('sync-status');
         statusBadge.innerHTML = `<i class="fas fa-check-circle me-1"></i> NODE.JS SYNCED (${myBookings.length} Trips)`;
@@ -122,6 +119,7 @@ function renderBookings(bookings) {
                     <div class="d-flex gap-2">
                         <a href="/bookings/${b._id}" class="btn btn-light flex-grow-1 rounded-pill fw-bold border">Details</a>
                         ${b.status === 'confirmed' ? `<a href="/bookings/${b._id}/boarding-pass" class="btn btn-primary flex-grow-1 rounded-pill fw-bold shadow-sm">Boarding Pass</a>` : ''}
+                        ${b.status === 'pending_payment' ? `<a href="/payments/${b._id}/process" class="btn btn-warning flex-grow-1 rounded-pill fw-bold shadow-sm text-dark">Pay Now</a>` : ''}
                     </div>
                 </div>
             </div>
@@ -132,7 +130,11 @@ function renderBookings(bookings) {
 async function apiCall(endpoint) {
     const url = NODE_API + endpoint;
     console.log(`%c 200 %c GET %c → %c ${url}`, `background: #1c1c1e; color: #34c759; padding: 2px 6px; border-radius: 3px; font-weight: bold;`, `background: #34c759; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;`, 'color: #8e8e93;', 'color: #007aff; text-decoration: underline;');
-    const res = await fetch(url);
+    
+    const options = { headers: {} };
+    if (window.API_TOKEN) options.headers['Authorization'] = 'Bearer ' + window.API_TOKEN;
+    
+    const res = await fetch(url, options);
     return await res.json();
 }
 </script>

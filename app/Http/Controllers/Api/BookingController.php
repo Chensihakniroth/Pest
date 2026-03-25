@@ -10,21 +10,21 @@ class BookingController extends Controller
 {
     public function index()
     {
-        return response()->json(Booking::with(['user', 'flight.originAirport', 'flight.destinationAirport'])->latest()->get());
+        return response()->json(Booking::with(['customer', 'flightDetails.originAirport', 'flightDetails.destinationAirport'])->latest()->get());
     }
 
     public function show($id)
     {
-        return response()->json(Booking::with(['user', 'flight.originAirport', 'flight.destinationAirport', 'passengers'])->findOrFail($id));
+        return response()->json(Booking::with(['customer', 'flightDetails.originAirport', 'flightDetails.destinationAirport', 'passengers'])->findOrFail($id));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required',
-            'flight_id' => 'required',
+            'user' => 'required',
+            'flight' => 'required',
             'booking_reference' => 'required|unique:bookings',
-            'status' => 'required|in:pending,confirmed,cancelled',
+            'status' => 'required|in:pending,pending_payment,confirmed,cancelled',
             'total_price' => 'required|numeric',
         ]);
 

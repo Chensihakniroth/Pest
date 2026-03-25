@@ -37,7 +37,9 @@ async function loadMyBookings() {
 
 async function loadDetails() {
     try {
-        const response = await fetch(`${NODE_API}/api/bookings/${bookingId}`);
+        const response = await fetch(`${NODE_API}/api/bookings/${bookingId}`, {
+            headers: window.API_TOKEN ? { 'Authorization': 'Bearer ' + window.API_TOKEN } : {}
+        });
         const data = await response.json();
         
         console.log('%c 📡 API DATA: ', 'color: #34c759; font-weight: bold;', data);
@@ -117,6 +119,11 @@ function renderDetails(b, passengers) {
                                     ${b.status === 'confirmed' ? `
                                         <a href="/bookings/${b._id}/boarding-pass" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-lg">
                                             <i class="fas fa-ticket-alt me-2"></i> GET BOARDING PASS
+                                        </a>
+                                    ` : ''}
+                                    ${b.status === 'pending_payment' ? `
+                                        <a href="/payments/${b._id}/process" class="btn btn-warning w-100 py-3 rounded-pill fw-bold shadow-lg text-dark">
+                                            <i class="fas fa-credit-card me-2"></i> COMPLETE PAYMENT
                                         </a>
                                     ` : ''}
                                 </div>

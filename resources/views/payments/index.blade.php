@@ -81,13 +81,13 @@
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
                                                 <span class="text-muted small">Flight</span><br>
-                                                <span class="fw-bold">{{ $payment->booking->flight->flight_number }}</span>
+                                                <span class="fw-bold">{{ $payment->booking->flightDetails->flight_number }}</span>
                                             </div>
                                             <div class="text-end">
                                                 <span class="text-muted small">Route</span><br>
                                                 <span class="fw-bold">
-                                                    {{ $payment->booking->flight->originAirport->city }} →
-                                                    {{ $payment->booking->flight->destinationAirport->city }}
+                                                    {{ $payment->booking->flightDetails->originAirport->city }} →
+                                                    {{ $payment->booking->flightDetails->destinationAirport->city }}
                                                 </span>
                                             </div>
                                         </div>

@@ -28,6 +28,7 @@ class RegisterController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'customer',
+            'api_token' => \Illuminate\Support\Str::random(60),
         ]);
 
         Auth::login($user);

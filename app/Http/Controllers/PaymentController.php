@@ -14,7 +14,7 @@ class PaymentController extends Controller
     public function show(Booking $booking)
     {
         // Ensure the authenticated user owns the booking
-        if (Auth::id() !== $booking->user_id && !Auth::user()->isAdmin()) {
+        if (Auth::id() !== (string)$booking->user && !Auth::user()->isAdmin()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -30,7 +30,7 @@ class PaymentController extends Controller
     public function process(Request $request, Booking $booking)
     {
         // Ensure the authenticated user owns the booking
-        if (Auth::id() !== $booking->user_id && !Auth::user()->isAdmin()) {
+        if (Auth::id() !== (string)$booking->user && !Auth::user()->isAdmin()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -48,34 +48,32 @@ class PaymentController extends Controller
             'card_cvv' => 'required|string|size:3',
         ]);
 
-        return DB::transaction(function () use ($request, $booking) {
-            // Create payment record (mocking the payment processing)
-            $payment = Payment::create([
-                'user_id' => Auth::id(),
-                'booking_id' => $booking->id,
-                'payment_reference' => 'PAY-' . Str::upper(Str::random(10)),
-                'card_number' => $request->card_number,
-                'card_holder_name' => $request->card_holder_name,
-                'card_expiry_month' => $request->card_expiry_month,
-                'card_expiry_year' => $request->card_expiry_year,
-                'card_cvv' => $request->card_cvv, // In real app, this should be encrypted
-                'amount' => $booking->total_price,
-                'status' => 'completed', // Mocking successful payment
-                'payment_method' => 'credit_card',
-                'paid_at' => now(),
-            ]);
+        // Create payment record (mocking the payment processing)
+        $payment = Payment::create([
+            'user_id' => Auth::id(),
+            'booking_id' => $booking->id,
+            'payment_reference' => 'PAY-' . Str::upper(Str::random(10)),
+            'card_number' => $request->card_number,
+            'card_holder_name' => $request->card_holder_name,
+            'card_expiry_month' => $request->card_expiry_month,
+            'card_expiry_year' => $request->card_expiry_year,
+            'card_cvv' => $request->card_cvv, // In real app, this should be encrypted
+            'amount' => $booking->total_price,
+            'status' => 'completed', // Mocking successful payment
+            'payment_method' => 'credit_card',
+            'paid_at' => now(),
+        ]);
 
-            // Update booking status to paid
-            $booking->update(['status' => 'confirmed']);
+        // Update booking status to paid
+        $booking->update(['status' => 'confirmed']);
 
-            return redirect()->route('bookings.show', $booking->id)
-                             ->with('success', 'Payment processed successfully! Your booking is now confirmed.');
-        });
+        return redirect()->route('bookings.show', $booking->id)
+                         ->with('success', 'Payment processed successfully! Your booking is now confirmed.');
     }
 
     public function index()
     {
-        $payments = Auth::user()->payments()->with('booking.flight.originAirport', 'booking.flight.destinationAirport')->latest()->get();
+        $payments = Auth::user()->payments()->with('booking.flightDetails.originAirport', 'booking.flightDetails.destinationAirport')->latest()->get();
         return view('payments.index', compact('payments'));
     }
 }

@@ -41,19 +41,20 @@
 @push('scripts')
 <script>
 const NODE_API = 'http://localhost:3000';
-let currentUserId = ''; 
+let currentUserId = '{{ auth()->user()->id }}'; 
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.clear();
     console.log('%c ⚡ PROFILE SYNC INITIALIZED ', 'background: #1c1c1e; color: #007aff; font-weight: bold; padding: 5px; border-radius: 5px;');
-    try {
-        const users = await apiCall('/api/users');
-        if (users && users.length > 0) {
-            const user = users[0];
-            currentUserId = user._id;
-            populateForm(user);
-        }
-    } catch (err) { console.error('Init Error:', err); }
+    
+    // Pre-fill the form with the authenticated user's data from Blade
+    const user = {
+        _id: currentUserId,
+        name: '{{ auth()->user()->name }}',
+        email: '{{ auth()->user()->email }}'
+    };
+    
+    populateForm(user);
 });
 
 function populateForm(user) {
@@ -70,6 +71,7 @@ async function apiCall(endpoint, method = 'GET', body = null) {
     console.log(`%c ${method} %c → %c ${url}`, `background: #1c1c1e; color: ${colors[method]}; padding: 2px 6px; border-radius: 3px; font-weight: bold;`, '', 'color: #007aff;');
 
     const options = { method, headers: { 'Accept': 'application/json' } };
+    if (window.API_TOKEN) options.headers['Authorization'] = 'Bearer ' + window.API_TOKEN;
     if (body) {
         options.headers['Content-Type'] = 'application/json';
         options.body = JSON.stringify(body);

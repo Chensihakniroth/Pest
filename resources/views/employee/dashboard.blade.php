@@ -29,8 +29,20 @@
 
         <div class="card-body p-4 p-lg-5">
             <div class="tab-content">
-                <div class="tab-pane fade show active" id="users-panel"><div id="user-list" class="row g-4"></div></div>
-                <div class="tab-pane fade" id="bookings-panel"><div class="table-responsive"><table class="table align-middle"><thead><tr><th class="ps-4">Reference</th><th>Passenger</th><th>Status</th><th class="text-end pe-4">Command</th></tr></thead><tbody id="booking-list"></tbody></table></div></div>
+                <div class="tab-pane fade show active" id="users-panel">
+                    <div id="user-list" class="row g-4 mb-4"></div>
+                    <div id="user-pagination" class="d-flex justify-content-center gap-2 mt-4"></div>
+                </div>
+                
+                <div class="tab-pane fade" id="bookings-panel">
+                    <div class="table-responsive mb-4">
+                        <table class="table align-middle">
+                            <thead><tr><th class="ps-4">Reference</th><th>Passenger</th><th>Status</th><th class="text-end pe-4">Command</th></tr></thead>
+                            <tbody id="booking-list"></tbody>
+                        </table>
+                    </div>
+                    <div id="booking-pagination" class="d-flex justify-content-center gap-2 mt-4"></div>
+                </div>
 
                 <!-- FLIGHTS PANEL -->
                 <div class="tab-pane fade" id="flights-panel">
@@ -83,7 +95,8 @@
                         </div>
                     </div>
 
-                    <div id="flight-list" class="row g-4"></div>
+                    <div id="flight-list" class="row g-4 mb-4"></div>
+                    <div id="flight-pagination" class="d-flex justify-content-center gap-2 mt-4"></div>
                 </div>
             </div>
         </div>
@@ -93,13 +106,47 @@
 <style>
     .nav-pills .nav-link { color: #8e8e93; transition: all 0.3s ease; }
     .nav-pills .nav-link.active { background: white !important; color: var(--sc-primary) !important; border-bottom: 3px solid var(--sc-primary) !important; }
-    .premium-user-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(0,0,0,0.05); }
-    .premium-user-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.08) !important; }
+    
+    /* Interactive Card Enhancements */
+    .premium-user-card, .premium-flight-card { 
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        border: 1px solid rgba(0,0,0,0.05); 
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    }
+    .premium-user-card:hover, .premium-flight-card:hover { 
+        transform: translateY(-8px) scale(1.02); 
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important; 
+        border-color: rgba(0, 122, 255, 0.2);
+    }
+    
+    /* Beautiful Table Styling */
+    .table-hover-custom tbody tr { transition: all 0.2s ease; cursor: pointer; }
+    .table-hover-custom tbody tr:hover { background-color: rgba(0, 122, 255, 0.03) !important; transform: scale(1.01); }
+    .table-hover-custom td { vertical-align: middle; border-bottom: 1px solid rgba(0,0,0,0.05); padding: 1.2rem 1rem; }
+    
+    /* Status Badge Glows */
+    .badge-glow-success { box-shadow: 0 0 10px rgba(52, 199, 89, 0.4); }
+    .badge-glow-secondary { box-shadow: 0 0 10px rgba(142, 142, 147, 0.4); }
+    
+    /* Glassmorphism Header */
+    .glass-header { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0,0,0,0.05); }
 </style>
 
 @push('scripts')
 <script>
 const NODE_API = 'http://localhost:3000';
+const ITEMS_PER_PAGE = 6;
+
+let state = {
+    users: [],
+    flights: [],
+    bookings: [],
+    pages: {
+        users: 1,
+        flights: 1,
+        bookings: 1
+    }
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     console.clear();
@@ -113,6 +160,7 @@ async function apiCall(endpoint, method = 'GET', body = null) {
     const url = NODE_API + endpoint;
     const colors = { 'GET': '#34c759', 'POST': '#ff9500', 'PUT': '#ff3b30', 'DELETE': '#5856d6' };
     const options = { method, headers: { 'Accept': 'application/json' } };
+    if (window.API_TOKEN) options.headers['Authorization'] = 'Bearer ' + window.API_TOKEN;
     if (body) { options.headers['Content-Type'] = 'application/json'; options.body = JSON.stringify(body); }
 
     try {
@@ -121,8 +169,13 @@ async function apiCall(endpoint, method = 'GET', body = null) {
         console.log(`%c ${response.status} %c ${method} %c → %c ${url}`, 
             `background: #1c1c1e; color: ${response.status < 400 ? '#34c759' : '#ff3b30'}; padding: 2px 6px; border-radius: 3px; font-weight: bold;`,
             `background: ${colors[method] || '#8e8e93'}; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;`, '', 'color: #007aff;');
+            
+        if (!response.ok) {
+            console.error('API Error Response:', data);
+            throw new Error(data.error || 'API Request Failed');
+        }
         return data;
-    } catch (err) { console.error('API Error:', err); throw err; }
+    } catch (err) { console.error('API Call Failed:', err); throw err; }
 }
 
 async function loadAirportsForForm() {
@@ -137,52 +190,178 @@ async function syncApi() {
         const [users, flights, bookings] = await Promise.all([apiCall('/api/users'), apiCall('/api/flights'), apiCall('/api/bookings')]);
         document.getElementById('api-indicator').className = 'bg-success rounded-circle me-2';
         document.getElementById('api-status-text').innerText = 'Node.js Connected';
-        renderUsers(users); renderFlights(flights); renderBookings(bookings);
+        
+        state.users = users;
+        state.flights = flights;
+        state.bookings = bookings;
+
+        renderAll();
     } catch (err) {
         document.getElementById('api-indicator').className = 'bg-danger rounded-circle me-2';
         document.getElementById('api-status-text').innerText = 'Backend Offline';
     }
 }
 
-function renderUsers(users) {
-    document.getElementById('user-list').innerHTML = users.map(user => `
-        <div class="col-xl-4 col-md-6" id="user-card-${user._id}">
-            <div class="card rounded-5 p-4 border-0 bg-light h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-800 mb-0 text-dark">${user.name}</h6>
-                    <button onclick="deleteUser('${user._id}')" class="btn btn-sm btn-link text-danger p-0"><i class="fas fa-trash-alt"></i></button>
-                </div>
-                <p class="small text-secondary mb-3">${user.email}</p>
-                <button onclick="toggleRestriction('${user._id}')" class="btn btn-sm ${user.is_active ? 'btn-outline-dark' : 'btn-danger'} rounded-pill w-100 py-2">${user.is_active ? 'RESTRICT' : 'UNRESTRICT'}</button>
-            </div>
-        </div>
-    `).join('');
+function renderAll() {
+    renderUsers();
+    renderFlights();
+    renderBookings();
 }
 
-function renderBookings(bookings) {
+function paginate(items, page, size) {
+    return items.slice((page - 1) * size, page * size);
+}
+
+function renderPaginationControls(type, totalItems) {
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    const currentPage = state.pages[type];
+    const container = document.getElementById(`${type.slice(0, -1)}-pagination`);
+    
+    if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = `
+        <button class="btn btn-outline-primary rounded-pill px-4 fw-bold" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage('${type}', ${currentPage - 1})">
+            <i class="fas fa-chevron-left me-2"></i>PREV
+        </button>
+        <span class="align-self-center fw-800 text-dark mx-3">PAGE ${currentPage} / ${totalPages}</span>
+        <button class="btn btn-outline-primary rounded-pill px-4 fw-bold" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage('${type}', ${currentPage + 1})">
+            NEXT<i class="fas fa-chevron-right ms-2"></i>
+        </button>
+    `;
+    container.innerHTML = html;
+}
+
+function changePage(type, newPage) {
+    state.pages[type] = newPage;
+    if (type === 'users') renderUsers();
+    if (type === 'flights') renderFlights();
+    if (type === 'bookings') renderBookings();
+}
+
+function renderUsers() {
+    const users = paginate(state.users, state.pages.users, ITEMS_PER_PAGE);
+    document.getElementById('user-list').innerHTML = users.map(user => {
+        const roleColor = user.role === 'admin' ? 'danger' : (user.role === 'employee' ? 'primary' : 'secondary');
+        return `
+        <div class="col-xl-4 col-md-6" id="user-card-${user._id}">
+            <div class="card rounded-5 p-4 border-0 premium-user-card h-100 position-relative overflow-hidden">
+                ${user.is_active ? '' : '<div class="position-absolute top-0 start-0 w-100 h-100 bg-danger opacity-10" style="pointer-events: none;"></div>'}
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="fw-800 mb-1 text-dark d-flex align-items-center gap-2">
+                            ${user.name} 
+                            <span class="badge bg-${roleColor} bg-opacity-10 text-${roleColor} small rounded-pill px-2 py-1">${user.role ? user.role.toUpperCase() : 'USER'}</span>
+                        </h5>
+                        <p class="small text-secondary mb-0"><i class="fas fa-envelope text-primary opacity-50 me-2"></i>${user.email}</p>
+                    </div>
+                    <div class="d-flex gap-1 bg-white rounded-pill shadow-sm p-1">
+                        <button onclick="changeUserRole('${user._id}', '${user.role || 'user'}')" class="btn btn-sm btn-light rounded-circle p-2 text-primary" title="Change Role" style="width:32px; height:32px;"><i class="fas fa-user-edit"></i></button>
+                        <button onclick="deleteUser('${user._id}')" class="btn btn-sm btn-light rounded-circle p-2 text-danger" title="Delete User" style="width:32px; height:32px;"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <div class="mt-auto pt-3 border-top">
+                    <button onclick="toggleRestriction('${user._id}')" class="btn btn-sm ${user.is_active ? 'btn-outline-dark' : 'btn-danger'} rounded-pill w-100 py-2 fw-bold shadow-sm transition-all">
+                        <i class="fas ${user.is_active ? 'fa-ban' : 'fa-check-circle'} me-2"></i>${user.is_active ? 'RESTRICT ACCOUNT' : 'UNRESTRICT ACCOUNT'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    `}).join('');
+    renderPaginationControls('users', state.users.length);
+}
+
+function renderBookings() {
+    const bookings = paginate(state.bookings, state.pages.bookings, ITEMS_PER_PAGE);
+    document.getElementById('booking-list').className = 'table-hover-custom';
     document.getElementById('booking-list').innerHTML = bookings.map(b => `
-        <tr class="border-bottom">
-            <td class="ps-4"><code>${b.booking_reference}</code></td>
-            <td>${b.user?.name || 'Guest'}</td>
-            <td><span class="badge bg-${b.status === 'confirmed' ? 'success' : 'secondary'} bg-opacity-10 text-${b.status === 'confirmed' ? 'success' : 'secondary'} rounded-pill px-3">${b.status}</span></td>
-            <td class="pe-4 text-end">${b.status === 'confirmed' ? `<button onclick="cancelBooking('${b._id}')" class="btn btn-link text-danger p-0 text-decoration-none fw-bold small">REVOKE</button>` : '<span class="small text-muted">CLOSED</span>'}</td>
+        <tr>
+            <td class="ps-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3 text-primary">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div>
+                        <code class="fs-6 fw-bold text-dark">${b.booking_reference}</code><br>
+                        <span class="small text-secondary fw-bold"><i class="fas fa-plane text-primary opacity-50 me-1"></i>Flight ${b.flight?.flight_number || 'N/A'}</span>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <span class="fw-bold text-dark">${b.user?.name || 'Guest User'}</span><br>
+                <span class="badge bg-success bg-opacity-10 text-success fw-bold border border-success border-opacity-25 mt-1">$${b.total_price ? b.total_price.toLocaleString() : '0'}</span>
+            </td>
+            <td>
+                <span class="badge bg-${b.status === 'confirmed' ? 'success' : 'secondary'} text-white rounded-pill px-3 py-2 fw-bold text-uppercase badge-glow-${b.status === 'confirmed' ? 'success' : 'secondary'}">
+                    <i class="fas ${b.status === 'confirmed' ? 'fa-check-circle' : 'fa-times-circle'} me-1"></i>${b.status}
+                </span>
+            </td>
+            <td class="pe-4 text-end">
+                <div class="btn-group shadow-sm rounded-pill bg-white p-1">
+                    <a href="/bookings/${b._id}" class="btn btn-sm btn-light rounded-pill px-3 text-primary fw-bold" title="View Details">VIEW</a>
+                    ${b.status === 'confirmed' 
+                        ? `<button onclick="cancelBooking('${b._id}')" class="btn btn-sm btn-light rounded-pill px-3 text-warning fw-bold border-start" title="Revoke Booking">REVOKE</button>` 
+                        : `<button onclick="confirmBooking('${b._id}')" class="btn btn-sm btn-light rounded-pill px-3 text-success fw-bold border-start" title="Confirm Booking">CONFIRM</button>`
+                    }
+                    <button onclick="deleteBooking('${b._id}')" class="btn btn-sm btn-light rounded-circle ms-1 text-danger px-2" title="Delete Booking"><i class="fas fa-trash"></i></button>
+                </div>
+            </td>
         </tr>
     `).join('');
+    renderPaginationControls('bookings', state.bookings.length);
 }
 
-function renderFlights(flights) {
+function renderFlights() {
+    const flights = paginate(state.flights, state.pages.flights, ITEMS_PER_PAGE);
     document.getElementById('flight-list').innerHTML = flights.map(f => `
         <div class="col-lg-6" id="flight-card-${f._id}">
-            <div class="card border-0 rounded-5 p-4 shadow-sm bg-light">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="badge bg-primary rounded-pill px-3">${f.flight_number}</span>
-                    <button onclick="deleteFlight('${f._id}')" class="btn btn-sm btn-link text-danger p-0 fw-bold small">DELETE</button>
+            <div class="card border-0 rounded-5 p-0 shadow-sm premium-flight-card overflow-hidden h-100">
+                <div class="p-4 glass-header d-flex justify-content-between align-items-center">
+                    <span class="badge bg-primary text-white rounded-pill px-3 py-2 fw-bold shadow-sm fs-6"><i class="fas fa-plane-departure me-2"></i>${f.flight_number}</span>
+                    <button onclick="deleteFlight('${f._id}')" class="btn btn-sm btn-white rounded-circle shadow-sm text-danger p-2" style="width:35px; height:35px;"><i class="fas fa-trash-alt"></i></button>
                 </div>
-                <h5 class="fw-800 text-dark mb-1">${f.airline}</h5>
-                <p class="small text-secondary mb-0">${f.origin_airport_id?.city || '???'} to ${f.destination_airport_id?.city || '???'}</p>
+                <div class="card-body p-4 pt-3">
+                    <h4 class="fw-800 text-dark mb-4 text-center">${f.airline}</h4>
+                    <div class="d-flex justify-content-between align-items-center position-relative">
+                        <div class="text-center w-50 pe-3">
+                            <h2 class="display-6 fw-900 text-dark mb-0">${f.origin_airport_id?.code || '???'}</h2>
+                            <p class="small text-secondary fw-bold text-uppercase mt-1">${f.origin_airport_id?.city || 'Unknown'}</p>
+                        </div>
+                        
+                        <!-- Flight Path Graphic -->
+                        <div class="position-absolute top-50 start-50 translate-middle w-50 px-4">
+                            <div class="d-flex align-items-center w-100">
+                                <div class="rounded-circle bg-primary opacity-25" style="width:8px; height:8px;"></div>
+                                <div class="flex-grow-1 border-bottom border-2 border-primary border-dashed opacity-25 mx-1"></div>
+                                <i class="fas fa-plane text-primary fs-5"></i>
+                                <div class="flex-grow-1 border-bottom border-2 border-primary border-dashed opacity-25 mx-1"></div>
+                                <div class="rounded-circle border border-2 border-primary opacity-25" style="width:8px; height:8px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="text-center w-50 ps-3">
+                            <h2 class="display-6 fw-900 text-dark mb-0">${f.destination_airport_id?.code || '???'}</h2>
+                            <p class="small text-secondary fw-bold text-uppercase mt-1">${f.destination_airport_id?.city || 'Unknown'}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-light p-3 border-top mt-auto d-flex justify-content-around text-center">
+                    <div>
+                        <small class="text-secondary text-uppercase fw-bold" style="font-size: 0.7rem;">Capacity</small>
+                        <div class="fw-bold text-dark"><i class="fas fa-users text-primary me-1"></i>${f.capacity || '150'}</div>
+                    </div>
+                    <div class="border-end"></div>
+                    <div>
+                        <small class="text-secondary text-uppercase fw-bold" style="font-size: 0.7rem;">Base Price</small>
+                        <div class="fw-bold text-success"><i class="fas fa-tag me-1"></i>$${f.price ? f.price.toLocaleString() : '0'}</div>
+                    </div>
+                </div>
             </div>
         </div>
     `).join('');
+    renderPaginationControls('flights', state.flights.length);
 }
 
 // --- CRUD ACTIONS ---
@@ -213,7 +392,18 @@ async function insertFlight() {
 }
 
 async function toggleRestriction(id) { await apiCall(`/api/users/${id}/toggle-restriction`, 'POST'); syncApi(); }
+async function changeUserRole(id, currentRole) {
+    const newRole = prompt(`Change role for user (current: ${currentRole}). Enter new role (admin, employee, user):`, currentRole);
+    if (newRole && ['admin', 'employee', 'user'].includes(newRole.toLowerCase())) {
+        await apiCall(`/api/users/${id}`, 'PUT', { role: newRole.toLowerCase() });
+        syncApi();
+    } else if (newRole) {
+        alert('Invalid role! Please enter admin, employee, or user.');
+    }
+}
 async function cancelBooking(id) { await apiCall(`/api/bookings/${id}`, 'PUT', { status: 'cancelled' }); syncApi(); }
+async function confirmBooking(id) { await apiCall(`/api/bookings/${id}`, 'PUT', { status: 'confirmed' }); syncApi(); }
+async function deleteBooking(id) { if(confirm('Permanently delete this booking?')) { await apiCall(`/api/bookings/${id}`, 'DELETE'); syncApi(); } }
 async function deleteFlight(id) { if(confirm('Delete flight?')) { await apiCall(`/api/flights/${id}`, 'DELETE'); syncApi(); } }
 async function deleteUser(id) { if(confirm('Permanently delete user?')) { await apiCall(`/api/users/${id}`, 'DELETE'); syncApi(); } }
 </script>

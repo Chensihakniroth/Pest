@@ -10,7 +10,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config({ path: path.join(__dirname, '../.env'), override: true });
 
 import User from './models/User.js';
 import Flight from './models/Flight.js';
@@ -40,6 +40,21 @@ mongoose.connect(process.env.MONGO_URL || 'mongodb://localhost:27017', { dbName:
     .then(() => console.log(`✅ Brain connected to: ${mongoose.connection.name}`))
     .catch(err => console.error('❌ DB Error:', err));
 
+// --- SECURITY MIDDLEWARE ---
+const requireAuth = async (req, res, next) => {
+    const token = req.headers['authorization']?.split(' ')[1] || req.headers['x-api-key'];
+    if (!token) return res.status(401).json({ success: false, error: 'Unauthorized: Missing API Token' });
+    
+    try {
+        const user = await User.findOne({ api_token: token });
+        if (!user) return res.status(401).json({ success: false, error: 'Unauthorized: Invalid Token' });
+        req.user = user;
+        next();
+    } catch (err) {
+        return res.status(500).json({ success: false, error: 'Server Error' });
+    }
+};
+
 // --- THE COMPLETE MASTER CRUD API ---
 
 //vanda
@@ -58,7 +73,7 @@ app.get('/api/flights', async (req, res) => {
 });
 
 //visa
-app.post('/api/flights', async (req, res) => {
+app.post('/api/flights', requireAuth, async (req, res) => {
     try {
         const flight = new Flight(req.body);
         await flight.save();
@@ -74,20 +89,31 @@ app.get('/api/flights/:id', async (req, res) => {
 
 
 //visa
-app.delete('/api/flights/:id', async (req, res) => {
+app.get('/api/flights/:id/seats', async (req, res) => {
+    try {
+        const bookings = await Booking.find({ flight: req.params.id }).select('_id');
+        const bookingIds = bookings.map(b => b._id);
+        const passengers = await Passenger.find({ booking_id: { $in: bookingIds } }).select('seat_number');
+        const occupiedSeats = passengers.map(p => p.seat_number).filter(s => s);
+        res.json({ success: true, occupiedSeats });
+    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+//visa
+app.delete('/api/flights/:id', requireAuth, async (req, res) => {
     await Flight.findByIdAndDelete(req.params.id);
     res.json({ success: true });
 });
 
 // USERS [GET, INSERT, UPDATE, DELETE]
 //leap
-app.get('/api/users', async (req, res) => {
+app.get('/api/users', requireAuth, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     res.json(users);
 });
 
 //leap
-app.post('/api/users', async (req, res) => {
+app.post('/api/users', requireAuth, async (req, res) => {
     try {
         const user = new User(req.body);
         await user.save();
@@ -96,7 +122,7 @@ app.post('/api/users', async (req, res) => {
 });
 
 //kon khmer
-app.put('/api/users/:id', async (req, res) => {
+app.put('/api/users/:id', requireAuth, async (req, res) => {
     try {
         const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json({ success: true, user });
@@ -104,13 +130,13 @@ app.put('/api/users/:id', async (req, res) => {
 });
 
 //leap
-app.delete('/api/users/:id', async (req, res) => {
+app.delete('/api/users/:id', requireAuth, async (req, res) => {
     await User.findByIdAndDelete(req.params.id);
     res.json({ success: true });
 });
 
 //leap
-app.post('/api/users/:id/toggle-restriction', async (req, res) => {
+app.post('/api/users/:id/toggle-restriction', requireAuth, async (req, res) => {
     const user = await User.findById(req.params.id);
     if (user) { user.is_active = !user.is_active; await user.save(); }
     res.json({ success: !!user, is_active: user?.is_active });
@@ -118,13 +144,13 @@ app.post('/api/users/:id/toggle-restriction', async (req, res) => {
 
 // BOOKINGS [GET, INSERT, UPDATE, DELETE]
 //hour
-app.get('/api/bookings', async (req, res) => {
+app.get('/api/bookings', requireAuth, async (req, res) => {
     const bookings = await Booking.find().populate('user').populate({path: 'flight', populate: ['origin_airport_id', 'destination_airport_id']}).sort({ createdAt: -1 });
     res.json(bookings);
 });
 
 //hour
-app.get('/api/bookings/:id', async (req, res) => {
+app.get('/api/bookings/:id', requireAuth, async (req, res) => {
     try {
         const booking = await Booking.findById(req.params.id).populate('user').populate({path: 'flight', populate: ['origin_airport_id', 'destination_airport_id']});
         const passengers = await Passenger.find({ booking_id: req.params.id });
@@ -133,27 +159,27 @@ app.get('/api/bookings/:id', async (req, res) => {
 });
 
 //hour
-app.post('/api/bookings', async (req, res) => {
+app.post('/api/bookings', requireAuth, async (req, res) => {
     try {
         const { user_id, flight_id, total_price, passengers } = req.body;
-        const booking = new Booking({ user: user_id, flight: flight_id, booking_reference: 'SC-' + Math.random().toString(36).substring(2, 9).toUpperCase(), status: 'confirmed', total_price });
+        const booking = new Booking({ user: user_id, flight: flight_id, booking_reference: 'SC-' + Math.random().toString(36).substring(2, 9).toUpperCase(), status: 'pending_payment', total_price });
         await booking.save();
         for (const p of passengers) {
-            const passenger = new Passenger({ booking_id: booking._id, first_name: p.first_name, last_name: p.last_name, passport_number: p.passport_number });
+            const passenger = new Passenger({ booking_id: booking._id, first_name: p.first_name, last_name: p.last_name, passport_number: p.passport_number, seat_number: p.seat_number });
             await passenger.save();
         }
-        res.json({ success: true, booking_reference: booking.booking_reference });
+        res.json({ success: true, booking_reference: booking.booking_reference, booking_id: booking._id });
     } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
 //hour
-app.put('/api/bookings/:id', async (req, res) => {
+app.put('/api/bookings/:id', requireAuth, async (req, res) => {
     const booking = await Booking.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(booking);
 });
 
 //hour
-app.delete('/api/bookings/:id', async (req, res) => {
+app.delete('/api/bookings/:id', requireAuth, async (req, res) => {
     await Booking.findByIdAndDelete(req.params.id);
     await Passenger.deleteMany({ booking_id: req.params.id });
     res.json({ success: true });
