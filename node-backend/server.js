@@ -26,12 +26,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+
 // Request Logger
+//niroth
 app.use((req, res, next) => {
     console.log(`[${new Date().toLocaleTimeString()}] ${req.method} → ${req.url}`);
     next();
 });
 
+//niroth
 const DB_NAME = process.env.DB_DATABASE || 'laravelsu15';
 mongoose.connect(process.env.MONGO_URL || 'mongodb://localhost:27017', { dbName: DB_NAME })
     .then(() => console.log(`✅ Brain connected to: ${mongoose.connection.name}`))
@@ -39,6 +42,7 @@ mongoose.connect(process.env.MONGO_URL || 'mongodb://localhost:27017', { dbName:
 
 // --- THE COMPLETE MASTER CRUD API ---
 
+//vanda
 // AIRPORTS [GET]
 app.get('/api/airports', async (req, res) => {
     const airports = await Airport.find().sort({ city: 1 });
@@ -46,11 +50,14 @@ app.get('/api/airports', async (req, res) => {
 });
 
 // FLIGHTS [GET, INSERT, UPDATE, DELETE]
+
+//visa
 app.get('/api/flights', async (req, res) => {
     const flights = await Flight.find().populate('origin_airport_id').populate('destination_airport_id').sort({ createdAt: -1 });
     res.json(flights);
 });
 
+//visa
 app.post('/api/flights', async (req, res) => {
     try {
         const flight = new Flight(req.body);
@@ -59,29 +66,27 @@ app.post('/api/flights', async (req, res) => {
     } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
+//visa
 app.get('/api/flights/:id', async (req, res) => {
     const flight = await Flight.findById(req.params.id).populate('origin_airport_id').populate('destination_airport_id');
     res.json(flight);
 });
 
-app.put('/api/flights/:id', async (req, res) => {
-    try {
-        const flight = await Flight.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.json({ success: true, flight });
-    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
 
+//visa
 app.delete('/api/flights/:id', async (req, res) => {
     await Flight.findByIdAndDelete(req.params.id);
     res.json({ success: true });
 });
 
 // USERS [GET, INSERT, UPDATE, DELETE]
+//leap
 app.get('/api/users', async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     res.json(users);
 });
 
+//leap
 app.post('/api/users', async (req, res) => {
     try {
         const user = new User(req.body);
@@ -90,6 +95,7 @@ app.post('/api/users', async (req, res) => {
     } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
+//kon khmer
 app.put('/api/users/:id', async (req, res) => {
     try {
         const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -97,11 +103,13 @@ app.put('/api/users/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
+//leap
 app.delete('/api/users/:id', async (req, res) => {
     await User.findByIdAndDelete(req.params.id);
     res.json({ success: true });
 });
 
+//leap
 app.post('/api/users/:id/toggle-restriction', async (req, res) => {
     const user = await User.findById(req.params.id);
     if (user) { user.is_active = !user.is_active; await user.save(); }
@@ -109,11 +117,13 @@ app.post('/api/users/:id/toggle-restriction', async (req, res) => {
 });
 
 // BOOKINGS [GET, INSERT, UPDATE, DELETE]
+//hour
 app.get('/api/bookings', async (req, res) => {
-    const bookings = await Booking.find().populate('user').populate('flight').sort({ createdAt: -1 });
+    const bookings = await Booking.find().populate('user').populate({path: 'flight', populate: ['origin_airport_id', 'destination_airport_id']}).sort({ createdAt: -1 });
     res.json(bookings);
 });
 
+//hour
 app.get('/api/bookings/:id', async (req, res) => {
     try {
         const booking = await Booking.findById(req.params.id).populate('user').populate({path: 'flight', populate: ['origin_airport_id', 'destination_airport_id']});
@@ -122,6 +132,7 @@ app.get('/api/bookings/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
+//hour
 app.post('/api/bookings', async (req, res) => {
     try {
         const { user_id, flight_id, total_price, passengers } = req.body;
@@ -135,11 +146,13 @@ app.post('/api/bookings', async (req, res) => {
     } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
+//hour
 app.put('/api/bookings/:id', async (req, res) => {
     const booking = await Booking.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(booking);
 });
 
+//hour
 app.delete('/api/bookings/:id', async (req, res) => {
     await Booking.findByIdAndDelete(req.params.id);
     await Passenger.deleteMany({ booking_id: req.params.id });
