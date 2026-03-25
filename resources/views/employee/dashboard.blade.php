@@ -352,12 +352,12 @@ function renderUsers() {
         return `
         <div class="col-xl-4 col-md-6" id="user-card-${user._id}">
             <div class="card rounded-5 p-4 border-0 premium-user-card h-100 position-relative overflow-hidden">
-                ${user.is_active ? '' : '<div class="position-absolute top-0 start-0 w-100 h-100 bg-danger opacity-10" style="pointer-events: none;"></div>'}
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
                         <h5 class="fw-800 mb-1 text-dark d-flex align-items-center gap-2">
                             ${user.name} 
                             <span class="badge bg-${roleColor} bg-opacity-10 text-${roleColor} small rounded-pill px-2 py-1">${user.role ? user.role.toUpperCase() : 'USER'}</span>
+                            ${user.is_active ? '' : '<span class="badge bg-danger text-white small rounded-pill px-2 py-1">RESTRICTED</span>'}
                         </h5>
                         <p class="small text-secondary mb-0"><i class="fas fa-envelope text-primary opacity-50 me-2"></i>${user.email}</p>
                     </div>
