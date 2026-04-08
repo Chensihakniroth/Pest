@@ -135,10 +135,10 @@ User Request → Laravel (Auth/Blade) → Node.js API → MongoDB
    # Start Laravel development server
    php artisan serve
    
-   # Start Node.js backend
+   # Start Node.js backend with nodemon (auto-restart on changes)
    npm run node-dev
    
-   # Or use the dev script for both
+   # Or use the dev script for both (if configured)
    npm run dev
    ```
 
@@ -623,6 +623,50 @@ FROM mongo:6.0
 - Consistent spacing and formatting
 - Mobile-first responsive design
 - CSS custom properties for theming
+
+### Node.js Development Setup
+
+#### Understanding npm run node-dev
+
+The `npm run node-dev` command is defined in your `package.json` file and uses **nodemon** to run your Node.js backend server with auto-restart functionality.
+
+**What it does:**
+- Starts the Node.js server using `nodemon node-backend/server.js`
+- Automatically restarts the server when you make changes to the code
+- Provides a development-friendly environment with hot reloading
+
+**How to set it up:**
+
+1. **Install nodemon globally (if not already installed):**
+   ```bash
+   npm install -g nodemon
+   ```
+
+2. **Or install as a development dependency:**
+   ```bash
+   npm install --save-dev nodemon
+   ```
+
+3. **Start the Node.js backend:**
+   ```bash
+   npm run node-dev
+   ```
+
+**Alternative commands:**
+- `npm run start` - Start Node.js server without auto-restart
+- `npm run dev` - Start both Laravel and Node.js (if configured)
+
+**Node.js Server Location:**
+- Main server file: `node-backend/server.js`
+- Models: `node-backend/models/`
+- Routes: `node-backend/routes/`
+- Views: `node-backend/views/`
+
+**Development Workflow:**
+1. Start Laravel: `php artisan serve`
+2. Start Node.js: `npm run node-dev`
+3. Both servers will run simultaneously
+4. Node.js will auto-restart when you save changes
 
 ### Git Workflow
 
